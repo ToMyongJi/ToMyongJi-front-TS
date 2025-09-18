@@ -1,3 +1,12 @@
 @theme{
-
+    --color-primary: #87AAFF;
+    --color-error: #FF698D;
+    --color-black: #282828;
+    --color-gray-90: #525772;
+    --color-gray-80: #767E9F;
+    --color-gray-70: #97A0C2;
+    --color-gray-20: #CFD7F1;
+    --color-gray-10: #E2EBFF;
+    --color-background: #F0F4FF;
+    --color-white: #FFFFFF;
 }
