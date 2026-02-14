@@ -1,7 +1,7 @@
 
 const MainPage = () => {
   return (
-    <div>
+    <div className="W_Header">
       메인페이지 입니다.
     </div>
   );

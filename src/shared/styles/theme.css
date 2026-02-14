@@ -1,4 +1,5 @@
 @theme{
+    --font-sans: 'Suit', sans-serif;
     --color-primary: #87AAFF;
     --color-error: #FF698D;
     --color-black: #282828;
@@ -9,4 +10,93 @@
     --color-gray-10: #E2EBFF;
     --color-background: #F0F4FF;
     --color-white: #FFFFFF;
+}
+
+@layer utilities {
+    /* Head */
+    .W_Header {
+        font-weight: 800;
+        font-size: 26px;
+        line-height: normal;
+    }
+
+    .W_Title {
+        font-weight: 700;
+        font-size: 20px;
+        line-height: normal;
+    }
+
+    /* Body */
+    .W_B17 {
+        font-weight: 700;
+        font-size: 17px;
+        line-height: normal;
+    }
+
+    .W_B15 {
+        font-weight: 700;
+        font-size: 15px;
+        line-height: normal;
+    }
+
+    .W_SB15 {
+        font-weight: 600;
+        font-size: 15px;
+        line-height: normal;
+    }
+
+    .W_M15 {
+        font-weight: 500;
+        font-size: 15px;
+        line-height: normal;
+    }
+
+    .W_R15 {
+        font-weight: 400;
+        font-size: 15px;
+        line-height: normal;
+    }
+
+    .W_B14 {
+        font-weight: 500;
+        font-size: 14px;
+        line-height: normal;
+    }
+
+    .W_SB14 {
+        font-weight: 600;
+        font-size: 14px;
+        line-height: normal;
+    }
+
+    .W_M14 {
+        font-weight: 500;
+        font-size: 14px;
+        line-height: normal;
+    }
+
+    .W_R14 {
+        font-weight: 400;
+        font-size: 14px;
+        line-height: normal;
+    }
+
+    .W_SB13 {
+        font-weight: 600;
+        font-size: 13px;
+        line-height: normal;
+    }
+
+    .W_SB12 {
+        font-weight: 600;
+        font-size: 12px;
+        line-height: normal;
+    }
+
+    .W_R12 {
+        font-weight: 400;
+        font-size: 12px;
+        line-height: normal;
+    }
+
 }
