@@ -1,6 +1,6 @@
 ---
 name: ✨ 기능 제안
-description: 새로운 기능이나 개선 사항을 제안할 때 사용
+about: 새로운 기능이나 개선 사항을 제안할 때 사용
 title: "[기능] "
 labels: ["enhancement"]
 ---
