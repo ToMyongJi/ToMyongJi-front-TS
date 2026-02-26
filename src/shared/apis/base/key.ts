@@ -8,4 +8,8 @@ export const QK = {
     emailVerify: () => ['auth', 'emailVerify'] as const,
   },
 
+  collegeAndClubs: {
+    all: () => ['collegeAndClubs'] as const
+  }
+
 }
