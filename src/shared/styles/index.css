@@ -7,6 +7,7 @@
   :root {
     --lh: 1.5;
     --ls: -0.025em;
+    --max-width: 1440px;
     --font-suit:
             'Suit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
             'Helvetica Neue', Arial, sans-serif;
@@ -17,10 +18,19 @@
     min-height: 100dvh;
   }
 
+  html{
+    background-color: #F5F5F5;
+  }
+
+  body{
+    background-color: white;
+  }
+
   html,
   body {
     font-size: 62.5%;
     font-family: var(--font-suit);
+    max-width: var(--max-width);
     margin-left: auto;
     margin-right: auto;
     display: flex;
