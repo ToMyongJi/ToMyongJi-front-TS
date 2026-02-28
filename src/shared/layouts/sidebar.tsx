@@ -33,6 +33,7 @@ const Sidebar = () => {
         {collegeAndClubs?.data?.map((item, idx) => (
           <div
           key={idx}
+          className={cn(!setActiveSideBar(isActiveCollege, item.collegeName) && 'border-t-1 border-b-1 border-gray-10')}
           >
             <button
               type="button"
