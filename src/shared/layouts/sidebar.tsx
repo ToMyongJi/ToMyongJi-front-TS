@@ -19,7 +19,7 @@ const Sidebar = () => {
 
 
   const setActiveSideBar = (current: string, target: string) => {
-    return current === target ? false : true;
+    return current !== target;
   };
 
   const handleMenuClick = (club: college) => {

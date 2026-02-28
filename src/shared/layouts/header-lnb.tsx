@@ -1,5 +1,5 @@
 import { cn } from '@libs/cn';
-import { useState } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const LNB_MENULIST = [
@@ -10,18 +10,16 @@ const LNB_MENULIST = [
 
 type HeaderLnbProps = {
   onClickSearch?: () => void;
+  setSidebarOpen?: Dispatch<SetStateAction<boolean>>
 };
 
-const HeaderLnb = ({ onClickSearch }: HeaderLnbProps) => {
+const HeaderLnb = ({ onClickSearch, setSidebarOpen }: HeaderLnbProps) => {
   const { pathname } = useLocation();
-  const [isActiveReview, setIsActiveReview] = useState(false);
   const navigate = useNavigate();
   const normalize = (p: string) =>
     p !== '/' && p.endsWith('/') ? p.slice(0, -1) : p;
 
   const setPathActive = (current: string, target: string) => {
-    // if (target === 'sidebar') return false;
-
     const cur = normalize(current);
     const tgt = normalize(target);
     if (tgt === '/') return cur === '/';
@@ -32,6 +30,9 @@ const HeaderLnb = ({ onClickSearch }: HeaderLnbProps) => {
     if (path === '/receipt-view') {
       onClickSearch?.();
       return;
+    }
+    if (setSidebarOpen) {
+      setSidebarOpen(false);
     }
     navigate(path);
   };

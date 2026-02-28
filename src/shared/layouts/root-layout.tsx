@@ -17,7 +17,7 @@ const RootLayout = () => {
   return (
     <div className="min-h-screen h-full flex flex-col">
       <HeaderGnb />
-      <HeaderLnb onClickSearch={handleClickSearch} />
+      <HeaderLnb onClickSearch={handleClickSearch} setSidebarOpen={setIsSidebarOpen} />
       <div className="flex flex-1 min-h-0">
         {isSidebarOpen && <Sidebar />}
         <main className="flex-1 min-h-0 overflow-auto">
