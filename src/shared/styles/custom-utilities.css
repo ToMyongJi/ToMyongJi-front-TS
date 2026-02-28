@@ -62,4 +62,18 @@
         display: none;
     }
 
+    /* 전체 스크롤 영역에 스크롤바 숨김 (overflow-auto/scroll 사용 요소) */
+    [class*="overflow-auto"]::-webkit-scrollbar,
+    [class*="overflow-y-auto"]::-webkit-scrollbar,
+    [class*="overflow-x-auto"]::-webkit-scrollbar {
+        display: none;
+    }
+
+    [class*="overflow-auto"],
+    [class*="overflow-y-auto"],
+    [class*="overflow-x-auto"] {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
 }

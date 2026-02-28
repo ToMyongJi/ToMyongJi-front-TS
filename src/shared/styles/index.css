@@ -7,6 +7,7 @@
   :root {
     --lh: 1.5;
     --ls: -0.025em;
+    --max-width: 1440px;
     --font-suit:
             'Suit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
             'Helvetica Neue', Arial, sans-serif;
@@ -15,12 +16,25 @@
   #root {
     width: 100%;
     min-height: 100dvh;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  html {
+    height: 100%;
+  }
+
+  body {
+    background-color: white;
+    min-height: 100%;
   }
 
   html,
   body {
     font-size: 62.5%;
     font-family: var(--font-suit);
+    max-width: var(--max-width);
     margin-left: auto;
     margin-right: auto;
     display: flex;
@@ -28,6 +42,12 @@
     height: 100%;
     flex-direction: column;
     scroll-behavior: smooth;
+    -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none;
   }
 }
