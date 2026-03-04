@@ -25,7 +25,7 @@ export default function ButtonTestPage() {
       {/* 2. Primary Outline 버튼 그룹 */}
       <section className="space-y-4">
         <h2 className="W_Title text-black border-b pb-2">2. Primary Outline Variant</h2>
-        <div className="flex flex-wrap gap-4 items-center p-4 bg-gray-100 rounded-lg">
+        <div className="flex flex-wrap gap-4 items-center p-4 rounded-lg">
           <Button variant="primary_outline" size="sm">작은버튼</Button>
           <Button variant="primary_outline" size="md">중간버튼</Button>
           <Button variant="primary_outline" size="regular">큰버튼</Button>
