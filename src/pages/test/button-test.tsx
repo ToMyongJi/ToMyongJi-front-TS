@@ -1,5 +1,5 @@
-import Button from '@components/button/button';
-import { ReceiptButton } from '@components/button/receipt-button';
+import { Button } from '@components/button';
+import { ReceiptButton } from '@components/receipt-button';
 
 export default function ButtonTestPage() {
   return (
