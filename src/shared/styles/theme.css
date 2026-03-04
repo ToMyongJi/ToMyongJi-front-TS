@@ -1,6 +1,7 @@
 @theme{
     --font-sans: 'Suit', sans-serif;
     --color-primary: #87AAFF;
+    --color-primary-deep: #759DFF;
     --color-error: #FF698D;
     --color-black: #282828;
     --color-gray-90: #525772;
