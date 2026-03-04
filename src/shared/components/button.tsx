@@ -14,7 +14,7 @@ const buttonVariants = cva(
         danger: 'bg-error text-white hover:bg-error/90 disabled:text-white active:bg-error-deep',
         gray: 'bg-gray-10 text-gray-80 disabled:text-gray-80',
         gray_outline: 'bg-white text-black border-1 border-gray-20 disabled:bg-background text-black active:bg-background',
-     },
+     }, 
       size: {
         sm: 'h-[3.2rem] px-[1.8rem] py-[1.5rem] W_M14',
         md: 'h-[4rem] px-[1.8rem] py-[1.5rem] W_SB15',
@@ -35,7 +35,6 @@ const buttonVariants = cva(
 interface ButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
-  // 필요한 커스텀 Props가 있다면 추가
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(

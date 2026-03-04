@@ -1,7 +1,10 @@
 import { Button } from '@components/button';
+import Chip from '@components/chip';
 import { ReceiptButton } from '@components/receipt-button';
+import { useState } from 'react';
 
 export default function ButtonTestPage() {
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
   return (
     <div className="p-8 space-y-12">
       <h1 className="W_Header text-primary">버튼 컴포넌트 테스트 페이지</h1>
@@ -78,6 +81,18 @@ export default function ButtonTestPage() {
         <div className="flex flex-wrap gap-4 items-center">
           <ReceiptButton receiptType="toss"/>
           <ReceiptButton receiptType="excel"/>
+        </div>
+      </section>
+
+      {/* 8. Chip */}
+      <section className="space-y-4">
+        <h2 className="W_Title text-black border-b pb-2">8. Chip</h2>
+        <div className="flex flex-wrap gap-4 items-center">
+        <Chip 
+        label="최신순" 
+        isActive={isFilterOpen} 
+        onClick={() => setIsFilterOpen(!isFilterOpen)} 
+      />
         </div>
       </section>
     </div>
