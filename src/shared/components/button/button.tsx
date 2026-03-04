@@ -9,16 +9,17 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary: 'bg-primary text-white hover:bg-primary/90',
-        outline: 'bg-background border-1 border-primary text-primary hover:bg-gray-10',
-        danger: 'bg-error text-white hover:bg-error/90',
-        gray: 'bg-gray-10 text-gray-80',
+        primary: 'bg-primary text-white hover:bg-primary/90 disabled:text-white active:bg-primary-deep',
+        primary_outline: 'bg-white border-1 border-primary text-primary disabled:border-none active:bg-background',
+        danger: 'bg-error text-white hover:bg-error/90 disabled:text-white active:bg-error-deep',
+        gray: 'bg-gray-10 text-gray-80 disabled:text-gray-80',
+        gray_outline: 'bg-white text-black border-1 border-gray-20 disabled:bg-background text-black active:bg-background',
      },
       size: {
-        sm: 'w-[8rem] h-[3.2rem] px-[1.8rem] py-[1.5rem] W_M14',
-        md: 'w-[11rem] h-[4rem] px-[1.8rem] py-[1.5rem] W_SB15',
-        regular: 'w-[12.2rem] h-[3.6rem] px-[1.8rem] py-[1.5rem] W_SB15',
-        save: 'w-[6.6rem] h-v[4rem] px-[1.8rem] py-[1.5rem] W_M14' 
+        sm: 'h-[3.2rem] px-[1.8rem] py-[1.5rem] W_M14',
+        md: 'h-[4rem] px-[1.8rem] py-[1.5rem] W_SB15',
+        regular: 'h-[3.6rem] px-[1.8rem] py-[1.5rem] W_SB15',
+        save: 'h-[4rem] px-[1.8rem] py-[1.5rem] W_M14' 
       },
       fullWidth: {
         true: 'w-full',
