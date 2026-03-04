@@ -1,4 +1,5 @@
 import Button from '@components/button/button';
+import { ReceiptButton } from '@components/button/receipt-button';
 
 export default function ButtonTestPage() {
   return (
@@ -61,12 +62,22 @@ export default function ButtonTestPage() {
           <Button variant="gray_outline" size="md" disabled>Disabled</Button>
         </div>
       </section>
+
       {/* 6. Full Width 테스트 */}
       <section className="space-y-4">
         <h2 className="W_Title text-black border-b pb-2">6. Full Width 옵션</h2>
         <div className="w-[30rem] border border-gray-20 p-4 rounded-lg flex flex-col gap-4">
           <Button variant="primary" fullWidth>Full Width Primary</Button>
           <Button variant="primary_outline" fullWidth>Full Width Primary Outline</Button>
+        </div>
+      </section>
+
+      {/* 7. Receipt Button */}
+      <section className="space-y-4">
+        <h2 className="W_Title text-black border-b pb-2">7. Receipt Button</h2>
+        <div className="flex flex-wrap gap-4 items-center">
+          <ReceiptButton receiptType="toss"/>
+          <ReceiptButton receiptType="excel"/>
         </div>
       </section>
     </div>

@@ -5,10 +5,6 @@ import { cn } from '@libs/cn';
 import TossIcon from '@assets/icons/toss-bank.svg?react';
 import ExcelIcon from '@assets/icons/excel.svg?react';
 
-// 필요하시다면 프로젝트 내 SVG 아이콘 경로로 변경하세요
-// import TossIcon from '@assets/icons/toss-logo.svg?react';
-// import ExcelIcon from '@assets/icons/excel-icon.svg?react';
-
 type ReceiptType = 'toss' | 'excel';
 
 interface ReceiptButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -23,18 +19,14 @@ export const ReceiptButton = forwardRef<HTMLButtonElement, ReceiptButtonProps>(
     // 1. 타입에 따른 텍스트와 아이콘, 추가 클래스 설정
     const config = {
       toss: {
-        text: (
-          <>
-            <span className="font-bold">toss bank</span> 거래내역서 추가
-          </>
-        ),
+        text: '거래내역서 추가',
         // icon: <TossIcon width={24} height={24} />,
-        icon: <TossIcon width={24} height={24} />, // 임시 아이콘 (실제 아이콘으로 교체)
+        icon: <TossIcon width={99} height={22} />, // 임시 아이콘 (실제 아이콘으로 교체)
       },
       excel: {
         text: 'Excel 데이터 추가',
         // icon: <ExcelIcon width={24} height={24} />,
-        icon: <ExcelIcon width={24} height={24} />, // 임시 아이콘 (실제 아이콘으로 교체)
+        icon: <ExcelIcon width={17} height={16} />, // 임시 아이콘 (실제 아이콘으로 교체)
       },
     };
 
@@ -48,13 +40,13 @@ export const ReceiptButton = forwardRef<HTMLButtonElement, ReceiptButtonProps>(
         fullWidth={fullWidth}
         className={cn(
           // receipt-button만의 특별한 추가 스타일이 있다면 여기에 작성
-          'justify-center gap-3', 
+          'justify-center gap-[0.6rem]', 
           className
         )}
         {...props}
       >
         {currentConfig.icon}
-        <span className="text-black">{currentConfig.text}</span>
+        <span className="text-gray-90">{currentConfig.text}</span>
       </Button>
     );
   }
