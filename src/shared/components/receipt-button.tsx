@@ -1,7 +1,7 @@
 import { ButtonHTMLAttributes, Ref } from 'react';
 import { Button } from '@components/button';
 import { cn } from '@libs/cn';
-import TossIcon from '@assets/icons/toss-bank.svg?react';
+import TossIcon from '@assets/icons/toss-bank.png';
 import ExcelIcon from '@assets/icons/excel.svg?react';
 
 type ReceiptType = 'toss' | 'excel';
@@ -21,8 +21,8 @@ export function ReceiptButton({
 }: ReceiptButtonProps) {
   const config = {
     toss: {
-      text: '거래내역서 추가',
-      icon: <TossIcon width={99} height={22} />, 
+      text: '거래내역서 추가', 
+      icon: <img src={TossIcon} alt="TossIcon" width={99} height={22} />, 
     },
     excel: {
       text: 'Excel 데이터 추가',
