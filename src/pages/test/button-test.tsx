@@ -1,6 +1,7 @@
 import { Button } from '@components/button';
 import CheckBox from '@components/check-box';
 import Chip from '@components/chip';
+import IconButton from '@components/icon-button';
 import { ReceiptButton } from '@components/receipt-button';
 import { useState } from 'react';
 
@@ -103,6 +104,15 @@ export default function ButtonTestPage() {
         <h2 className="W_Title text-black border-b pb-2">9. CheckBox</h2>
         <div className="flex flex-wrap gap-4 items-center">
           <CheckBox checked={isChecked} onChange={setIsChecked} />
+        </div>
+      </section>
+
+      {/* 10. Icon Button */}
+      <section className="space-y-4">
+        <h2 className="W_Title text-black border-b pb-2">10. Icon Button</h2>
+        <div className="flex flex-wrap gap-4 items-center">
+          <IconButton iconType="edit" onClick={() => console.log('edit')} />
+          <IconButton iconType="cancel" onClick={() => console.log('cancel')} />
         </div>
       </section>
     </div>

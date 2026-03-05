@@ -37,7 +37,7 @@ export function IconButton({
       variant="gray_outline" 
     
       className={cn(
-        '!p-0 w-[3rem] h-[3rem] flex-shrink-0', 
+        '!p-0 w-[3rem] h-[3rem] flex-shrink-0 rounded-[0.8rem]', 
         className
       )}
       {...props}
