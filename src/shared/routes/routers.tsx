@@ -9,6 +9,7 @@ import ReceiptView from '@pages/view/receipt-view';
 import ReceiptCreate from '@pages/create/receipt-create';
 import Mypage from '@pages/mypage/mypage';
 import MainPage from '@pages/main/main-page';
+import ButtonTestPage from '@pages/test/button-test';
 
 export const router = createBrowserRouter([
   {
@@ -19,6 +20,7 @@ export const router = createBrowserRouter([
       {path: 'register', element: <Register/>},
       {path: 'not-login', element: <NotLogin/>},
       {path: 'receipt-view/:clubid', element: <ReceiptView/>},
+      {path: 'test/buttons', element: <ButtonTestPage/>},
       {
         element: <ProtectedRouter/>,
         children: [
