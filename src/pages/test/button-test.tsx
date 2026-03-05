@@ -1,10 +1,12 @@
 import { Button } from '@components/button';
+import CheckBox from '@components/check-box';
 import Chip from '@components/chip';
 import { ReceiptButton } from '@components/receipt-button';
 import { useState } from 'react';
 
 export default function ButtonTestPage() {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [isChecked, setIsChecked] = useState<boolean>(false);
   return (
     <div className="p-8 space-y-12">
       <h1 className="W_Header text-primary">버튼 컴포넌트 테스트 페이지</h1>
@@ -93,6 +95,14 @@ export default function ButtonTestPage() {
         isActive={isFilterOpen} 
         onClick={() => setIsFilterOpen(!isFilterOpen)} 
       />
+        </div>
+      </section>
+
+      {/* 9. CheckBox */}
+      <section className="space-y-4">
+        <h2 className="W_Title text-black border-b pb-2">9. CheckBox</h2>
+        <div className="flex flex-wrap gap-4 items-center">
+          <CheckBox checked={isChecked} onChange={setIsChecked} />
         </div>
       </section>
     </div>
