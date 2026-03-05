@@ -1,4 +1,3 @@
-// src/shared/components/select-button.tsx
 import { ButtonHTMLAttributes, Ref } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@libs/cn';

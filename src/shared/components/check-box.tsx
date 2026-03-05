@@ -1,4 +1,3 @@
-// src/shared/components/check-box.tsx
 import { InputHTMLAttributes, Ref } from 'react';
 import { cn } from '@libs/cn';
 import CheckIcon from '@assets/icons/check.svg?react';

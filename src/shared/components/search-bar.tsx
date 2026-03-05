@@ -1,4 +1,3 @@
-// src/shared/components/search-bar.tsx
 import { InputHTMLAttributes, Ref, useState } from 'react';
 import { cn } from '@libs/cn';
 import SearchIcon from '@assets/icons/search.svg?react';

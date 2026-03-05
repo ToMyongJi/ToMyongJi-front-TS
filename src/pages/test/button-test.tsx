@@ -5,6 +5,7 @@ import IconButton from '@components/icon-button';
 import { ReceiptButton } from '@components/receipt-button';
 import SearchBar from '@components/search-bar';
 import SelectButton from '@components/select-button';
+import TextField from '@components/textfield';
 import { useState } from 'react';
 
 export default function ButtonTestPage() {
@@ -13,7 +14,8 @@ export default function ButtonTestPage() {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedValue, setSelectedValue] = useState(''); 
     const [searchKeyword, setSearchKeyword] = useState('');
-    
+    const [textFieldValue, setTextFieldValue] = useState('');
+
   return (
     <div className="p-8 space-y-12">
       <h1 className="W_Header text-primary">버튼 컴포넌트 테스트 페이지</h1>
@@ -161,6 +163,17 @@ export default function ButtonTestPage() {
               value={searchKeyword} 
               onChange={(e) => setSearchKeyword(e.target.value)} 
             />
+        </div>
+      </section>
+
+      {/* 13. Text Field */}
+      <section className="space-y-4">
+        <h2 className="W_Title text-black border-b pb-2">13. Text Field</h2>
+        <div className="flex flex-wrap gap-4 items-center">
+            <TextField placeholder="텍스트필드" value={textFieldValue} onChange={(e) => setTextFieldValue(e.target.value)} />
+            <TextField type='price' placeholder="입금" />
+            <TextField type='price' placeholder="출금" />
+            <TextField placeholder="가격필드(에러)" isError={true} />
         </div>
       </section>
     </div>

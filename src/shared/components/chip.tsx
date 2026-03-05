@@ -1,4 +1,3 @@
-// src/shared/components/chip.tsx
 import { HTMLAttributes, Ref,  } from 'react';
 import { cn } from '@libs/cn';
 import ArrowDownIcon from '@assets/icons/arrow-up.svg?react';

@@ -1,4 +1,3 @@
-// src/shared/components/icon-button.tsx
 import { ButtonHTMLAttributes, Ref } from "react";
 import Button from "@components/button";
 import { cn } from "@libs/cn";
