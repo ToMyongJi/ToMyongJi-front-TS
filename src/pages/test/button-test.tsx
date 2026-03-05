@@ -3,6 +3,7 @@ import CheckBox from '@components/check-box';
 import Chip from '@components/chip';
 import IconButton from '@components/icon-button';
 import { ReceiptButton } from '@components/receipt-button';
+import SearchBar from '@components/search-bar';
 import SelectButton from '@components/select-button';
 import { useState } from 'react';
 
@@ -11,6 +12,8 @@ export default function ButtonTestPage() {
     const [isChecked, setIsChecked] = useState<boolean>(false);
     const [isOpen, setIsOpen] = useState(false);
     const [selectedValue, setSelectedValue] = useState(''); 
+    const [searchKeyword, setSearchKeyword] = useState('');
+    
   return (
     <div className="p-8 space-y-12">
       <h1 className="W_Header text-primary">버튼 컴포넌트 테스트 페이지</h1>
@@ -146,6 +149,18 @@ export default function ButtonTestPage() {
         isOpen={isOpen}
         onClick={() => setIsOpen(!isOpen)}
       />
+        </div>
+      </section>
+
+      {/* 12. Search Bar */}
+      <section className="space-y-4">
+        <h2 className="W_Title text-black border-b pb-2">12. Search Bar</h2>
+        <div className="flex flex-wrap gap-4 items-center">
+        <SearchBar 
+              placeholder="검색어 2글자 이상 입력" 
+              value={searchKeyword} 
+              onChange={(e) => setSearchKeyword(e.target.value)} 
+            />
         </div>
       </section>
     </div>
