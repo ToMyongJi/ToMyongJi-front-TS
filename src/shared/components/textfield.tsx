@@ -1,5 +1,5 @@
-import { InputHTMLAttributes, Ref, useState } from 'react';
 import { cn } from '@libs/cn';
+import { type InputHTMLAttributes, type Ref, useState } from 'react';
 
 // default: 일반 텍스트 필드, price: 오른쪽에 '원'이 고정으로 붙는 필드
 type TextFieldType = 'default' | 'price';
@@ -36,37 +36,29 @@ export function TextField({
     <div
       className={cn(
         // 컨테이너 공통 스타일
-        'flex items-center h-[4rem] px-[1.4rem] py-[0.8rem] rounded-[0.8rem] transition-colors border-[1px] active:border-primary',
+        'flex h-[4rem] items-center rounded-[0.8rem] border-[1px] px-[1.4rem] py-[0.8rem] transition-colors active:border-primary',
         // 배경색 분기: disabled면 회색, 아니면 흰색
-        disabled ? 'bg-background border-none' : 'bg-white border-gray-10',
+        disabled ? 'border-none bg-background' : 'border-gray-10 bg-white',
         type === 'price' ? 'w-[14.6rem]' : '',
         // 테두리 분기 로직
-        !disabled && (
-          isError 
-            ? 'border-error' 
-            : isFocused 
-              ? 'border-primary' 
-              : 'border-gray-20'
-        ),
-        className
+        !disabled && (isError ? 'border-error' : isFocused ? 'border-primary' : 'border-gray-20'),
+        className,
       )}
     >
       <input
         ref={ref}
-        type='text'
+        type="text"
         value={currentValue}
         disabled={disabled}
         className={cn(
-          'w-full h-full bg-transparent outline-none W_R15 placeholder:text-gray-70',
-          disabled && 'text-black'
+          'W_R15 h-full w-full bg-transparent outline-none placeholder:text-gray-70',
+          disabled && 'text-black',
         )}
         onFocus={() => {
           setIsFocused(true);
-      
         }}
         onBlur={() => {
           setIsFocused(false);
-     
         }}
         onChange={handleChange}
         {...props}
@@ -74,13 +66,7 @@ export function TextField({
 
       {/* 타입이 'price'일 때만 무조건 '원'을 우측에 렌더링 */}
       {type === 'price' && (
-        <span 
-          className={cn(
-            'flex-shrink-0 ml-[0.8rem] W_B15 select-none text-black',
-          )}
-        >
-          원
-        </span>
+        <span className={cn('W_B15 ml-[0.8rem] flex-shrink-0 select-none text-black')}>원</span>
       )}
     </div>
   );

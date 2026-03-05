@@ -1,6 +1,6 @@
-import { InputHTMLAttributes, Ref } from 'react';
-import { cn } from '@libs/cn';
 import CheckIcon from '@assets/icons/check.svg?react';
+import { cn } from '@libs/cn';
+import type { InputHTMLAttributes, Ref } from 'react';
 
 interface CheckBoxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
   /** 현재 체크 여부 (controlled 상태) */
@@ -11,20 +11,20 @@ interface CheckBoxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onC
   ref?: Ref<HTMLInputElement>;
 }
 
-export function CheckBox({ 
-  className, 
-  checked = false, 
-  onChange, 
+export function CheckBox({
+  className,
+  checked = false,
+  onChange,
   ref,
   disabled,
-  ...props 
+  ...props
 }: CheckBoxProps) {
   return (
-    <label 
+    <label
       className={cn(
-        'inline-flex items-center cursor-pointer',
+        'inline-flex cursor-pointer items-center',
         disabled && 'cursor-not-allowed',
-        className
+        className,
       )}
     >
       {/* 실제 동작을 담당하지만 시각적으로는 숨겨진 기본 체크박스 */}
@@ -39,18 +39,16 @@ export function CheckBox({
       />
 
       {/* 디자인이 적용된 커스텀 체크박스 모양 */}
-      <div 
+      <div
         className={cn(
-          'flex items-center justify-center w-[2rem] h-[2rem] border-1  transition-colors', // 크기나 모서리(rounded)는 디자인 수치에 맞게 조절하세요.
-          checked 
+          'flex h-[2rem] w-[2rem] items-center justify-center border-1 transition-colors', // 크기나 모서리(rounded)는 디자인 수치에 맞게 조절하세요.
+          checked
             ? 'border-primary bg-white' // 체크되었을 때 (이미지처럼 테두리 파란색, 배경 흰색)
-            : 'border-gray-20 bg-white' // 체크 안되었을 때 (테두리 연한 회색)
+            : 'border-gray-20 bg-white', // 체크 안되었을 때 (테두리 연한 회색)
         )}
       >
         {/* 체크 상태일 때만 보이는 V 아이콘 */}
-        {checked && (
-            <CheckIcon width={14} height={10} />
-        )}
+        {checked && <CheckIcon width={14} height={10} />}
       </div>
     </label>
   );

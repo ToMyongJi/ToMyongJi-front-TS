@@ -1,23 +1,26 @@
-import { ButtonHTMLAttributes, Ref } from 'react';
-import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@libs/cn';
+import { cva, type VariantProps } from 'class-variance-authority';
+import type { ButtonHTMLAttributes, Ref } from 'react';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center rounded-[1rem] gap-[1rem] transition-colors hover:cursor-pointer disabled:bg-gray-20 disabled:text-gray-70 disable:cursor-not-allowed',
+  'inline-flex disable:cursor-not-allowed items-center justify-center gap-[1rem] rounded-[1rem] transition-colors hover:cursor-pointer disabled:bg-gray-20 disabled:text-gray-70',
   {
     variants: {
       variant: {
-        primary: 'bg-primary text-white hover:bg-primary/90 disabled:text-white active:bg-primary-deep',
-        primary_outline: 'bg-white border-1 border-primary text-primary disabled:border-none active:bg-background',
-        danger: 'bg-error text-white hover:bg-error/90 disabled:text-white active:bg-error-deep',
+        primary:
+          'bg-primary text-white hover:bg-primary/90 active:bg-primary-deep disabled:text-white',
+        primary_outline:
+          'border-1 border-primary bg-white text-primary active:bg-background disabled:border-none',
+        danger: 'bg-error text-white hover:bg-error/90 active:bg-error-deep disabled:text-white',
         gray: 'bg-gray-10 text-gray-80 disabled:text-gray-80',
-        gray_outline: 'bg-white text-black border-1 border-gray-20 disabled:bg-background text-black active:bg-background',
+        gray_outline:
+          'border-1 border-gray-20 bg-white text-black text-black active:bg-background disabled:bg-background',
       },
       size: {
-        sm: 'h-[3.2rem] px-[1.8rem] py-[1.5rem] W_M14',
-        md: 'h-[4rem] px-[1.8rem] py-[1.5rem] W_SB15',
-        regular: 'h-[3.6rem] px-[1.8rem] py-[1.5rem] W_SB15',
-        save: 'h-[4rem] px-[1.8rem] py-[1.5rem] W_M14',
+        sm: 'W_M14 h-[3.2rem] px-[1.8rem] py-[1.5rem]',
+        md: 'W_SB15 h-[4rem] px-[1.8rem] py-[1.5rem]',
+        regular: 'W_SB15 h-[3.6rem] px-[1.8rem] py-[1.5rem]',
+        save: 'W_M14 h-[4rem] px-[1.8rem] py-[1.5rem]',
       },
       fullWidth: {
         true: 'w-full',
@@ -27,7 +30,7 @@ const buttonVariants = cva(
       variant: 'primary',
       size: 'md',
     },
-  }
+  },
 );
 
 interface ButtonProps
@@ -36,14 +39,7 @@ interface ButtonProps
   ref?: Ref<HTMLButtonElement>;
 }
 
-export function Button({ 
-  className, 
-  variant, 
-  size, 
-  fullWidth, 
-  ref, 
-  ...props 
-}: ButtonProps) {
+export function Button({ className, variant, size, fullWidth, ref, ...props }: ButtonProps) {
   return (
     <button
       ref={ref}

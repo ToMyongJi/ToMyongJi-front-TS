@@ -1,18 +1,12 @@
-import { InputHTMLAttributes, Ref, useState } from 'react';
-import { cn } from '@libs/cn';
 import SearchIcon from '@assets/icons/search.svg?react';
+import { cn } from '@libs/cn';
+import { type InputHTMLAttributes, type Ref, useState } from 'react';
 
 interface SearchBarProps extends InputHTMLAttributes<HTMLInputElement> {
   ref?: Ref<HTMLInputElement>;
 }
 
-export function SearchBar({ 
-  className, 
-  value, 
-  onChange,
-  ref, 
-  ...props 
-}: SearchBarProps) {
+export function SearchBar({ className, value, onChange, ref, ...props }: SearchBarProps) {
   const [isFocused, setIsFocused] = useState(false);
   // ✅ 추가됨: 내부적으로 사용자가 입력한 값을 추적하기 위한 state
   const [internalValue, setInternalValue] = useState(value || '');
@@ -29,11 +23,11 @@ export function SearchBar({
   };
 
   return (
-    <div 
+    <div
       className={cn(
-        'flex items-center justify-between w-[30rem] h-[4rem] pl-[2rem] pr-[1.6rem] py-[0.8rem] rounded-[3rem] transition-colors bg-white border-[1px]',
+        'flex h-[4rem] w-[30rem] items-center justify-between rounded-[3rem] border-[1px] bg-white py-[0.8rem] pr-[1.6rem] pl-[2rem] transition-colors',
         isFocused ? 'border-primary' : 'border-gray-20',
-        className
+        className,
       )}
     >
       <input
@@ -41,8 +35,8 @@ export function SearchBar({
         type="text"
         value={currentValue}
         className={cn(
-          'w-full h-full bg-transparent outline-none W_R14 placeholder:text-gray-70',
-          hasValue ? 'text-black' : 'text-gray-70'
+          'W_R14 h-full w-full bg-transparent outline-none placeholder:text-gray-70',
+          hasValue ? 'text-black' : 'text-gray-70',
         )}
         onFocus={() => {
           setIsFocused(true);
@@ -53,10 +47,10 @@ export function SearchBar({
         onChange={handleChange}
         {...props}
       />
-      
-      <button 
-        type="button" 
-        className="flex-shrink-0 flex items-center justify-center cursor-pointer outline-none"
+
+      <button
+        type="button"
+        className="flex flex-shrink-0 cursor-pointer items-center justify-center outline-none"
       >
         <SearchIcon width={20} height={20} />
       </button>
