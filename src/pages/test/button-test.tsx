@@ -3,11 +3,14 @@ import CheckBox from '@components/check-box';
 import Chip from '@components/chip';
 import IconButton from '@components/icon-button';
 import { ReceiptButton } from '@components/receipt-button';
+import SelectButton from '@components/select-button';
 import { useState } from 'react';
 
 export default function ButtonTestPage() {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [isChecked, setIsChecked] = useState<boolean>(false);
+    const [isOpen, setIsOpen] = useState(false);
+    const [selectedValue, setSelectedValue] = useState(''); 
   return (
     <div className="p-8 space-y-12">
       <h1 className="W_Header text-primary">버튼 컴포넌트 테스트 페이지</h1>
@@ -115,7 +118,36 @@ export default function ButtonTestPage() {
           <IconButton iconType="cancel" onClick={() => console.log('cancel')} />
         </div>
       </section>
-      
+
+      {/* 11. Select Button */}
+      <section className="space-y-4">
+        <h2 className="W_Title text-black border-b pb-2">11. Select Button</h2>
+        <div className="flex flex-wrap gap-4 items-center">
+        <SelectButton 
+        placeholder="대학을 선택해주세요" 
+        isOpen={false} 
+      />
+
+      {/* 2. 열렸을 때 (Pressed) - isOpen이 true이므로 자동으로 회색 배경이 됩니다 */}
+      <SelectButton 
+        placeholder="대학을 선택해주세요" 
+        isOpen={true} 
+      />
+
+      {/* 3. 값 선택 완료 (Filled) - value가 존재하므로 자동으로 파란색 테두리가 생깁니다 */}
+      <SelectButton 
+        value="서울대학교" 
+        isOpen={false} 
+      />
+
+      <SelectButton 
+        value={selectedValue}
+        placeholder="대학을 선택해주세요"
+        isOpen={isOpen}
+        onClick={() => setIsOpen(!isOpen)}
+      />
+        </div>
+      </section>
     </div>
   );
 }

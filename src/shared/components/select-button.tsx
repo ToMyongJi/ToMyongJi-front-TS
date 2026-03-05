@@ -14,7 +14,7 @@ const selectButtonVariants = cva(
         // 2. Pressed: 클릭(드롭다운이 열려있는) 상태
         pressed: 'bg-background text-black border-1 border-gray-20',
         // 3. Filled: 값을 선택 완료한 상태 (흰색 배경, 파란색 테두리, 진한 글씨)
-        filled: 'bg-white text-black border-1 border-primary',
+        filled: 'bg-white text-black border-1 border-primary hover:bg-gray-50 active:bg-background',
       },
     },
     defaultVariants: {
