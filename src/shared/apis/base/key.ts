@@ -8,6 +8,10 @@ export const QK = {
     emailVerify: () => ['auth', 'emailVerify'] as const,
   },
 
+  receipt: {
+    list: (clubId:number, size?: number, y: number, m:number) => ['receiptList', clubId, size, y, m] as const,
+  },
+
   collegeAndClubs: {
     all: () => ['collegeAndClubs'] as const
   }
