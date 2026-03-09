@@ -8,12 +8,11 @@ import { Link } from 'react-router-dom';
 import * as z from 'zod';
 
 const loginSchema = z.object({
-  id: z.string().min(1, { message: '아이디를 입력해주세요.' }),
+  userId: z.string().min(1, { message: '아이디를 입력해주세요.' }),
   password: z
     .string()
     .min(1, { message: '비밀번호를 입력해주세요.' })
     .min(6, { message: '비밀번호는 최소 6자 이상이어야 합니다.' }),
-  rememberMe: z.boolean(),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -27,16 +26,15 @@ const Login = () => {
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      id: '',
+      userId: '',
       password: '',
-      rememberMe: false,
     },
   });
   // watch를 통해 현재 입력된 아이디와 비밀번호 값을 실시간으로 가져옵니다.
-  const id = watch('id');
+  const userId = watch('userId');
   const password = watch('password');
   // 둘 중 하나라도 비어있으면 true를 반환하는 변수를 만듭니다.
-  const isButtonDisabled = !id || !password;
+  const isButtonDisabled = !userId || !password;
 
   const [rememberMe, setRememberMe] = useState(false);
 
@@ -56,8 +54,8 @@ const Login = () => {
             <TextField
               type="default"
               placeholder="아이디"
-              {...register('id')}
-              isError={!!errors.id}
+              {...register('userId')}
+              isError={!!errors.userId}
             />
             {/* 비밀번호 입력 영역 */}
             <TextField
