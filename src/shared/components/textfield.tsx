@@ -19,6 +19,7 @@ export function TextField({
   isError = false,
   disabled = false,
   onChange,
+  onBlur,
   ref,
   ...props
 }: TextFieldProps) {
@@ -57,8 +58,9 @@ export function TextField({
         onFocus={() => {
           setIsFocused(true);
         }}
-        onBlur={() => {
+        onBlur={(e) => {
           setIsFocused(false);
+          onBlur?.(e);
         }}
         onChange={handleChange}
         {...props}
