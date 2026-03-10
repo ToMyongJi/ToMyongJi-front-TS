@@ -13,7 +13,7 @@ const registerSchema = z.object({
   studentNum: z.string().min(1, { message: '학번을 입력해주세요.' }),
   collegeName: z.string().min(1, { message: '대학을 선택해주세요.' }),
   studentClubId: z.number().min(1, { message: '소속을 선택해주세요.' }),
-  email: z.string().email({ message: '올바른 이메일 형식이 아닙니다.' }),
+  email: z.string().email({ message: '이메일 형식이 올바르지 않습니다.' }),
   password: z
     .string()
     .min(8, { message: '비밀번호는 8자 이상이어야 합니다.' })
@@ -90,9 +90,6 @@ const Register = () => {
                     </Button>
                   </div>
                 </div>
-                {errors.userId && (
-                  <p className="W_SB12 ml-[7.6rem] text-error">{errors.userId.message}</p>
-                )}
               </div>
 
               {/* 비밀번호 */}
@@ -108,9 +105,6 @@ const Register = () => {
                 <p className="W_R12 text-gray-70">
                   * 영문 대·소문자, 숫자, 특수기호를 모두 포함하여 8자~20자로 작성
                 </p>
-                {errors.password && (
-                  <p className="W_SB12 ml-[7.6rem] text-error">{errors.password.message}</p>
-                )}
               </div>
 
               {/* 이메일 & 인증코드 */}
@@ -128,7 +122,10 @@ const Register = () => {
                       variant="primary"
                       size="regular"
                       className="w-[9.2rem]"
-                      disabled={!email}
+                      disabled={!email || !!errors.email}
+                      onClick={() => {
+                        console.log('코드 발송');
+                      }}
                     >
                       코드 발송
                     </Button>
@@ -166,9 +163,6 @@ const Register = () => {
                   <p className="W_SB15 w-[5.6rem] text-gray-90">이름</p>
                   <TextField className="w-[30rem]" {...register('name')} isError={!!errors.name} />
                 </div>
-                {errors.name && (
-                  <p className="W_SB12 ml-[7.6rem] text-error">{errors.name.message}</p>
-                )}
               </div>
 
               {/* 학번 */}
@@ -181,9 +175,6 @@ const Register = () => {
                     isError={!!errors.studentNum}
                   />
                 </div>
-                {errors.studentNum && (
-                  <p className="W_SB12 ml-[7.6rem] text-error">{errors.studentNum.message}</p>
-                )}
               </div>
 
               {/* 대학 */}
