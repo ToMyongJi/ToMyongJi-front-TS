@@ -1,10 +1,14 @@
+import type { authLoginResponse } from '@apis/auth/auth';
+import { authMutations } from '@apis/auth/auth-mutations';
 import { Button } from '@components/common/button';
 import CheckBox from '@components/common/check-box';
 import TextField from '@components/common/textfield';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import useAuthStore from 'src/shared/store/auth-store';
 import * as z from 'zod';
 
 const loginSchema = z.object({
@@ -28,26 +32,31 @@ const Login = () => {
       password: '',
     },
   });
-  // watch를 통해 현재 입력된 아이디와 비밀번호 값을 실시간으로 가져옵니다.
+
+  const navigate = useNavigate();
+  const loginMutation = useMutation(authMutations.login());
+  const setAuthData = useAuthStore((state) => state.setAuthData);
   const userId = watch('userId');
   const password = watch('password');
-  // 둘 중 하나라도 비어있으면 true를 반환하는 변수를 만듭니다.
   const isButtonDisabled = !userId || !password;
 
   const [rememberMe, setRememberMe] = useState(false);
 
   const onSubmit = (data: LoginFormValues) => {
     console.log('로그인 시도 데이터:', data);
-    try {
-      throw new Error('Login failed');
-    } catch {
-      setError('userId', { type: 'manual' });
-      setError('password', { type: 'manual' });
-      setError('root.serverError', {
-        type: 'server',
-        message: '아이디 또는 비밀번호를 다시 확인해 주세요',
-      });
-    }
+    loginMutation.mutate(data, {
+      onSuccess: (response: authLoginResponse) => {
+        setAuthData(response.data.grantType, response.data.accessToken, response.data.refreshToken);
+        navigate('/');
+      },
+      onError: () => {
+        // 에러 처리
+        setError('root.serverError', {
+          type: 'server',
+          message: '아이디 또는 비밀번호를 다시 확인해 주세요',
+        });
+      },
+    });
   };
 
   return (
