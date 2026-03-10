@@ -1,5 +1,5 @@
 import MainLogo from '@assets/icons/logo.svg?react';
-import Button from '@components/button';
+import { Button } from '@components/common/button';
 import { useNavigate } from 'react-router-dom';
 
 const HeaderGnb = () => {

@@ -1,6 +1,6 @@
 import ExcelIcon from '@assets/icons/excel.svg?react';
 import TossIcon from '@assets/icons/toss-bank.png';
-import { Button } from '@components/button';
+import { Button } from '@components/common/button';
 import { cn } from '@libs/cn';
 import type { ButtonHTMLAttributes, Ref } from 'react';
 

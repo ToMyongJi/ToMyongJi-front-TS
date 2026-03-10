@@ -1,6 +1,6 @@
-import Button from '@components/button';
-import CheckBox from '@components/check-box';
-import TextField from '@components/textfield';
+import { Button } from '@components/common/button';
+import CheckBox from '@components/common/check-box';
+import TextField from '@components/common/textfield';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -39,14 +39,8 @@ const Login = () => {
   const onSubmit = (data: LoginFormValues) => {
     console.log('로그인 시도 데이터:', data);
     try {
-      // API 호출 로직이 들어갈 자리입니다.
-      // const response = await api.login(data);
-
-      // 강제로 실패를 시뮬레이션 해보겠습니다.
       throw new Error('Login failed');
     } catch {
-      // 2. API 실패 시 두 필드 모두에 에러를 설정하고,
-      // root(전역 폼 에러)에 메시지를 세팅합니다.
       setError('userId', { type: 'manual' });
       setError('password', { type: 'manual' });
       setError('root.serverError', {

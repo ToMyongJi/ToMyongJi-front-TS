@@ -1,6 +1,6 @@
 import CloseIcon from '@assets/icons/cancel.svg?react';
 import EditIcon from '@assets/icons/edit.svg?react';
-import Button from '@components/button';
+import { Button } from '@components/common/button';
 import { cn } from '@libs/cn';
 import type { ButtonHTMLAttributes, Ref } from 'react';
 
