@@ -68,7 +68,7 @@ const Register = () => {
                       {...register('userId')}
                       isError={!!errors.userId}
                     />
-                    <Button type="button" variant="primary" size="regular" className="w-[8.9ㅎrem]">
+                    <Button type="button" variant="primary" size="regular" className="w-[8.9rem]">
                       중복확인
                     </Button>
                   </div>
