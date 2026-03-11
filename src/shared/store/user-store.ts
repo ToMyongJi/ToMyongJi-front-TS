@@ -3,10 +3,12 @@ import { persist } from 'zustand/middleware';
 
 export interface User {
   id: number;
+  userId?: string; // 사용자 아이디
   name?: string;
-  studentNum?: string;
-  college?: string;
-  studentClubId?: number;
+  role?: 'ADMIN' | 'STU' | 'PRESIDENT'; // ADMIN: 관리자, STU: 학생, PRESIDENT: 학생회장
+  studentNum?: string; // 학번
+  college?: string; // 소속 단과대
+  studentClubId?: number; // 학생회 아이디
 }
 
 interface UserState {
