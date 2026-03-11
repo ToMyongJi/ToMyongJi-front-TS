@@ -2,18 +2,18 @@ import MainLogo from '@assets/icons/logo.svg?react';
 import { Button } from '@components/common/button';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../store/auth-store';
+import useUserStore from '../store/user-store';
 
 const HeaderGnb = () => {
   const navigate = useNavigate();
-  // authData와 clearAuthData(로그아웃용 함수)를 가져옵니다.
   const { authData, clearAuthData } = useAuthStore();
+  const { user } = useUserStore();
 
-  // 임시로 학생회 이름을 설정 (실제로는 API 응답이나 스토어에서 가져와야 함)
-  const studentClubName = '멋쟁이사자처럼 학생회';
+  const studentClubName = user?.college;
 
   const handleLogout = () => {
-    clearAuthData(); // 스토어에서 토큰 삭제
-    navigate('/'); // 메인 페이지로 이동
+    clearAuthData();
+    navigate('/');
   };
 
   return (
@@ -31,7 +31,6 @@ const HeaderGnb = () => {
           </Button>
         </div>
       ) : (
-        /* authData가 없으면(비로그인 상태) 로그인 버튼 표시 */
         <Button
           variant="primary_outline"
           size="sm"

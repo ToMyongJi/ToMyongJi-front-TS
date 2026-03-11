@@ -50,6 +50,7 @@ const Login = () => {
 
   const onSubmit = (data: LoginFormValues) => {
     console.log('로그인 시도 데이터:', data);
+
     loginMutation.mutate(data, {
       onSuccess: async (response: authLoginResponse) => {
         const { grantType, accessToken, refreshToken } = response.data;
@@ -75,7 +76,6 @@ const Login = () => {
               college: myInfo.college,
               studentClubId: myInfo.studentClubId,
             });
-            console.log('유저 정보 저장 완료:', id, userId, role, myInfo);
           } catch (error) {
             console.error('내 정보 조회 실패:', error);
           }
