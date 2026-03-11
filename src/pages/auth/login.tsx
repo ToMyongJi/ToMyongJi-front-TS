@@ -61,7 +61,7 @@ const Login = () => {
         const decodedPayload = decodeToken(accessToken);
 
         if (decodedPayload) {
-          const { id, role } = decodedPayload;
+          const { id, auth: role } = decodedPayload;
 
           try {
             const myInfoResponse = await myApi.getMyInfo(id);
@@ -70,12 +70,19 @@ const Login = () => {
             setUser({
               id: id,
               userId: userId,
-              role: role,
+              role,
               name: myInfo.name,
               studentNum: myInfo.studentNum,
               college: myInfo.college,
               studentClubId: myInfo.studentClubId,
             });
+
+            if (role === 'ADMIN') {
+              navigate('/home-admin');
+            } else {
+              navigate('/');
+            }
+            return;
           } catch (error) {
             console.error('내 정보 조회 실패:', error);
           }
@@ -83,11 +90,9 @@ const Login = () => {
           console.error('토큰 디코딩에 실패하여 유저 정보를 저장하지 못했습니다.');
         }
 
-        // 5. 메인 페이지로 이동
         navigate('/');
       },
       onError: () => {
-        // 에러 처리
         setError('root.serverError', {
           type: 'server',
           message: '아이디 또는 비밀번호를 다시 확인해 주세요',

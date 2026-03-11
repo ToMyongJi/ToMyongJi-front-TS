@@ -7,12 +7,13 @@ import useUserStore from '../store/user-store';
 const HeaderGnb = () => {
   const navigate = useNavigate();
   const { authData, clearAuthData } = useAuthStore();
-  const { user } = useUserStore();
+  const { user, clearUser } = useUserStore();
 
   const studentClubName = user?.college;
 
   const handleLogout = () => {
     clearAuthData();
+    clearUser();
     navigate('/');
   };
 
