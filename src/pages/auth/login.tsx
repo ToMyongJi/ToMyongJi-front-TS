@@ -1,14 +1,17 @@
 import type { authLoginResponse } from '@apis/auth/auth';
 import { authMutations } from '@apis/auth/auth-mutations';
+import { myApi } from '@apis/my/my';
 import { Button } from '@components/common/button';
 import CheckBox from '@components/common/check-box';
 import TextField from '@components/common/textfield';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { decodeToken } from '@libs/token';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import useAuthStore from 'src/shared/store/auth-store';
+import useUserStore from 'src/shared/store/user-store';
 import * as z from 'zod';
 
 const loginSchema = z.object({
@@ -35,7 +38,10 @@ const Login = () => {
 
   const navigate = useNavigate();
   const loginMutation = useMutation(authMutations.login());
+
   const setAuthData = useAuthStore((state) => state.setAuthData);
+  const setUser = useUserStore((state) => state.setUser);
+
   const userId = watch('userId');
   const password = watch('password');
   const isButtonDisabled = !userId || !password;
@@ -45,8 +51,39 @@ const Login = () => {
   const onSubmit = (data: LoginFormValues) => {
     console.log('로그인 시도 데이터:', data);
     loginMutation.mutate(data, {
-      onSuccess: (response: authLoginResponse) => {
-        setAuthData(response.data.grantType, response.data.accessToken, response.data.refreshToken);
+      onSuccess: async (response: authLoginResponse) => {
+        const { grantType, accessToken, refreshToken } = response.data;
+
+        // 1. 토큰 저장
+        setAuthData(grantType, accessToken, refreshToken);
+        // 2. 토큰 디코딩
+        const decodedPayload = decodeToken(accessToken);
+
+        if (decodedPayload) {
+          const { id, role } = decodedPayload;
+
+          try {
+            const myInfoResponse = await myApi.getMyInfo(id);
+
+            const myInfo = myInfoResponse.data;
+            setUser({
+              id: id,
+              userId: userId,
+              role: role,
+              name: myInfo.name,
+              studentNum: myInfo.studentNum,
+              college: myInfo.college,
+              studentClubId: myInfo.studentClubId,
+            });
+            console.log('유저 정보 저장 완료:', id, userId, role, myInfo);
+          } catch (error) {
+            console.error('내 정보 조회 실패:', error);
+          }
+        } else {
+          console.error('토큰 디코딩에 실패하여 유저 정보를 저장하지 못했습니다.');
+        }
+
+        // 5. 메인 페이지로 이동
         navigate('/');
       },
       onError: () => {

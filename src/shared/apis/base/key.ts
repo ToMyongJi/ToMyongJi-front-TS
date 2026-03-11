@@ -1,4 +1,8 @@
 export const QK = {
+  my: {
+    getMyInfo: () => ['my', 'getMyInfo'] as const,
+  },
+
   auth: {
     findIds: () => ['auth', 'findIds'] as const,
     clubVerify: () => ['auth', 'clubVerify'] as const,
@@ -9,7 +13,6 @@ export const QK = {
   },
 
   collegeAndClubs: {
-    all: () => ['collegeAndClubs'] as const
-  }
-
-}
+    all: () => ['collegeAndClubs'] as const,
+  },
+};
