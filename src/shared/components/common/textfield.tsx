@@ -2,7 +2,7 @@ import { cn } from '@libs/cn';
 import { type InputHTMLAttributes, type Ref, useState } from 'react';
 
 // default: 일반 텍스트 필드, price: 오른쪽에 '원'이 고정으로 붙는 필드
-type TextFieldType = 'default' | 'price';
+type TextFieldType = 'default' | 'price' | 'password';
 
 interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   /** 텍스트 필드의 종류 (default: 일반, price: 가격 입력) */
@@ -48,7 +48,7 @@ export function TextField({
     >
       <input
         ref={ref}
-        type="text"
+        type={type === 'password' ? 'password' : 'text'}
         value={currentValue}
         disabled={disabled}
         className={cn(

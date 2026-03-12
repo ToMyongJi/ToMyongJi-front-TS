@@ -118,7 +118,7 @@ const Login = () => {
             />
             {/* 비밀번호 입력 영역 */}
             <TextField
-              type="default"
+              type="password"
               placeholder="비밀번호"
               {...register('password')}
               isError={!!errors.password || !!errors.root?.serverError}

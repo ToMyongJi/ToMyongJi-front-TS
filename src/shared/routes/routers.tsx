@@ -10,6 +10,7 @@ import ButtonTestPage from '@pages/test/button-test';
 import ReceiptView from '@pages/view/receipt-view';
 import ProtectedRouter from '@routes/protected-router';
 import { createBrowserRouter } from 'react-router-dom';
+import PublicRouter from './public-router';
 
 export const router = createBrowserRouter([
   {
@@ -17,11 +18,16 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <MainPage /> },
       { path: 'home-admin', element: <AdminPage /> },
-      { path: 'login', element: <Login /> },
-      { path: 'register', element: <Register /> },
       { path: 'not-login', element: <NotLogin /> },
       { path: 'receipt-view/:clubid', element: <ReceiptView /> },
       { path: 'test/buttons', element: <ButtonTestPage /> },
+      {
+        element: <PublicRouter />,
+        children: [
+          { path: 'login', element: <Login /> },
+          { path: 'register', element: <Register /> },
+        ],
+      },
       {
         element: <ProtectedRouter />,
         children: [
