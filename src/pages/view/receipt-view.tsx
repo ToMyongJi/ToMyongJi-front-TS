@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import dayjs
+import dayjs from 'dayjs';
 import InfoIcon from "@assets/icons/info.svg?react";
 import MenuIcon from "@assets/icons/menu.svg?react";
 import TableHeader from '@components/table/table-header';
@@ -18,14 +18,21 @@ const HeaderData = [
 
 
 const ReceiptView = () => {
-  const [year, setYear] = useState();
+  const [year, setYear] = useState(dayjs().format('YYYY년'));
   const [yearFilter, setYearFilter] = useState(false);
-  const [month, setMonth] = useState();
+  const [month, setMonth] = useState("전체");
   const [monthFilter, setMonthFilter] = useState(false);
   const [page, setPage] = useState(1);
 
-  const handleChipClick = () => {
+  const currentYear = dayjs().year();
+  const yearOptions = Array.from(
+    { length: 5 },
+    (_, i) => `${currentYear - 2 + i}년`,
+  );
+  const monthOptions = ['전체', ...Array.from({ length: 12 }, (_, i) => `${i + 1}월`)];
 
+  const handleChipClick = (type: 'YEAR' | 'MONTH') => {
+    type === 'YEAR' ? setYearFilter(true) : setMonthFilter(true);
   }
 
   return (
@@ -40,9 +47,27 @@ const ReceiptView = () => {
       <div className="flex-col gap-[1rem]">
         <section className="flex-row-between">
           <div className="flex gap-[0.8rem]">
-            <Chip label={`${year}년`} isActive={yearFilter}/>
-            <Dropdown labels={['2021', '2022', '2023', '2024', '2025']} currentYear={year} setCurrentYear={setYear}/>
-            <Chip label={"전체"} isActive={monthFilter} />
+            <div className="relative">
+              <Chip label={year} isActive={yearFilter} onClick={() => handleChipClick('YEAR')} />
+              {yearFilter &&
+                <Dropdown
+                  className="absolute top-0"
+                  onClick={() => setYearFilter(false)}
+                  datas={yearOptions}
+                  previewData={year}
+                  setPreViewData={setYear} />}
+            </div>
+            <div className="relative">
+              <Chip label={month} isActive={monthFilter} onClick={() => handleChipClick('MONTH')} />
+              {monthFilter &&
+                <Dropdown
+                  className="absolute top-0"
+                  onClick={() => setMonthFilter(false)}
+                  datas={monthOptions}
+                  previewData={month}
+                  setPreViewData={setMonth}/>
+              }
+            </div>
           </div>
           <SearchBar
             placeholder="검색어 2글자 이상 입력"
