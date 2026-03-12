@@ -16,6 +16,23 @@ export type myGetMyInfoResponse = Rsp<{
   studentClubId: number;
 }>;
 
+export type addMemberRequest = {
+  id: number;
+  studentNum: string;
+  name: string;
+};
+
+export type memberResponse = Rsp<{
+  memberId: number;
+  studentNum: string;
+  name: string;
+}>;
+
 export const myApi = {
   getMyInfo: (id: number) => http.get<myGetMyInfoResponse>(ENDPOINTS.my.view(id)),
+  addMember: (body: addMemberRequest) =>
+    http.post<memberResponse, typeof body>(ENDPOINTS.my.add, body),
+  viewMember: (id: number) => http.get<memberResponse>(ENDPOINTS.my.viewMember(id)),
+  deleteMember: (deletedStudentNumb: number) =>
+    http.delete<memberResponse>(ENDPOINTS.my.deleteMember(deletedStudentNumb)),
 };
