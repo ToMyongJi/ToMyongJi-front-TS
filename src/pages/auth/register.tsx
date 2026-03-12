@@ -92,6 +92,7 @@ const Register = () => {
   const [emailMessage, setEmailMessage] = useState('');
   const [emailMessageType, setEmailMessageType] = useState<'success' | 'error' | null>(null);
   const [selectedRole, setSelectedRole] = useState<string>('');
+  const [isClubVerified, setIsClubVerified] = useState(false);
 
   const [selectedStudentClub, setSelectedStudentClub] = useState('');
 
@@ -181,12 +182,14 @@ const Register = () => {
             type: 'manual',
             message: '소속 인증이 완료되었습니다.',
           });
+          setIsClubVerified(true);
         },
         onError: () => {
           setError('studentClubId', {
             type: 'manual',
             message: '소속 인증에 실패했습니다.',
           });
+          setIsClubVerified(false);
         },
       },
     );
@@ -473,6 +476,7 @@ const Register = () => {
                                     setValue('studentClubId', club.studentClubId, {
                                       shouldValidate: true,
                                     });
+                                    setIsClubVerified(false); // 소속이 바뀌면 인증 초기화
                                     setOpenDropdown(null);
                                   }}
                                 >
@@ -516,7 +520,7 @@ const Register = () => {
                 variant="primary"
                 size="md"
                 className="w-[12rem]"
-                disabled={!isValid || isSubmitting}
+                disabled={!isValid || isSubmitting || !isClubVerified}
               >
                 가입하기
               </Button>
