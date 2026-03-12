@@ -10,7 +10,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import * as z from 'zod';
 
 const ROLE_OPTIONS = [
@@ -32,7 +32,7 @@ const registerSchema = z.object({
     .min(8, { message: '비밀번호는 8자 이상이어야 합니다.' })
     .max(20, { message: '비밀번호는 20자 이하이어야 합니다.' })
     .regex(/[!@#$%^&*(),.?":{}|<>]/, { message: '특수문자가 적어도 한 개 포함되어야 합니다.' }),
-  role: z.string().min(1, { message: '자격을 선택해주세요.' }),
+  role: z.nativeEnum(Role),
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
@@ -56,14 +56,17 @@ const Register = () => {
       name: '',
       studentNum: '',
       collegeName: '',
-      role: '',
+      role: Role.STU,
       studentClubId: 0,
     },
   });
 
+  const signupMutation = useMutation(authMutations.signup());
   const sendEmailMutation = useMutation(authMutations.sendEmail());
   const emailCheckMutation = useMutation(authMutations.emailCheck());
   const clubVerifyMutation = useMutation(authMutations.clubVerify());
+
+  const navigate = useNavigate();
 
   const userId = watch('userId');
   const email = watch('email');
@@ -191,6 +194,14 @@ const Register = () => {
 
   const onSubmit = (data: RegisterFormValues) => {
     console.log('회원가입 데이터:', data);
+    signupMutation.mutate(data, {
+      onSuccess: () => {
+        navigate('/login');
+      },
+      onError: () => {
+        setError('root', { type: 'manual', message: '회원가입에 실패했습니다.' });
+      },
+    });
   };
 
   return (
