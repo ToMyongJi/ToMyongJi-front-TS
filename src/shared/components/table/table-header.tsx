@@ -10,9 +10,9 @@ type TableHeaderProps = {
 const TableHeader = ({headerData}: TableHeaderProps) => {
   return (
     <thead>
-      <tr className="W_B15 border-b border-gray-70">
+      <tr className="W_B15 border-gray-70 border-b">
         {headerData.map((item, idx) => (
-          <th key={idx} className={`w-[${item.width}] text-center py-[1rem]`}>
+          <th key={idx} className={`w-[${item.width}] py-[1rem] text-center`}>
             {item.labels}
           </th>
         ))}

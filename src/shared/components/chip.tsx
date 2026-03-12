@@ -23,7 +23,7 @@ export function Chip({ className, label, isActive = false, ref, ...props }: Chip
       <span
         className={cn('flex items-center justify-center', isActive ? 'rotate-180' : 'rotate-0')}
       >
-        <ArrowDownIcon width={20} height={20} />
+        <ArrowDownIcon width={20} height={20} className="text-gray-20" />
       </span>
     </button>
   );

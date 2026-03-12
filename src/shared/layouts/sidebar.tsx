@@ -28,7 +28,7 @@ const Sidebar = () => {
   }
 
   return (
-    <div className="border-r border-gray-20 w-[25.2rem] h-full flex-shrink-0 overflow-hidden overflow-y-auto">
+    <div className="h-full w-[25.2rem] flex-shrink-0 overflow-hidden overflow-y-auto border-gray-20 border-r">
       <div className="h-full">
         {collegeAndClubs?.data?.map((item, idx) => (
           <div
@@ -38,7 +38,7 @@ const Sidebar = () => {
             <button
               type="button"
               onClick={() => setIsActiveCollege(item.collegeName)}
-              className="flex items-center justify-between py-[1.2rem] pl-[4rem] pr-[2.4rem] cursor-pointer w-full">
+              className="flex w-full cursor-pointer items-center justify-between py-[1.2rem] pr-[2.4rem] pl-[4rem]">
               <p className="W_SB14 text-gray-90">{item.collegeName}</p>
               {setActiveSideBar(isActiveCollege, item.collegeName) ?
                 <ArrowDownIcon className="text-gray-20" /> : <ArrowUpIcon className="text-gray-20"/>}
@@ -49,7 +49,7 @@ const Sidebar = () => {
                   key={idx}
                   type="button"
                   onClick={() => handleMenuClick(club)}
-                  className={cn('W_SB13 text-gray-90 py-[1.4rem] text-start pl-[4rem] cursor-pointer w-full', !setActiveSideBar(isActiveClubs, club.studentClubName) && "bg-background")}>{club?.studentClubName}</button>
+                  className={cn('W_SB13 w-full cursor-pointer py-[1.4rem] pl-[4rem] text-start text-gray-90', !setActiveSideBar(isActiveClubs, club.studentClubName) && "bg-background")}>{club?.studentClubName}</button>
               ))}
             </div>}
 
