@@ -18,6 +18,8 @@ const ROLE_OPTIONS = [
   { label: '부원', value: Role.STU },
 ] as const;
 
+type OpenDropdown = 'college' | 'role' | 'studentClub' | null;
+
 const registerSchema = z.object({
   userId: z.string().min(1, { message: '아이디를 입력해주세요.' }),
   name: z.string().min(1, { message: '이름을 입력해주세요.' }),
@@ -55,7 +57,7 @@ const Register = () => {
       studentNum: '',
       collegeName: '',
       role: '',
-      studentClubId: 1,
+      studentClubId: 0,
     },
   });
 
@@ -65,14 +67,19 @@ const Register = () => {
   const userId = watch('userId');
   const email = watch('email');
 
-  const { data } = useQuery(collegeQuery.collegeAndClubs());
-  const colleges = data?.data ?? [];
+  const [selectedCollege, setSelectedCollege] = useState('');
+  const [selectedCollegeId, setSelectedCollegeId] = useState<number | null>(null);
+
+  const { data: collegeData } = useQuery(collegeQuery.collegeAndClubs());
+  const colleges = collegeData?.data ?? [];
+
+  const { data: clubData } = useQuery({
+    ...collegeQuery.getCollegeByClub(selectedCollegeId ?? 0),
+    enabled: selectedCollegeId !== null,
+  });
+  const studentClubOptions = clubData?.data ?? [];
 
   // 대학, 자격, 소속 선택 상태
-  const [selectedCollege, setSelectedCollege] = useState('');
-  const [collegeOpen, setCollegeOpen] = useState<boolean>(false);
-  const [roleOpen, setRoleOpen] = useState<boolean>(false);
-  const [studentClubOpen, setStudentClubOpen] = useState<boolean>(false);
   const [emailVerificationCode, setEmailVerificationCode] = useState<string>('');
 
   const [isIdChecked, setIsIdChecked] = useState(false);
@@ -81,6 +88,13 @@ const Register = () => {
   const [emailMessage, setEmailMessage] = useState('');
   const [emailMessageType, setEmailMessageType] = useState<'success' | 'error' | null>(null);
   const [selectedRole, setSelectedRole] = useState<string>('');
+
+  const [selectedStudentClub, setSelectedStudentClub] = useState('');
+
+  const [openDropdown, setOpenDropdown] = useState<OpenDropdown>(null);
+  const toggleDropdown = (target: Exclude<OpenDropdown, null>) => {
+    setOpenDropdown((prev) => (prev === target ? null : target));
+  };
 
   const handleIdCheck = async () => {
     if (!userId) return;
@@ -317,11 +331,11 @@ const Register = () => {
                       className="w-full"
                       value={selectedCollege}
                       placeholder="대학을 선택해주세요"
-                      isOpen={collegeOpen}
-                      onClick={() => setCollegeOpen((prev) => !prev)}
+                      isOpen={openDropdown === 'college'}
+                      onClick={() => toggleDropdown('college')}
                     />
 
-                    {collegeOpen && (
+                    {openDropdown === 'college' && (
                       <ul className="absolute top-[calc(100%+0.4rem)] left-0 z-30 w-full overflow-y-auto rounded-[1rem] border-1 border-gray-20 bg-white shadow-sm">
                         {colleges.map((college) => (
                           <li key={college.collegeId}>
@@ -329,11 +343,14 @@ const Register = () => {
                               type="button"
                               className="W_M15 w-full cursor-pointer py-[1rem] pr-[1rem] pl-[1.4rem] text-left text-gray-90 hover:bg-background"
                               onClick={() => {
-                                setSelectedCollege(college.collegeName);
+                                setSelectedCollege(college.collegeName); // 화면 표시용
+                                setSelectedCollegeId(college.collegeId); // API 조회용
                                 setValue('collegeName', college.collegeName, {
                                   shouldValidate: true,
                                 });
-                                setCollegeOpen(false);
+                                setSelectedStudentClub('');
+                                setValue('studentClubId', 0, { shouldValidate: true });
+                                setOpenDropdown(null);
                               }}
                             >
                               {college.collegeName}
@@ -356,11 +373,11 @@ const Register = () => {
                       className="w-full"
                       value={selectedRole}
                       placeholder="자격을 선택해주세요"
-                      isOpen={roleOpen}
-                      onClick={() => setRoleOpen((prev) => !prev)}
+                      isOpen={openDropdown === 'role'}
+                      onClick={() => toggleDropdown('role')}
                     />
 
-                    {roleOpen && (
+                    {openDropdown === 'role' && (
                       <ul className="absolute top-[calc(100%+0.4rem)] left-0 z-30 w-full overflow-hidden rounded-[1rem] border border-gray-20 bg-white py-[0.8rem] shadow-sm">
                         {ROLE_OPTIONS.map((option) => (
                           <li key={option.value}>
@@ -370,7 +387,7 @@ const Register = () => {
                               onClick={() => {
                                 setSelectedRole(option.label);
                                 setValue('role', option.value, { shouldValidate: true });
-                                setRoleOpen(false);
+                                setOpenDropdown(null);
                               }}
                             >
                               {option.label}
@@ -383,22 +400,61 @@ const Register = () => {
                 </div>
               </div>
 
+              {/* 소속 */}
               <div className="flex flex-col gap-[0.8rem]">
-                <div className="flex items-center gap-[1.6rem]">
-                  <p className="W_SB15 w-[5.6rem] text-gray-90">소속</p>
+                <div className="flex items-start gap-[1.6rem]">
+                  <p className="W_SB15 mt-[1rem] w-[5.6rem] text-gray-90">소속</p>
+
                   <div className="flex flex-1 gap-[0.8rem]">
-                    <SelectButton
-                      className="w-[20rem]"
-                      placeholder="소속을 선택해주세요"
-                      isOpen={studentClubOpen}
-                      onClick={() => setStudentClubOpen(!studentClubOpen)}
-                    />
+                    <div className="relative">
+                      <SelectButton
+                        className="w-[20rem]"
+                        value={selectedStudentClub}
+                        placeholder={
+                          selectedCollege ? '소속을 선택해주세요' : '대학을 먼저 선택해주세요'
+                        }
+                        isOpen={openDropdown === 'studentClub'}
+                        onClick={() => {
+                          if (!selectedCollege) return;
+                          toggleDropdown('studentClub');
+                        }}
+                      />
+
+                      {openDropdown === 'studentClub' && (
+                        <ul className="absolute top-[calc(100%+0.4rem)] left-0 z-30 overflow-hidden rounded-[1rem] border border-gray-20 bg-white shadow-sm">
+                          {studentClubOptions.length === 0 ? (
+                            <li className="W_M15 px-[1.4rem] py-[1rem] text-gray-60">
+                              조회된 소속이 없습니다.
+                            </li>
+                          ) : (
+                            studentClubOptions.map((club) => (
+                              <li key={club.studentClubId}>
+                                <button
+                                  type="button"
+                                  className="W_M15 w-full cursor-pointer py-[1rem] pr-[1rem] pl-[1.4rem] text-left text-gray-90 hover:bg-background"
+                                  onClick={() => {
+                                    setSelectedStudentClub(club.studentClubName);
+                                    setValue('studentClubId', club.studentClubId, {
+                                      shouldValidate: true,
+                                    });
+                                    setOpenDropdown(null);
+                                  }}
+                                >
+                                  {club.studentClubName}
+                                </button>
+                              </li>
+                            ))
+                          )}
+                        </ul>
+                      )}
+                    </div>
+
                     <Button
                       type="button"
                       variant="primary"
                       size="regular"
                       className="w-[8.9rem]"
-                      disabled={!studentClubOpen}
+                      disabled={!watch('studentClubId') || watch('studentClubId') < 1}
                     >
                       인증하기
                     </Button>
