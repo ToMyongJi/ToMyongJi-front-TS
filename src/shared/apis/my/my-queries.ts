@@ -3,5 +3,6 @@ import { QK } from '@apis/base/key';
 import { myApi } from './my';
 
 export const myQuery = {
-  getMyInfo: (id: number) => buildQuery(QK.my.getMyInfo(), () => myApi.getMyInfo(id)),
+  getMyInfo: (id: number) => buildQuery(QK.my.getMyInfo(id), () => myApi.getMyInfo(id)),
+  viewMember: (id: number) => buildQuery(QK.my.viewMember(id), () => myApi.viewMember(id)),
 };

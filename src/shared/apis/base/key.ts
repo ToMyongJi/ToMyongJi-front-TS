@@ -1,6 +1,7 @@
 export const QK = {
   my: {
-    getMyInfo: () => ['my', 'getMyInfo'] as const,
+    getMyInfo: (id: number) => ['my', 'getMyInfo', id] as const,
+    viewMember: (id: number) => ['my', 'viewMember', id] as const,
   },
 
   auth: {
