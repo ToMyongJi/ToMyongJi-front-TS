@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {useNavigate} from 'react-router-dom';
 import { cn } from '@libs/cn';
+import {useStudentClubStore} from '@store/studentClubStore';
 
 import { collegeQuery } from '@apis/college/college-queries';
 import { college } from '@apis/college/college';
@@ -15,6 +16,8 @@ const Sidebar = () => {
   const [isActiveCollege, setIsActiveCollege] = useState<string>('');
   const [isActiveClubs, setIsActiveClubs] = useState<string>('');
 
+  const { setSelectedClub } = useStudentClubStore();
+
   const { data: collegeAndClubs } = useQuery(collegeQuery.collegeAndClubs());
 
 
@@ -24,8 +27,15 @@ const Sidebar = () => {
 
   const handleMenuClick = (club: college) => {
     setIsActiveClubs(club?.studentClubName);
+
+    setSelectedClub({
+      studentClubId: club.studentClubId,
+      studentClubName: club.studentClubName,
+      verification: club.verification,
+    });
+
     navigate(`/receipt-view/${club.studentClubId}`);
-  }
+  };
 
   return (
     <div className="h-full w-[25.2rem] flex-shrink-0 overflow-hidden overflow-y-auto border-gray-20 border-r">
@@ -44,9 +54,9 @@ const Sidebar = () => {
                 <ArrowDownIcon className="text-gray-20" /> : <ArrowUpIcon className="text-gray-20"/>}
             </button>
             {!setActiveSideBar(isActiveCollege, item.collegeName) && <div className="w-full">
-              {item?.clubs?.map((club: college, idx: number) => (
+              {item?.clubs?.map((club: college) => (
                 <button
-                  key={idx}
+                  key={club.studentClubId}
                   type="button"
                   onClick={() => handleMenuClick(club)}
                   className={cn('W_SB13 w-full cursor-pointer py-[1.4rem] pl-[4rem] text-start text-gray-90', !setActiveSideBar(isActiveClubs, club.studentClubName) && "bg-background")}>{club?.studentClubName}</button>

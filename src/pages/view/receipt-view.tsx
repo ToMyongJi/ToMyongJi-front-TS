@@ -1,4 +1,8 @@
 import {useState} from 'react';
+import {useInfiniteQuery} from '@tanstack/react-query';
+import {receiptQueries} from '@apis/receipt/receipt-queries';
+import {useStudentClubStore} from '@store/studentClubStore';
+import { Receipt } from '@apis/receipt/receipt';
 import dayjs from 'dayjs';
 import InfoIcon from "@assets/icons/info.svg?react";
 import MenuIcon from "@assets/icons/menu.svg?react";
@@ -24,11 +28,26 @@ const ReceiptView = () => {
   const [monthFilter, setMonthFilter] = useState(false);
   const [page, setPage] = useState(1);
 
-  const currentYear = dayjs().year();
-  const yearOptions = Array.from(
-    { length: 5 },
-    (_, i) => `${currentYear - 2 + i}년`,
-  );
+  const clubData = useStudentClubStore((state) => state.selectedClub);
+
+  const selectedYear = Number(year.replace('년', '')); // 항상 숫자
+  const selectedMonth = month === '전체'
+    ? undefined
+    : Number(month.replace('월', ''));
+
+  const receiptList = useInfiniteQuery({
+    ...receiptQueries.listInfinite(
+      clubData?.studentClubId,
+      selectedYear,
+      selectedMonth,
+      10,
+      page - 1, // API는 0-based
+    ),
+  });
+  const totalPages = receiptList.data?.pages[0]?.data.totalPages ?? 0;
+  const receipts =
+    receiptList.data?.pages.flatMap((p) => p.data.receiptDtoList) ?? [];
+  const yearOptions = Array.from({ length: 5 }, (_, i) => `${dayjs().year() - 2 + i}년`,);
   const monthOptions = ['전체', ...Array.from({ length: 12 }, (_, i) => `${i + 1}월`)];
 
   const handleChipClick = (type: 'YEAR' | 'MONTH') => {
@@ -39,7 +58,7 @@ const ReceiptView = () => {
     <div className="mb-[10rem] flex-col gap-[4.6rem] px-[9.3rem] pt-[4.2rem]">
       <section className="flex-row-between">
         <div className="flex items-center gap-[0.8rem]">
-          <p className="W_Header text-black">인공지능소프트웨어융합대학 학생회</p>
+          <p className="W_Header text-black">{clubData?.studentClubName}</p>
           <InfoIcon className="text-gray-20" />
         </div>
         <MenuIcon className='md:hidden'/>
@@ -77,12 +96,18 @@ const ReceiptView = () => {
           <div className="pt-[1.6rem]">
             <table className="w-full table-fixed">
               <TableHeader headerData={HeaderData} />
-              <TableCell type={"VIEW"} />
+              {receipts.map((item: Receipt) => (
+                <TableCell
+                  key={item.receiptId}
+                  type={'VIEW'}
+                  {...item}
+                        />
+              ))}
             </table>
             <div className="py-[1.6rem]">
               <PaginationCustom
                 currentPage={page}
-                totalPages={10}
+                totalPages={totalPages}
                 onPageChange={(pageNumber) => setPage(pageNumber)}/>
             </div>
 

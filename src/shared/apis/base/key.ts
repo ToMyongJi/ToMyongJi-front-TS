@@ -9,7 +9,8 @@ export const QK = {
   },
 
   receipt: {
-    list: (clubId:number, size?: number, y: number, m:number) => ['receiptList', clubId, size, y, m] as const,
+    list: (clubId?: number, size?: number, y?: number, m?: number, page?: number) =>
+      ['receiptList', clubId, size, y, m, page] as const,
   },
 
   collegeAndClubs: {

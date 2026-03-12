@@ -6,7 +6,7 @@ export const ENDPOINTS = {
     specific: (receiptId: string) => `/api/receipt/${receiptId}`,
     keyword: '/api/receipt/keyword',
     club: (clubId: string) => `/api/receipt/club/${clubId}`,
-    paging: (clubId: string) => `/api/receipt/club/${clubId}/paging`,
+    paging: (clubId?: number) => `/api/receipt/club/${clubId}/paging`,
   },
 
   auth:{
