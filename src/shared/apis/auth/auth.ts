@@ -29,10 +29,24 @@ export type authSignupRequest = {
 
 export type idCheckResponse = Rsp<boolean>;
 
+export type sendEmailRequest = {
+  email: string;
+};
+
+export type emailCheckRequest = {
+  email: string;
+  code: string;
+};
+
+export type emailCheckResponse = Rsp<boolean>;
 export const authApi = {
   login: (body: authLoginRequest) =>
     http.post<authLoginResponse, typeof body>(ENDPOINTS.auth.login, body),
   signup: (body: authSignupRequest) =>
     http.post<Rsp<null>, typeof body>(ENDPOINTS.auth.signup, body),
   idCheck: (userId: string) => http.get<idCheckResponse>(ENDPOINTS.auth.check(userId)),
+  sendEmail: (body: sendEmailRequest) =>
+    http.post<Rsp<null>, typeof body>(ENDPOINTS.auth.email, body),
+  emailCheck: (body: emailCheckRequest) =>
+    http.post<emailCheckResponse, typeof body>(ENDPOINTS.auth.emailCheck, body),
 };

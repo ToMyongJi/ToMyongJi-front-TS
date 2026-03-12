@@ -1,8 +1,10 @@
 import { authApi } from '@apis/auth/auth';
+import { authMutations } from '@apis/auth/auth-mutations';
 import { Button } from '@components/common/button';
 import SelectButton from '@components/common/select-button';
 import TextField from '@components/common/textfield';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -49,6 +51,8 @@ const Register = () => {
     },
   });
 
+  const sendEmailMutation = useMutation(authMutations.sendEmail());
+  const emailCheckMutation = useMutation(authMutations.emailCheck());
   // 실시간으로 가져온 값 -> 추후 대학, 자격, 소속 선택 상태 관리 필요
   const userId = watch('userId');
   const email = watch('email');
@@ -60,6 +64,10 @@ const Register = () => {
   const [emailVerificationCode, setEmailVerificationCode] = useState<string>('');
 
   const [isIdChecked, setIsIdChecked] = useState(false);
+  const [isEmailSent, setIsEmailSent] = useState(false);
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [emailMessage, setEmailMessage] = useState('');
+  const [emailMessageType, setEmailMessageType] = useState<'success' | 'error' | null>(null);
 
   const handleIdCheck = async () => {
     if (!userId) return;
@@ -80,6 +88,53 @@ const Register = () => {
         message: '아이디 중복 확인 중 오류가 발생했습니다.',
       });
     }
+  };
+
+  const handleSendEmail = () => {
+    if (!email || !!errors.email || isEmailVerified) return;
+
+    sendEmailMutation.mutate(
+      { email },
+      {
+        onSuccess: () => {
+          setIsEmailSent(true);
+          setEmailMessage('인증코드를 발송했습니다. 이메일을 확인해주세요.');
+          setEmailMessageType('success');
+        },
+        onError: () => {
+          setIsEmailSent(false);
+          setIsEmailVerified(false);
+          setEmailMessage('이메일 발송에 실패했습니다. 다시 시도해주세요.');
+          setEmailMessageType('error');
+        },
+      },
+    );
+  };
+
+  const handleEmailCheck = () => {
+    if (!emailVerificationCode || isEmailVerified) return;
+
+    emailCheckMutation.mutate(
+      { email, code: emailVerificationCode },
+      {
+        onSuccess: (res) => {
+          if (res.data === true) {
+            setIsEmailVerified(true);
+            setEmailMessageType('success');
+            setEmailMessage('이메일 인증이 완료되었습니다.');
+          } else {
+            setIsEmailVerified(false);
+            setEmailMessageType('error');
+            setEmailMessage('인증코드가 올바르지 않습니다.');
+          }
+        },
+        onError: () => {
+          setIsEmailVerified(false);
+          setEmailMessageType('error');
+          setEmailMessage('인증코드 확인에 실패했습니다.');
+        },
+      },
+    );
   };
 
   const onSubmit = (data: RegisterFormValues) => {
@@ -148,23 +203,40 @@ const Register = () => {
                   <div className="flex gap-[1rem]">
                     <TextField
                       className="w-[20rem]"
-                      {...register('email')}
-                      isError={!!errors.email}
+                      {...register('email', {
+                        onChange: () => {
+                          setIsEmailSent(false);
+                          setIsEmailVerified(false);
+                          setEmailVerificationCode('');
+                          setEmailMessage('');
+                          setEmailMessageType(null);
+                          clearErrors('email');
+                        },
+                      })}
+                      isError={!!errors.email || emailMessageType === 'error'}
+                      disabled={isEmailVerified}
                     />
                     <Button
                       type="button"
                       variant="primary"
                       size="regular"
                       className="w-[9.2rem]"
-                      disabled={!email || !!errors.email}
-                      onClick={() => {
-                        console.log('코드 발송');
-                      }}
+                      disabled={
+                        !email || !!errors.email || sendEmailMutation.isPending || isEmailSent
+                      }
+                      onClick={handleSendEmail}
                     >
-                      코드 발송
+                      {sendEmailMutation.isPending ? '발송 중...' : '코드 발송'}
                     </Button>
                   </div>
                 </div>
+                {emailMessageType && (
+                  <p
+                    className={`W_R12 ${emailMessageType === 'success' ? 'text-green-600' : 'text-error'}`}
+                  >
+                    {emailMessage}
+                  </p>
+                )}
 
                 {/* 인증코드 */}
                 <div className="flex items-center gap-[1rem]">
@@ -174,15 +246,26 @@ const Register = () => {
                       className="w-[20rem]"
                       value={emailVerificationCode}
                       onChange={(e) => setEmailVerificationCode(e.target.value)}
+                      disabled={!isEmailSent || isEmailVerified}
                     />
                     <Button
                       type="button"
                       variant="primary"
                       size="regular"
                       className="w-[9.2rem]"
-                      disabled={!emailVerificationCode}
+                      disabled={
+                        !emailVerificationCode ||
+                        !isEmailSent ||
+                        isEmailVerified ||
+                        emailCheckMutation.isPending
+                      }
+                      onClick={handleEmailCheck}
                     >
-                      인증하기
+                      {isEmailVerified
+                        ? '인증완료'
+                        : emailCheckMutation.isPending
+                          ? '확인 중...'
+                          : '인증하기'}
                     </Button>
                   </div>
                 </div>
