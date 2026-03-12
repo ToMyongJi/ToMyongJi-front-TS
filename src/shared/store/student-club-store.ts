@@ -1,14 +1,12 @@
 import { type college, collegeApi, type collegeGetAllResponse } from '@apis/college/college';
+import { type addMemberRequest, myApi } from '@apis/my/my';
 import { create } from 'zustand';
-// TODO: 멤버 추가, 삭제 등에 대한 API가 apis 폴더 내에 구현되면 아래처럼 import 해야 합니다.
-// import { clubMemberApi } from '@apis/club-member/club-member';
 
 // 1. 필요한 타입 정의
 export interface ClubMember {
-  id: number;
+  memeberId: number;
   studentNum: string;
   name: string;
-  // 필요한 필드 추가
 }
 
 export interface CurrentClub extends college {
@@ -16,7 +14,7 @@ export interface CurrentClub extends college {
 }
 
 interface StudentClubState {
-  clubs: collegeGetAllResponse['data'][]; // 단과대와 동아리 목록 전체 데이터
+  clubs: collegeGetAllResponse['data']; // 단과대와 학생회 목록
   allClubsFlat: college[]; // 모든 동아리만 평탄화(flatten)한 목록
   currentClub: CurrentClub | null;
   isLoading: boolean;
@@ -27,8 +25,8 @@ interface StudentClubState {
   getClubNameById: (clubId: number) => string;
   setCurrentClub: (clubId: number) => void;
   fetchClubMembers: (clubId: number) => Promise<void>;
-  addMember: (userId: string, memberData: any) => Promise<void>;
-  deleteMember: (memberId: number) => Promise<void>;
+  addMember: (memberData: addMemberRequest) => Promise<void>;
+  deleteMember: (deletedStudentNumb: number) => Promise<void>;
   verifyClubMembership: (clubId: number, studentNum: string, name: string) => Promise<boolean>;
 }
 
@@ -44,12 +42,13 @@ const useStudentClubStore = create<StudentClubState>((set, get) => ({
   fetchClubs: async () => {
     set({ isLoading: true });
     try {
-      // 현재 프로젝트의 collegeApi 사용
       const response = await collegeApi.collegesAndClubs();
-      const clubsData = Array.isArray(response.data) ? response.data : [response.data]; // 배열 형태 보장
+      const clubsData = response.data; // 타입: collegeGetAllResponse['data']
 
-      // 모든 동아리만 평탄화하여 찾기 쉽게 만듦
-      const flatClubs = clubsData.flatMap((college) => college.clubs || []);
+      const flatClubs = clubsData.reduce<college[]>((acc, collegeItem) => {
+        acc.push(...(collegeItem.clubs ?? []));
+        return acc;
+      }, []);
 
       set({
         clubs: clubsData,
@@ -89,10 +88,19 @@ const useStudentClubStore = create<StudentClubState>((set, get) => ({
   fetchClubMembers: async (clubId) => {
     set({ isLoading: true });
     try {
-      // TODO: 현재 프로젝트 구조에 맞게 API 교체 필요
-      // const response = await clubMemberApi.getMembers(clubId);
-      // const members = response.data;
-      const members: ClubMember[] = []; // 임시 빈 배열
+      // myApi.viewMember 호출
+      const response = await myApi.viewMember(clubId);
+
+      // API 응답이 단일 객체인지 배열인지에 따라 처리 (타입상 단일 객체로 정의되어 있으나, 보통 목록은 배열로 옴)
+      // 만약 배열로 온다면 아래처럼 처리하고, 단일 객체라면 [response.data]로 감쌉니다.
+      const membersData = Array.isArray(response.data) ? response.data : [response.data];
+
+      // 응답 데이터를 ClubMember 타입에 맞게 매핑
+      const members: ClubMember[] = membersData.map((m) => ({
+        memeberId: m.memberId,
+        studentNum: m.studentNum,
+        name: m.name,
+      }));
 
       set((state) => ({
         currentClub: state.currentClub ? { ...state.currentClub, memberInfos: members } : null,
@@ -105,13 +113,18 @@ const useStudentClubStore = create<StudentClubState>((set, get) => ({
   },
 
   // 멤버 추가
-  addMember: async (userId, memberData) => {
+  addMember: async (memberData: addMemberRequest) => {
     set({ isLoading: true });
     try {
-      // TODO: 현재 프로젝트 구조에 맞게 API 교체 필요
-      //   const response = await clubMemberApi.addMember(userId, memberData);
-      // const newMember = response.data;
-      const newMember: ClubMember = { id: 999, studentNum: 'temp', name: 'temp' }; // 임시 데이터
+      // myApi.addMember 호출
+      const response = await myApi.addMember(memberData);
+      const newMemberData = response.data;
+
+      const newMember: ClubMember = {
+        memeberId: newMemberData.memberId,
+        studentNum: newMemberData.studentNum,
+        name: newMemberData.name,
+      };
 
       set((state) => {
         if (!state.currentClub) return state;
@@ -130,18 +143,21 @@ const useStudentClubStore = create<StudentClubState>((set, get) => ({
   },
 
   // 멤버 삭제
-  deleteMember: async (memberId) => {
+  deleteMember: async (deletedStudentNumb: number) => {
     set({ isLoading: true });
     try {
-      // TODO: 현재 프로젝트 구조에 맞게 API 교체 필요
-      // await clubMemberApi.deleteMember(memberId);
+      // myApi.deleteMember 호출
+      await myApi.deleteMember(deletedStudentNumb);
 
       set((state) => {
         if (!state.currentClub) return state;
         return {
           currentClub: {
             ...state.currentClub,
-            memberInfos: (state.currentClub.memberInfos || []).filter((m) => m.id !== memberId),
+            // 삭제된 멤버의 memberId를 기준으로 필터링
+            memberInfos: (state.currentClub.memberInfos || []).filter(
+              (m) => m.memeberId !== deletedStudentNumb,
+            ),
           },
           isLoading: false,
           error: null,
