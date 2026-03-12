@@ -1,7 +1,9 @@
 import MainLogo from '@assets/icons/logo.svg?react';
 import { Button } from '@components/common/button';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../store/auth-store';
+import useStudentClubStore from '../store/student-club-store';
 import useUserStore from '../store/user-store';
 
 const HeaderGnb = () => {
@@ -9,7 +11,15 @@ const HeaderGnb = () => {
   const { authData, clearAuthData } = useAuthStore();
   const { user, clearUser } = useUserStore();
 
-  const studentClubName = user?.college;
+  const { allClubsFlat, getClubNameById, fetchClubs } = useStudentClubStore();
+
+  useEffect(() => {
+    if (authData && allClubsFlat.length === 0) {
+      fetchClubs();
+    }
+  }, [authData, allClubsFlat.length, fetchClubs]);
+
+  const studentClubName = user?.studentClubId != null ? getClubNameById(user.studentClubId) : '';
 
   const handleLogout = () => {
     clearAuthData();
@@ -23,10 +33,9 @@ const HeaderGnb = () => {
         <MainLogo className="h-[3.8rem] w-[4.3rem]" />
       </button>
 
-      {/* authData가 있으면(로그인 상태) 학생회 이름과 로그아웃 버튼 표시 */}
       {authData ? (
         <div className="flex items-center gap-[1.6rem]">
-          <span className="W_B14 text-black">{studentClubName}</span>
+          <span className="W_B14 text-black">{studentClubName || '학생회'}</span>
           <Button variant="gray" size="sm" onClick={handleLogout}>
             로그아웃
           </Button>

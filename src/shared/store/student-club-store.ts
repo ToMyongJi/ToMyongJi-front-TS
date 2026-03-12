@@ -2,7 +2,6 @@ import { type college, collegeApi, type collegeGetAllResponse } from '@apis/coll
 import { type addMemberRequest, myApi } from '@apis/my/my';
 import { create } from 'zustand';
 
-// 1. 필요한 타입 정의
 export interface ClubMember {
   memeberId: number;
   studentNum: string;
@@ -15,7 +14,7 @@ export interface CurrentClub extends college {
 
 interface StudentClubState {
   clubs: collegeGetAllResponse['data']; // 단과대와 학생회 목록
-  allClubsFlat: college[]; // 모든 동아리만 평탄화(flatten)한 목록
+  allClubsFlat: college[]; // 모든 동아리 목록
   currentClub: CurrentClub | null;
   isLoading: boolean;
   error: Error | unknown | null;
@@ -30,7 +29,6 @@ interface StudentClubState {
   verifyClubMembership: (clubId: number, studentNum: string, name: string) => Promise<boolean>;
 }
 
-// 2. 스토어 생성
 const useStudentClubStore = create<StudentClubState>((set, get) => ({
   clubs: [],
   allClubsFlat: [],
@@ -88,14 +86,10 @@ const useStudentClubStore = create<StudentClubState>((set, get) => ({
   fetchClubMembers: async (clubId) => {
     set({ isLoading: true });
     try {
-      // myApi.viewMember 호출
       const response = await myApi.viewMember(clubId);
 
-      // API 응답이 단일 객체인지 배열인지에 따라 처리 (타입상 단일 객체로 정의되어 있으나, 보통 목록은 배열로 옴)
-      // 만약 배열로 온다면 아래처럼 처리하고, 단일 객체라면 [response.data]로 감쌉니다.
       const membersData = Array.isArray(response.data) ? response.data : [response.data];
 
-      // 응답 데이터를 ClubMember 타입에 맞게 매핑
       const members: ClubMember[] = membersData.map((m) => ({
         memeberId: m.memberId,
         studentNum: m.studentNum,
@@ -146,7 +140,6 @@ const useStudentClubStore = create<StudentClubState>((set, get) => ({
   deleteMember: async (deletedStudentNumb: number) => {
     set({ isLoading: true });
     try {
-      // myApi.deleteMember 호출
       await myApi.deleteMember(deletedStudentNumb);
 
       set((state) => {
@@ -154,7 +147,6 @@ const useStudentClubStore = create<StudentClubState>((set, get) => ({
         return {
           currentClub: {
             ...state.currentClub,
-            // 삭제된 멤버의 memberId를 기준으로 필터링
             memberInfos: (state.currentClub.memberInfos || []).filter(
               (m) => m.memeberId !== deletedStudentNumb,
             ),
@@ -203,7 +195,6 @@ const useStudentClubStore = create<StudentClubState>((set, get) => ({
   },
 }));
 
-// 스토어 초기화 시 동아리 목록 불러오기
 useStudentClubStore.getState().fetchClubs();
 
 export default useStudentClubStore;
