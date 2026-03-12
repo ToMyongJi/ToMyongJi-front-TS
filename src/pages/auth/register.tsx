@@ -4,6 +4,7 @@ import { collegeQuery } from '@apis/college/college-queries';
 import { Button } from '@components/common/button';
 import SelectButton from '@components/common/select-button';
 import TextField from '@components/common/textfield';
+import Role from '@constants/role';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
@@ -11,6 +12,11 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 import * as z from 'zod';
+
+const ROLE_OPTIONS = [
+  { label: '학생회장', value: Role.PRESIDENT },
+  { label: '부원', value: Role.STU },
+] as const;
 
 const registerSchema = z.object({
   userId: z.string().min(1, { message: '아이디를 입력해주세요.' }),
@@ -47,8 +53,8 @@ const Register = () => {
       email: '',
       name: '',
       studentNum: '',
-      collegeName: '샘플대학교',
-      role: '샘플자격',
+      collegeName: '',
+      role: '',
       studentClubId: 1,
     },
   });
@@ -74,6 +80,7 @@ const Register = () => {
   const [isEmailVerified, setIsEmailVerified] = useState(false);
   const [emailMessage, setEmailMessage] = useState('');
   const [emailMessageType, setEmailMessageType] = useState<'success' | 'error' | null>(null);
+  const [selectedRole, setSelectedRole] = useState<string>('');
 
   const handleIdCheck = async () => {
     if (!userId) return;
@@ -341,14 +348,38 @@ const Register = () => {
 
               {/* 자격 */}
               <div className="flex flex-col gap-[0.8rem]">
-                <div className="flex items-center gap-[1.6rem]">
-                  <p className="W_SB15 w-[5.6rem] text-gray-90">자격</p>
-                  <SelectButton
-                    className="w-[30rem]"
-                    placeholder="자격을 선택해주세요"
-                    isOpen={roleOpen}
-                    onClick={() => setRoleOpen(!roleOpen)}
-                  />
+                <div className="flex items-start gap-[1.6rem]">
+                  <p className="W_SB15 mt-[1rem] w-[5.6rem] text-gray-90">자격</p>
+
+                  <div className="relative w-[30rem]">
+                    <SelectButton
+                      className="w-full"
+                      value={selectedRole}
+                      placeholder="자격을 선택해주세요"
+                      isOpen={roleOpen}
+                      onClick={() => setRoleOpen((prev) => !prev)}
+                    />
+
+                    {roleOpen && (
+                      <ul className="absolute top-[calc(100%+0.4rem)] left-0 z-30 w-full overflow-hidden rounded-[1rem] border border-gray-20 bg-white py-[0.8rem] shadow-sm">
+                        {ROLE_OPTIONS.map((option) => (
+                          <li key={option.value}>
+                            <button
+                              type="button"
+                              className="W_M15 w-full px-[2rem] py-[1rem] text-left text-gray-90 hover:bg-gray-50"
+                              onClick={() => {
+                                setSelectedRole(option.label);
+                                setValue('role', option.value, { shouldValidate: true });
+                                setRoleOpen(false);
+                              }}
+                            >
+                              {option.label}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
                 </div>
               </div>
 

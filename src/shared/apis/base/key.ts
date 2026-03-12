@@ -16,4 +16,9 @@ export const QK = {
   collegeAndClubs: {
     all: () => ['collegeAndClubs'] as const,
   },
+
+  college: {
+    getAllClub: () => ['college', 'getAllClub'] as const,
+    getCollegeByClub: (collegeId: number) => ['college', 'getCollegeByClub', collegeId] as const,
+  },
 };
