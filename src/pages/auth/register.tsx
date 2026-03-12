@@ -63,6 +63,7 @@ const Register = () => {
 
   const sendEmailMutation = useMutation(authMutations.sendEmail());
   const emailCheckMutation = useMutation(authMutations.emailCheck());
+  const clubVerifyMutation = useMutation(authMutations.clubVerify());
 
   const userId = watch('userId');
   const email = watch('email');
@@ -159,6 +160,30 @@ const Register = () => {
           setIsEmailVerified(false);
           setEmailMessageType('error');
           setEmailMessage('인증코드 확인에 실패했습니다.');
+        },
+      },
+    );
+  };
+  const handleClubVerify = () => {
+    if (!watch('studentClubId') || !watch('collegeName') || !watch('role')) return;
+    clubVerifyMutation.mutate(
+      {
+        clubId: watch('studentClubId'),
+        studentNum: watch('studentNum'),
+        role: watch('role') as Role,
+      },
+      {
+        onSuccess: () => {
+          setError('studentClubId', {
+            type: 'manual',
+            message: '소속 인증이 완료되었습니다.',
+          });
+        },
+        onError: () => {
+          setError('studentClubId', {
+            type: 'manual',
+            message: '소속 인증에 실패했습니다.',
+          });
         },
       },
     );
@@ -455,11 +480,17 @@ const Register = () => {
                       size="regular"
                       className="w-[8.9rem]"
                       disabled={!watch('studentClubId') || watch('studentClubId') < 1}
+                      onClick={handleClubVerify}
                     >
                       인증하기
                     </Button>
                   </div>
                 </div>
+                {errors.studentClubId ? (
+                  <p className="W_R12 text-center text-error">{errors.studentClubId.message}</p>
+                ) : clubVerifyMutation.isSuccess ? (
+                  <p className="W_R12 text-center text-green-600">소속 인증이 완료되었습니다.</p>
+                ) : null}
               </div>
             </div>
 
