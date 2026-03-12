@@ -6,4 +6,6 @@ export const authMutations = {
   signup: () => buildMutation(authApi.signup),
   sendEmail: () => buildMutation(authApi.sendEmail),
   emailCheck: () => buildMutation(authApi.emailCheck),
+  delete: () => buildMutation(authApi.delete),
+  clubVerify: () => buildMutation(authApi.clubVerify),
 };
