@@ -27,9 +27,12 @@ export type authSignupRequest = {
   role: 'ADMIN' | 'STU' | 'PRESIDENT';
 };
 
+export type idCheckResponse = Rsp<boolean>;
+
 export const authApi = {
   login: (body: authLoginRequest) =>
     http.post<authLoginResponse, typeof body>(ENDPOINTS.auth.login, body),
   signup: (body: authSignupRequest) =>
     http.post<Rsp<null>, typeof body>(ENDPOINTS.auth.signup, body),
+  idCheck: (userId: string) => http.get<idCheckResponse>(ENDPOINTS.auth.check(userId)),
 };

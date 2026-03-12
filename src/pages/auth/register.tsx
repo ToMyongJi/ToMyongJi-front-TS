@@ -1,7 +1,9 @@
+import { authApi } from '@apis/auth/auth';
 import { Button } from '@components/common/button';
 import SelectButton from '@components/common/select-button';
 import TextField from '@components/common/textfield';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { isAxiosError } from 'axios';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
@@ -29,6 +31,8 @@ const Register = () => {
     register,
     handleSubmit,
     watch,
+    setError,
+    clearErrors,
     formState: { errors, isValid, isSubmitting },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -55,6 +59,29 @@ const Register = () => {
   const [studentClubOpen, setStudentClubOpen] = useState<boolean>(false);
   const [emailVerificationCode, setEmailVerificationCode] = useState<string>('');
 
+  const [isIdChecked, setIsIdChecked] = useState(false);
+
+  const handleIdCheck = async () => {
+    if (!userId) return;
+    try {
+      await authApi.idCheck(userId);
+      setIsIdChecked(true);
+      clearErrors('userId');
+    } catch (error) {
+      if (isAxiosError(error) && error.response?.status === 409) {
+        setError('userId', {
+          type: 'manual',
+          message: '중복된 아이디입니다.',
+        });
+        return;
+      }
+      setError('userId', {
+        type: 'manual',
+        message: '아이디 중복 확인 중 오류가 발생했습니다.',
+      });
+    }
+  };
+
   const onSubmit = (data: RegisterFormValues) => {
     console.log('회원가입 데이터:', data);
   };
@@ -70,7 +97,7 @@ const Register = () => {
             {/* 첫 번째 그룹: 계정 정보 */}
             <div className="flex flex-col gap-[1.6rem] rounded-[1rem] border border-gray-20 px-[2.6rem] py-[3rem]">
               {/* 아이디 */}
-              <div className="flex w-[36.6rem] gap-[1rem]">
+              <div className="flex w-[36.6rem] flex-col gap-[1rem]">
                 <div className="flex items-center gap-[1.6rem]">
                   <p className="W_B15 w-[5.6rem] text-gray-90">아이디</p>
                   <div className="flex gap-[1rem]">
@@ -78,18 +105,25 @@ const Register = () => {
                       className="w-[20rem]"
                       {...register('userId')}
                       isError={!!errors.userId}
+                      disabled={isIdChecked}
                     />
                     <Button
                       type="button"
                       variant="primary"
                       size="regular"
                       className="w-[8.9rem]"
-                      disabled={!userId}
+                      disabled={!userId || isIdChecked}
+                      onClick={handleIdCheck}
                     >
                       중복확인
                     </Button>
                   </div>
                 </div>
+                {errors.userId ? (
+                  <p className="W_R12 text-error">{errors.userId.message}</p>
+                ) : isIdChecked ? (
+                  <p className="W_R12 text-green-600">사용 가능한 아이디입니다.</p>
+                ) : null}
               </div>
 
               {/* 비밀번호 */}
