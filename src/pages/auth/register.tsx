@@ -1,10 +1,11 @@
 import { authApi } from '@apis/auth/auth';
 import { authMutations } from '@apis/auth/auth-mutations';
+import { collegeQuery } from '@apis/college/college-queries';
 import { Button } from '@components/common/button';
 import SelectButton from '@components/common/select-button';
 import TextField from '@components/common/textfield';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -33,6 +34,7 @@ const Register = () => {
     register,
     handleSubmit,
     watch,
+    setValue,
     setError,
     clearErrors,
     formState: { errors, isValid, isSubmitting },
@@ -53,11 +55,15 @@ const Register = () => {
 
   const sendEmailMutation = useMutation(authMutations.sendEmail());
   const emailCheckMutation = useMutation(authMutations.emailCheck());
-  // 실시간으로 가져온 값 -> 추후 대학, 자격, 소속 선택 상태 관리 필요
+
   const userId = watch('userId');
   const email = watch('email');
 
+  const { data } = useQuery(collegeQuery.collegeAndClubs());
+  const colleges = data?.data ?? [];
+
   // 대학, 자격, 소속 선택 상태
+  const [selectedCollege, setSelectedCollege] = useState('');
   const [collegeOpen, setCollegeOpen] = useState<boolean>(false);
   const [roleOpen, setRoleOpen] = useState<boolean>(false);
   const [studentClubOpen, setStudentClubOpen] = useState<boolean>(false);
@@ -296,14 +302,40 @@ const Register = () => {
 
               {/* 대학 */}
               <div className="flex flex-col gap-[0.8rem]">
-                <div className="flex items-center gap-[1.6rem]">
-                  <p className="W_SB15 w-[5.6rem] text-gray-90">대학</p>
-                  <SelectButton
-                    placeholder="대학을 선택해주세요"
-                    className="w-[30rem]"
-                    isOpen={collegeOpen}
-                    onClick={() => setCollegeOpen(!collegeOpen)}
-                  />
+                <div className="flex items-start gap-[1.6rem]">
+                  <p className="W_SB15 mt-[1rem] w-[5.6rem] text-gray-90">대학</p>
+
+                  <div className="relative w-[30rem]">
+                    <SelectButton
+                      className="w-full"
+                      value={selectedCollege}
+                      placeholder="대학을 선택해주세요"
+                      isOpen={collegeOpen}
+                      onClick={() => setCollegeOpen((prev) => !prev)}
+                    />
+
+                    {collegeOpen && (
+                      <ul className="absolute top-[calc(100%+0.4rem)] left-0 z-30 w-full overflow-y-auto rounded-[1rem] border-1 border-gray-20 bg-white shadow-sm">
+                        {colleges.map((college) => (
+                          <li key={college.collegeId}>
+                            <button
+                              type="button"
+                              className="W_M15 w-full cursor-pointer py-[1rem] pr-[1rem] pl-[1.4rem] text-left text-gray-90 hover:bg-background"
+                              onClick={() => {
+                                setSelectedCollege(college.collegeName);
+                                setValue('collegeName', college.collegeName, {
+                                  shouldValidate: true,
+                                });
+                                setCollegeOpen(false);
+                              }}
+                            >
+                              {college.collegeName}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
                 </div>
               </div>
 

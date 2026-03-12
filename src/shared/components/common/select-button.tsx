@@ -8,12 +8,12 @@ const selectButtonVariants = cva(
   {
     variants: {
       status: {
-        // 1. Default: 아무것도 선택하지 않은 기본 상태 (흰색 배경)
+        // 1) 기본 상태
         default:
-          'border-1 border-gray-20 bg-white text-gray-90 hover:bg-gray-50 active:bg-background',
-        // 2. Pressed: 클릭(드롭다운이 열려있는) 상태
-        pressed: 'border-1 border-gray-20 bg-background text-black',
-        // 3. Filled: 값을 선택 완료한 상태 (흰색 배경, 파란색 테두리, 진한 글씨)
+          'border-1 border-gray-20 bg-white text-gray-70 hover:bg-gray-50 active:bg-background active:text-black',
+        // 2) 열림 상태 (드롭다운 펼침)
+        selecting: 'border-1 border-primary bg-white text-gray-70',
+        // 3) 선택 완료 상태
         filled: 'border-1 border-primary bg-white text-black hover:bg-gray-50 active:bg-background',
       },
     },
@@ -26,11 +26,8 @@ const selectButtonVariants = cva(
 interface SelectButtonProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'value'>,
     VariantProps<typeof selectButtonVariants> {
-  /** 버튼에 표시될 텍스트 (예: "대학을 선택해주세요" 또는 "선택 완료된 값") */
   value?: string;
-  /** 값이 없을 때 보여줄 기본 텍스트 (placeholder) */
   placeholder?: string;
-  /** 드롭다운이 열려있는지 여부 (화살표 방향 및 pressed 상태를 결정) */
   isOpen?: boolean;
   ref?: Ref<HTMLButtonElement>;
 }
@@ -44,12 +41,8 @@ export function SelectButton({
   ref,
   ...props
 }: SelectButtonProps) {
-  // 상태 자동 계산:
-  // props로 status를 명시적으로 넘기지 않은 경우,
-  // 1. isOpen이 true면 'pressed' 상태
-  // 2. isOpen은 false인데 value가 있으면 'filled' 상태
-  // 3. 둘 다 아니면 'default' 상태
-  const currentStatus = status || (isOpen ? 'pressed' : value ? 'filled' : 'default');
+  // 우선순위: isOpen > value > default
+  const currentStatus = status || (isOpen ? 'selecting' : value ? 'filled' : 'default');
 
   return (
     <button
@@ -58,11 +51,8 @@ export function SelectButton({
       className={cn(selectButtonVariants({ status: currentStatus, className }))}
       {...props}
     >
-      {/* 텍스트 영역: 값이 있으면 value, 없으면 placeholder 표시 */}
       <span>{value || placeholder}</span>
-
-      {/* 화살표 아이콘 영역 */}
-      <span className={cn('text-gray-20', isOpen && 'rotate-180')}>
+      <span className={cn('text-gray-20 transition-transform', isOpen && 'rotate-180')}>
         <ArrowDownIcon width={20} height={20} />
       </span>
     </button>
