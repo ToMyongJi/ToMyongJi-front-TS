@@ -22,18 +22,16 @@ const HeaderData = [
 
 
 const ReceiptView = () => {
-  const [year, setYear] = useState(dayjs().format('YYYY년'));
+  const [year, setYear] = useState("전체(년)");
   const [yearFilter, setYearFilter] = useState(false);
-  const [month, setMonth] = useState("전체");
+  const [month, setMonth] = useState("전체(월)");
   const [monthFilter, setMonthFilter] = useState(false);
   const [page, setPage] = useState(1);
 
   const clubData = useStudentClubStore((state) => state.selectedClub);
 
-  const selectedYear = Number(year.replace('년', '')); // 항상 숫자
-  const selectedMonth = month === '전체'
-    ? undefined
-    : Number(month.replace('월', ''));
+  const selectedYear = year === '전체(년)' ? undefined : Number(year.replace('년', '')); // 항상 숫자
+  const selectedMonth = month === '전체(월)' ? undefined : Number(month.replace('월', ''));
 
   const receiptList = useInfiniteQuery({
     ...receiptQueries.listInfinite(
@@ -45,10 +43,9 @@ const ReceiptView = () => {
     ),
   });
   const totalPages = receiptList.data?.pages[0]?.data.totalPages ?? 0;
-  const receipts =
-    receiptList.data?.pages.flatMap((p) => p.data.receiptDtoList) ?? [];
-  const yearOptions = Array.from({ length: 5 }, (_, i) => `${dayjs().year() - 2 + i}년`,);
-  const monthOptions = ['전체', ...Array.from({ length: 12 }, (_, i) => `${i + 1}월`)];
+  const receipts = receiptList.data?.pages.flatMap((p) => p.data.receiptDtoList) ?? [];
+  const yearOptions =['전체(년)', ...Array.from({ length: 5 }, (_, i) => `${dayjs().year() - 2 + i}년`,)];
+  const monthOptions = ['전체(월)', ...Array.from({ length: 12 }, (_, i) => `${i + 1}월`)];
 
   const handleChipClick = (type: 'YEAR' | 'MONTH') => {
     type === 'YEAR' ? setYearFilter(true) : setMonthFilter(true);
