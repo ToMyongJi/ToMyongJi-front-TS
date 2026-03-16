@@ -13,6 +13,9 @@ type TableCellProps = {
 }
 
 
+const formatAmount = (value: number) =>
+  (value ?? 0).toLocaleString('ko-KR');
+
 const TableCell = ({type, date, content, deposit, withdrawal}: TableCellProps) => {
   const tdStyle = 'W_M15 text-gray-90 text-center py-[1rem]';
   return (
@@ -21,8 +24,8 @@ const TableCell = ({type, date, content, deposit, withdrawal}: TableCellProps) =
       {type === 'EDIT' && <td><CheckBox /></td>}
       <td className={tdStyle}>{date}</td>
       <td className={cn(tdStyle, 'text-start')}>{content}</td>
-      <td className={cn(tdStyle, "text-success")}>{deposit}</td>
-      <td className={cn(tdStyle, "text-error-deep")}>{withdrawal}</td>
+      <td className={cn(tdStyle, "text-success")}>{formatAmount(deposit)}</td>
+      <td className={cn(tdStyle, "text-error-deep")}>{formatAmount(withdrawal)}</td>
       {type === 'EDIT' && <td><IconButton iconType={'edit'} /></td>}
     </tr>
 
