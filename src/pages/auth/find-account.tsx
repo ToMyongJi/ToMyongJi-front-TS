@@ -3,16 +3,20 @@ import Button from '@components/common/button';
 import TextField from '@components/common/textfield';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const FindAccount = () => {
   const [email, setEmail] = useState('');
   const isValidEmail = emailRegex.test(email);
+  const [foundId, setFoundId] = useState<string | null>();
+  const navigate = useNavigate();
+
   const { mutate: findId } = useMutation({
     mutationFn: (email: string) => authApi.findId({ email }),
     onSuccess: (data) => {
-      console.log(data);
+      setFoundId(data.data);
     },
     onError: (error) => {
       console.error(error);
@@ -39,16 +43,22 @@ const FindAccount = () => {
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
+          {foundId && (
+            <p className="W_SB12 w-full text-left text-black">
+              해당 이메일로 등록된 아이디는 <span className="W_SB12 text-black">{foundId}</span>
+              입니다.
+            </p>
+          )}
         </div>
         {/* 아이디 찾기 버튼 */}
         <Button
           variant="primary"
           size="md"
           className="w-full"
-          disabled={!isValidEmail}
-          onClick={handleFindAccount}
+          disabled={!isValidEmail && !foundId}
+          onClick={foundId ? () => navigate('/login') : handleFindAccount}
         >
-          아이디 찾기
+          {foundId ? '확인' : '아이디 찾기'}
         </Button>
       </div>
     </div>
