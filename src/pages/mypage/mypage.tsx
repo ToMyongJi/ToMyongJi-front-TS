@@ -64,6 +64,7 @@ const Mypage = () => {
     ...myMutations.deleteMember(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my', 'viewMember'] });
+      alert('부원 삭제에 성공했습니다.');
     },
     onError: () => {
       alert('부원 삭제에 실패했습니다.');
@@ -166,7 +167,7 @@ const Mypage = () => {
 
               {/* 부원 목록 */}
               {members.length === 0 ? (
-                <p className="W_R14 text-center text-gray-60">소속 부원이 없습니다.</p>
+                <p className="W_R14 text-center text-gray-70">소속 부원이 없습니다.</p>
               ) : (
                 <ul className="flex flex-col gap-[0.8rem]">
                   {members.map((member) => (
