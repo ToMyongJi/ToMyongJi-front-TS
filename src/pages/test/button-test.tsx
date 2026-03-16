@@ -1,11 +1,11 @@
-import { Button } from '@components/button';
-import CheckBox from '@components/check-box';
-import Chip from '@components/chip';
-import IconButton from '@components/icon-button';
-import { ReceiptButton } from '@components/receipt-button';
-import SearchBar from '@components/search-bar';
-import SelectButton from '@components/select-button';
-import TextField from '@components/textfield';
+import { Button } from '@components/common/button';
+import CheckBox from '@components/common/check-box';
+import Chip from '@components/common/chip';
+import IconButton from '@components/common/icon-button';
+import { ReceiptButton } from '@components/common/receipt-button';
+import SearchBar from '@components/common/search-bar';
+import SelectButton from '@components/common/select-button';
+import TextField from '@components/common/textfield';
 import { useState } from 'react';
 
 export default function ButtonTestPage() {
