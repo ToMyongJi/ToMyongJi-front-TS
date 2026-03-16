@@ -1,4 +1,4 @@
-import { authApi } from '@apis/auth/auth';
+import { authMutations } from '@apis/auth/auth-mutations';
 import { collegeQuery } from '@apis/college/college-queries';
 import { myMutations } from '@apis/my/my-mutations';
 import { myQuery } from '@apis/my/my-queries';
@@ -8,6 +8,7 @@ import Role from '@constants/role';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import useAuthStore from 'src/shared/store/auth-store';
 import useUserStore from 'src/shared/store/user-store';
 
 const roleLabel: Record<string, string> = {
@@ -19,6 +20,7 @@ const roleLabel: Record<string, string> = {
 const Mypage = () => {
   const queryClient = useQueryClient();
   const { user, clearUser } = useUserStore();
+  const { clearAuthData } = useAuthStore();
   const navigate = useNavigate();
 
   const [newStudentNum, setNewStudentNum] = useState('');
@@ -68,6 +70,18 @@ const Mypage = () => {
     },
   });
 
+  const deleteMutation = useMutation({
+    ...authMutations.delete(),
+    onSuccess: () => {
+      clearUser();
+      clearAuthData();
+      navigate('/login');
+    },
+    onError: () => {
+      alert('회원탈퇴에 실패했습니다.');
+    },
+  });
+
   const handleAddMember = () => {
     if (!newStudentNum || !newName || !user?.id) return;
     try {
@@ -83,13 +97,7 @@ const Mypage = () => {
 
   const handleDeleteAccount = async () => {
     if (!confirm('정말 탈퇴하시겠습니까?')) return;
-    try {
-      await authApi.delete();
-      clearUser();
-      navigate('/login');
-    } catch {
-      alert('회원탈퇴에 실패했습니다.');
-    }
+    deleteMutation.mutate();
   };
 
   const info = myInfo?.data;
@@ -184,7 +192,7 @@ const Mypage = () => {
         {/* 하단 버튼 */}
         <div className="flex items-center justify-between">
           {isPresident ? (
-            <Button variant="gray_outline" size="md" type="button">
+            <Button variant="primary_outline" size="md" type="button">
               학생회 이전
             </Button>
           ) : (
