@@ -170,6 +170,7 @@ const Register = () => {
   };
   const handleClubVerify = () => {
     if (!watch('studentClubId') || !watch('collegeName') || !watch('role')) return;
+    clearErrors('studentClubId');
     clubVerifyMutation.mutate(
       {
         clubId: watch('studentClubId'),
@@ -178,10 +179,6 @@ const Register = () => {
       },
       {
         onSuccess: () => {
-          setError('studentClubId', {
-            type: 'manual',
-            message: '소속 인증이 완료되었습니다.',
-          });
           setIsClubVerified(true);
         },
         onError: () => {

@@ -5,7 +5,7 @@ import { myQuery } from '@apis/my/my-queries';
 import Button from '@components/common/button';
 import TextField from '@components/common/textfield';
 import Role from '@constants/role';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useUserStore from 'src/shared/store/user-store';
@@ -17,6 +17,7 @@ const roleLabel: Record<string, string> = {
 };
 
 const Mypage = () => {
+  const queryClient = useQueryClient();
   const { user, clearUser } = useUserStore();
   const navigate = useNavigate();
 
@@ -47,6 +48,9 @@ const Mypage = () => {
   const addMemberMutation = useMutation({
     ...myMutations.addMember(),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my', 'viewMember'] });
+      setNewStudentNum('');
+      setNewName('');
       alert('부원 추가에 성공했습니다.');
     },
     onError: () => {
@@ -54,7 +58,15 @@ const Mypage = () => {
     },
   });
 
-  const deleteMemberMutation = useMutation(myMutations.deleteMember());
+  const deleteMemberMutation = useMutation({
+    ...myMutations.deleteMember(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my', 'viewMember'] });
+    },
+    onError: () => {
+      alert('부원 삭제에 실패했습니다.');
+    },
+  });
 
   const handleAddMember = () => {
     if (!newStudentNum || !newName || !user?.id) return;
