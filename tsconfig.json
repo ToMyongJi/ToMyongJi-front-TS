@@ -19,6 +19,7 @@
       "@libs/*": ["src/shared/libs/*"],
       "@layouts/*": ["src/shared/layouts/*"],
       "@hooks/*": ["src/shared/hooks/*"],
+      "@store/*": ["src/shared/store/*"],
       "@constants/*": ["src/shared/constants/*"],
       "@utils/*": ["src/shared/utils/*"],
       "@apis/*": ["src/shared/apis/*"],

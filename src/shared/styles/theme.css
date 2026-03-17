@@ -2,6 +2,7 @@
     --font-sans: 'Suit', sans-serif;
     --color-primary: #87AAFF;
     --color-primary-deep: #759DFF;
+    --color-success: #3979F1;
     --color-error: #FF698D;
     --color-error-deep: #FF4975;
     --color-black: #282828;
@@ -12,92 +13,93 @@
     --color-gray-10: #E2EBFF;
     --color-background: #F0F4FF;
     --color-white: #FFFFFF;
+
 }
 
 @layer utilities {
     /* Head */
     .W_Header {
         font-weight: 800;
-        font-size: 26px;
+        font-size: 2.2rem;
         line-height: normal;
     }
 
     .W_Title {
         font-weight: 700;
-        font-size: 20px;
+        font-size: 2rem;
         line-height: normal;
     }
 
     /* Body */
     .W_B17 {
         font-weight: 700;
-        font-size: 17px;
+        font-size: 1.7rem;
         line-height: normal;
     }
 
     .W_B15 {
         font-weight: 700;
-        font-size: 15px;
+        font-size: 1.5rem;
         line-height: normal;
     }
 
     .W_SB15 {
         font-weight: 600;
-        font-size: 15px;
+        font-size: 1.5rem;
         line-height: normal;
     }
 
     .W_M15 {
         font-weight: 500;
-        font-size: 15px;
+        font-size: 1.5rem;
         line-height: normal;
     }
 
     .W_R15 {
         font-weight: 400;
-        font-size: 15px;
+        font-size: 1.5rem;
         line-height: normal;
     }
 
     .W_B14 {
         font-weight: 500;
-        font-size: 14px;
+        font-size: 1.4rem;
         line-height: normal;
     }
 
     .W_SB14 {
         font-weight: 600;
-        font-size: 14px;
+        font-size: 1.4rem;
         line-height: normal;
     }
 
     .W_M14 {
         font-weight: 500;
-        font-size: 14px;
+        font-size: 1.4rem;
         line-height: normal;
     }
 
     .W_R14 {
         font-weight: 400;
-        font-size: 14px;
+        font-size: 1.4rem;
         line-height: normal;
     }
 
     .W_SB13 {
         font-weight: 600;
-        font-size: 13px;
+        font-size: 1.3rem;
         line-height: normal;
     }
 
     .W_SB12 {
         font-weight: 600;
-        font-size: 12px;
+        font-size: 1.2rem;
         line-height: normal;
     }
 
     .W_R12 {
         font-weight: 400;
-        font-size: 12px;
+        font-size: 1.2rem;
         line-height: normal;
     }
 
