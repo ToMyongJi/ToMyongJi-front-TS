@@ -38,12 +38,12 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="h-full w-[25.2rem] flex-shrink-0 overflow-hidden overflow-y-auto border-gray-20 border-r">
+    <div className="h-full w-[25.2rem] flex-shrink-0 overflow-hidden overflow-y-auto border-gray-20 border-r bg-white">
       <div className="h-full">
-        {collegeAndClubs?.data?.map((item, idx) => (
+        {collegeAndClubs?.data?.map((item) => (
           <div
-          key={idx}
-          className={cn(!setActiveSideBar(isActiveCollege, item.collegeName) && 'border-t-1 border-b-1 border-gray-10')}
+          key={item.collegeId}
+          className={cn(!setActiveSideBar(isActiveCollege, item.collegeName) && 'border-gray-10 border-t-1 border-b-1')}
           >
             <button
               type="button"

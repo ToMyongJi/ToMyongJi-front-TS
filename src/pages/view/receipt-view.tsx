@@ -31,7 +31,7 @@ const ReceiptView = () => {
 
   const clubData = useStudentClubStore((state) => state.selectedClub);
 
-  const selectedYear = year === '전체(년)' ? undefined : Number(year.replace('년', '')); // 항상 숫자
+  const selectedYear = year === '전체(년)' ? undefined : Number(year.replace('년', ''));
   const selectedMonth = month === '전체(월)' ? undefined : Number(month.replace('월', ''));
 
   const receiptList = useInfiniteQuery({
@@ -40,7 +40,7 @@ const ReceiptView = () => {
       selectedYear,
       selectedMonth,
       10,
-      page - 1, // API는 0-based
+      page - 1,
     ),
   });
   const totalPages = receiptList.data?.pages[0]?.data.totalPages ?? 0;
@@ -62,7 +62,7 @@ const ReceiptView = () => {
   }
 
   return (
-    <div className="mb-[10rem] flex-col gap-[4.6rem] px-[9.3rem] pt-[4.2rem]">
+    <div className="mb-[10rem] flex-col gap-[4.6rem] px-[3rem] pt-[4.2rem] xl:px-[9.3rem]">
       <section className="flex-row-between">
         <div className="flex items-center gap-[0.8rem]">
           <p className="W_Header text-black">{clubData?.studentClubName}</p>
@@ -107,7 +107,7 @@ const ReceiptView = () => {
             }}
           />
         </section>
-        <section className="rounded-[1rem] border border-gray-20 px-[10rem]">
+        <section className="rounded-[1rem] border border-gray-20 px-[2.6rem] xl:px-[10rem]">
           <div className="pt-[1.6rem]">
             <table className="w-full table-fixed">
               <TableHeader headerData={HeaderData} />
