@@ -4,7 +4,7 @@ import Footer from '@layouts/footer';
 
 import HeaderLnb from './header-lnb';
 import { Outlet } from 'react-router-dom';
-import { useLayoutStore } from '@store/layoutStore';
+import { useLayoutStore } from '@store/layout-store';
 
 const RootLayout = () => {
   const { isSidebarOpen, toggleSidebar, closeSidebar } = useLayoutStore();

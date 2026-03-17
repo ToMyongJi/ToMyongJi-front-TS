@@ -1,8 +1,8 @@
 import {useState} from 'react';
 import {useInfiniteQuery} from '@tanstack/react-query';
 import {receiptQueries} from '@apis/receipt/receipt-queries';
-import {useStudentClubStore} from '@store/studentClubStore';
-import { useLayoutStore } from '@store/layoutStore';
+import {useStudentClubStore} from '@store/sidebar-store';
+import { useLayoutStore } from '@store/layout-store';
 import { Receipt } from '@apis/receipt/receipt';
 import dayjs from 'dayjs';
 import InfoIcon from "@assets/icons/info.svg?react";
