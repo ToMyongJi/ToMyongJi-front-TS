@@ -9,8 +9,8 @@ import InfoIcon from "@assets/icons/info.svg?react";
 import MenuIcon from "@assets/icons/menu.svg?react";
 import TableHeader from '@components/table/table-header';
 import TableCell from '@components/table/table-cell';
-import Chip from '@components/chip';
-import SearchBar from '@components/search-bar';
+import Chip from '@components/common/chip';
+import SearchBar from '@components/common/search-bar';
 import PaginationCustom from '@components/pagination-custom';
 import Dropdown from '@components/dropdown';
 

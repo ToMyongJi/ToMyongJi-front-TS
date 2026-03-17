@@ -1,8 +1,7 @@
 import { cn } from '@libs/cn';
 
-import CheckBox from '@components/check-box';
-import IconButton from '@components/icon-button';
-
+import CheckBox from '@components/common/check-box';
+import IconButton from '@components/common/icon-button';
 
 type TableCellProps = {
   type: 'VIEW' | 'EDIT';
