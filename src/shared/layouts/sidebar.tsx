@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {useNavigate} from 'react-router-dom';
 import { cn } from '@libs/cn';
-import {useStudentClubStore} from '@store/studentClubStore';
-import { useLayoutStore } from '@store/layoutStore';
+import {useStudentClubStore} from '@store/sidebar-store';
+import { useLayoutStore } from '@store/layout-store';
 
 import { collegeQuery } from '@apis/college/college-queries';
 import { college } from '@apis/college/college';
