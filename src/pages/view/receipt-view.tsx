@@ -2,6 +2,7 @@ import {useState} from 'react';
 import {useInfiniteQuery} from '@tanstack/react-query';
 import {receiptQueries} from '@apis/receipt/receipt-queries';
 import {useStudentClubStore} from '@store/studentClubStore';
+import { useLayoutStore } from '@store/layoutStore';
 import { Receipt } from '@apis/receipt/receipt';
 import dayjs from 'dayjs';
 import InfoIcon from "@assets/icons/info.svg?react";
@@ -29,6 +30,7 @@ const ReceiptView = () => {
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
 
+  const {toggleSidebar} = useLayoutStore();
   const clubData = useStudentClubStore((state) => state.selectedClub);
 
   const selectedYear = year === '전체(년)' ? undefined : Number(year.replace('년', ''));
@@ -69,7 +71,7 @@ const ReceiptView = () => {
           <InfoIcon className="text-gray-20" />
         </div>
         <button type="button" className="cursor-pointer">
-          <MenuIcon className='md:hidden'/>
+          <MenuIcon className='md:hidden' onClick={toggleSidebar} />
         </button>
 
       </section>

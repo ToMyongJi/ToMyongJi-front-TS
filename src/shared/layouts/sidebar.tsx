@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import {useNavigate} from 'react-router-dom';
 import { cn } from '@libs/cn';
 import {useStudentClubStore} from '@store/studentClubStore';
+import { useLayoutStore } from '@store/layoutStore';
 
 import { collegeQuery } from '@apis/college/college-queries';
 import { college } from '@apis/college/college';
@@ -12,6 +13,7 @@ import ArrowUpIcon from '@assets/icons/arrow-up.svg?react';
 
 const Sidebar = () => {
   const navigate = useNavigate();
+  const { closeSidebar } = useLayoutStore();
 
   const [isActiveCollege, setIsActiveCollege] = useState<string>('');
   const [isActiveClubs, setIsActiveClubs] = useState<string>('');
@@ -35,6 +37,11 @@ const Sidebar = () => {
     });
 
     navigate(`/receipt-view/${club.studentClubId}`);
+
+    // md 이하일 때 사이드바 닫기 및 오버레이 제거
+    if (window.matchMedia('(max-width: 767px)').matches) {
+      closeSidebar();
+    }
   };
 
   return (
