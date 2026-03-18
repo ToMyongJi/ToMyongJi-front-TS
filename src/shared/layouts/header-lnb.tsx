@@ -1,6 +1,6 @@
 import { cn } from '@libs/cn';
-import type { Dispatch, SetStateAction } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import {useLayoutStore} from '@store/layout-store';
 
 const LNB_MENULIST = [
   { label: '조회', to: '/receipt-view' },
@@ -10,11 +10,11 @@ const LNB_MENULIST = [
 
 type HeaderLnbProps = {
   onClickSearch?: () => void;
-  setSidebarOpen?: Dispatch<SetStateAction<boolean>>;
 };
 
-const HeaderLnb = ({ onClickSearch, setSidebarOpen }: HeaderLnbProps) => {
+const HeaderLnb = ({ onClickSearch }: HeaderLnbProps) => {
   const { pathname } = useLocation();
+  const {closeSidebar} = useLayoutStore();
   const navigate = useNavigate();
   const normalize = (p: string) => (p !== '/' && p.endsWith('/') ? p.slice(0, -1) : p);
 
@@ -30,8 +30,8 @@ const HeaderLnb = ({ onClickSearch, setSidebarOpen }: HeaderLnbProps) => {
       onClickSearch?.();
       return;
     }
-    if (setSidebarOpen) {
-      setSidebarOpen(false);
+    else{
+      closeSidebar();
     }
     navigate(path);
   };

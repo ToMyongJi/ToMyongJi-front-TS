@@ -11,7 +11,7 @@ const RootLayout = () => {
   return (
     <div className="flex h-full min-h-screen flex-col">
       <HeaderGnb />
-      <HeaderLnb onClickSearch={toggleSidebar} setSidebarOpen={toggleSidebar} />
+      <HeaderLnb onClickSearch={toggleSidebar}/>
       <div className="relative flex flex-1">
         {isSidebarOpen && (
           <div className="absolute z-50 h-full md:static">
