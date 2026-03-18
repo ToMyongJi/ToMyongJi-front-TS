@@ -3,6 +3,7 @@ import { create } from 'zustand';
 // 대학 정보에 대한 타입 정의
 export interface College {
   collegeId: number;
+  collegeName: string;
 }
 
 // 스토어의 상태와 액션에 대한 인터페이스 정의
