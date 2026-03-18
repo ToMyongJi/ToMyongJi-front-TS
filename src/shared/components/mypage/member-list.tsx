@@ -1,6 +1,7 @@
+import CheckBox from '@components/common/check-box';
 import IconButton from '@components/common/icon-button';
 
-interface MemberItem {
+export interface MemberItem {
   memberId: number;
   studentNum: string;
   name: string;
@@ -9,10 +10,18 @@ interface MemberItem {
 interface MemberListProps {
   members: MemberItem[];
   onDelete: (member: MemberItem) => void;
-  isDeleting?: boolean;
+  buttonType?: 'delete' | 'check';
+  onCheck?: (member: MemberItem, checked: boolean) => void;
+  selectedMemberIds?: number[];
 }
 
-const MemberList = ({ members, onDelete }: MemberListProps) => {
+const MemberList = ({
+  members,
+  onDelete,
+  buttonType,
+  onCheck,
+  selectedMemberIds,
+}: MemberListProps) => {
   if (members.length === 0) {
     return <p className="W_R14 text-center text-gray-70">소속 부원이 없습니다.</p>;
   }
@@ -34,12 +43,24 @@ const MemberList = ({ members, onDelete }: MemberListProps) => {
             </span>
           </div>
 
-          <IconButton
-            iconType="cancel"
-            onClick={() => onDelete(member)}
-            aria-label={`${member.name} 삭제`}
-            className="h-[3rem] w-[3rem]"
-          />
+          {buttonType === 'delete' && (
+            <IconButton
+              iconType="cancel"
+              onClick={() => onDelete(member)}
+              className="h-[3rem] w-[3rem]"
+            />
+          )}
+          {buttonType === 'check' && (
+            <CheckBox
+              checked={
+                selectedMemberIds?.some(
+                  (selectedMemberId) => selectedMemberId === member.memberId,
+                ) ?? false
+              }
+              onChange={(checked) => onCheck?.(member, checked)}
+              aria-label={`${member.name} 체크`}
+            />
+          )}
         </li>
       ))}
     </ul>

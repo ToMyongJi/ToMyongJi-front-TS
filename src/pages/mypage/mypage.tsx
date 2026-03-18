@@ -190,6 +190,7 @@ const Mypage = () => {
               <MemberList
                 members={members}
                 onDelete={(member) => deleteMemberMutation.mutate(Number(member.studentNum))}
+                buttonType="delete"
               />
             </div>
           </div>
