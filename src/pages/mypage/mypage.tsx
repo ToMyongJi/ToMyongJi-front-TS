@@ -4,6 +4,7 @@ import { myMutations } from '@apis/my/my-mutations';
 import { myQuery } from '@apis/my/my-queries';
 import Button from '@components/common/button';
 import TextField from '@components/common/textfield';
+import MemberList from '@components/mypage/member-list';
 import Role from '@constants/role';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
@@ -166,7 +167,7 @@ const Mypage = () => {
               </div>
 
               {/* 부원 목록 */}
-              {members.length === 0 ? (
+              {/* {members.length === 0 ? (
                 <p className="W_R14 text-center text-gray-70">소속 부원이 없습니다.</p>
               ) : (
                 <ul className="flex flex-col gap-[0.8rem]">
@@ -185,7 +186,11 @@ const Mypage = () => {
                     </li>
                   ))}
                 </ul>
-              )}
+              )} */}
+              <MemberList
+                members={members}
+                onDelete={(member) => deleteMemberMutation.mutate(Number(member.studentNum))}
+              />
             </div>
           </div>
         )}
