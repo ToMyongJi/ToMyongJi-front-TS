@@ -199,7 +199,12 @@ const Mypage = () => {
         {/* 하단 버튼 */}
         <div className="flex items-center justify-between">
           {isPresident ? (
-            <Button variant="primary_outline" size="md" type="button">
+            <Button
+              variant="primary_outline"
+              size="md"
+              type="button"
+              onClick={() => navigate('/club-transfer')}
+            >
               학생회 이전
             </Button>
           ) : (

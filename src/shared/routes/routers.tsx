@@ -6,11 +6,13 @@ import NotLogin from '@pages/common/not-login';
 import ReceiptCreate from '@pages/create/receipt-create';
 import AdminPage from '@pages/main/admin-page';
 import MainPage from '@pages/main/main-page';
+import { ClubTransfer } from '@pages/mypage/club-transfer';
 import Mypage from '@pages/mypage/mypage';
 import ButtonTestPage from '@pages/test/button-test';
 import ReceiptView from '@pages/view/receipt-view';
 import ProtectedRouter from '@routes/protected-router';
 import { createBrowserRouter } from 'react-router-dom';
+import PresidentRouter from './president-router';
 import PublicRouter from './public-router';
 
 export const router = createBrowserRouter([
@@ -38,6 +40,11 @@ export const router = createBrowserRouter([
           { path: 'receipt-create', element: <ReceiptCreate /> },
           { path: 'mypage', element: <Mypage /> },
         ],
+      },
+      // ✅ 학생회장만 접근할 수 있는 라우터 (여기에 추가)
+      {
+        element: <PresidentRouter />,
+        children: [{ path: 'club-transfer', element: <ClubTransfer /> }],
       },
     ],
   },
