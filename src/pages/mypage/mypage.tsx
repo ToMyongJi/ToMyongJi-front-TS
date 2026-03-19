@@ -107,10 +107,10 @@ const Mypage = () => {
   const isPresident = user?.role === Role.PRESIDENT;
 
   return (
-    <div className="mt-[4.2rem] mb-[10rem] flex flex-col items-center justify-center">
-      <div className="flex w-full max-w-[42rem] flex-col gap-[3.2rem] px-[1.5rem]">
+    <div className="mt-[4.2rem] mb-[10rem] flex flex-col items-center justify-center px-[1.5rem]">
+      <div className="flex w-full max-w-[42rem] flex-col gap-[3.2rem]">
         {/* 내 정보 */}
-        <div className="flex flex-col gap-[1.6rem]">
+        <div className="flex flex-col gap-[1.8rem]">
           <p className="W_Title text-black">내 정보</p>
           <div className="flex flex-col gap-[1.6rem] rounded-[1rem] border border-gray-20 px-[2.6rem] py-[3rem]">
             {[
@@ -166,27 +166,6 @@ const Mypage = () => {
                 </Button>
               </div>
 
-              {/* 부원 목록 */}
-              {/* {members.length === 0 ? (
-                <p className="W_R14 text-center text-gray-70">소속 부원이 없습니다.</p>
-              ) : (
-                <ul className="flex flex-col gap-[0.8rem]">
-                  {members.map((member) => (
-                    <li key={member.memberId} className="flex items-center justify-between">
-                      <span className="W_R14 text-gray-90">
-                        {member.studentNum} · {member.name}
-                      </span>
-                      <button
-                        type="button"
-                        className="W_R13 text-error hover:underline"
-                        onClick={() => deleteMemberMutation.mutate(Number(member.studentNum))}
-                      >
-                        삭제
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )} */}
               <MemberList
                 members={members}
                 onDelete={(member) => deleteMemberMutation.mutate(Number(member.studentNum))}
