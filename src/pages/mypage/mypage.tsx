@@ -108,7 +108,7 @@ const Mypage = () => {
 
   return (
     <div className="mt-[4.2rem] mb-[10rem] flex flex-col items-center justify-center">
-      <div className="flex w-full max-w-[42rem] flex-col gap-[3.2rem]">
+      <div className="flex w-full max-w-[42rem] flex-col gap-[3.2rem] px-[1.5rem]">
         {/* 내 정보 */}
         <div className="flex flex-col gap-[1.6rem]">
           <p className="W_Title text-black">내 정보</p>
