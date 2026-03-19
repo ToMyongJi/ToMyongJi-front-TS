@@ -113,10 +113,11 @@ const ReceiptView = () => {
           <div className="pt-[1.6rem]">
             <table className="w-full table-fixed">
               <TableHeader headerData={HeaderData} />
-              {filteredReceipts.map((item: Receipt) => (
+              {filteredReceipts.map((item: Receipt, index: number) => (
                 <TableCell
                   key={item.receiptId}
                   type={'VIEW'}
+                  isLastRow={index === filteredReceipts.length - 1}
                   {...item}
                         />
               ))}

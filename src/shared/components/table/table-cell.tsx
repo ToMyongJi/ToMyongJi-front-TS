@@ -9,18 +9,19 @@ type TableCellProps = {
   content: string;
   deposit: number;
   withdrawal: number;
+  isLastRow?: boolean;
 }
 
 
 const formatAmount = (value: number) =>
   (value ?? 0).toLocaleString('ko-KR');
 
-const TableCell = ({type, date, content, deposit, withdrawal}: TableCellProps) => {
-  const tdStyle = 'W_M15 text-gray-90 text-center py-[1rem]';
+const TableCell = ({type, date, content, deposit, withdrawal, isLastRow = false}: TableCellProps) => {
+  const tdStyle = 'W_M15 text-gray-90 text-center px-[0.3rem] py-[1rem]';
   return (
     <tbody>
-    <tr className="border-gray-10 border-b-1">
-      {type === 'EDIT' && <td><CheckBox /></td>}
+    <tr className={cn('border-gray-10', !isLastRow && 'border-b-1')}>
+      {type === 'EDIT' && <td className="text-center"><CheckBox /></td>}
       <td className={tdStyle}>{date}</td>
       <td className={cn(tdStyle, 'text-start')}>{content}</td>
       <td className={cn(tdStyle, "text-success")}>{formatAmount(deposit)}</td>
