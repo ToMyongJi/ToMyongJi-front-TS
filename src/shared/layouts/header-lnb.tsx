@@ -1,6 +1,6 @@
 import { cn } from '@libs/cn';
-import { Dispatch, SetStateAction } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import type { Dispatch, SetStateAction } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const LNB_MENULIST = [
   { label: '조회', to: '/receipt-view' },
@@ -10,14 +10,13 @@ const LNB_MENULIST = [
 
 type HeaderLnbProps = {
   onClickSearch?: () => void;
-  setSidebarOpen?: Dispatch<SetStateAction<boolean>>
+  setSidebarOpen?: Dispatch<SetStateAction<boolean>>;
 };
 
 const HeaderLnb = ({ onClickSearch, setSidebarOpen }: HeaderLnbProps) => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const normalize = (p: string) =>
-    p !== '/' && p.endsWith('/') ? p.slice(0, -1) : p;
+  const normalize = (p: string) => (p !== '/' && p.endsWith('/') ? p.slice(0, -1) : p);
 
   const setPathActive = (current: string, target: string) => {
     const cur = normalize(current);
@@ -38,7 +37,7 @@ const HeaderLnb = ({ onClickSearch, setSidebarOpen }: HeaderLnbProps) => {
   };
 
   return (
-    <div className="px-[4rem] flex gap-[3rem] border-b border-gray-20">
+    <div className="flex gap-[3rem] border-gray-20 border-b px-[4rem]">
       {LNB_MENULIST.map((item, index) => {
         const isActive = setPathActive(pathname, item.to);
         return (
@@ -47,18 +46,11 @@ const HeaderLnb = ({ onClickSearch, setSidebarOpen }: HeaderLnbProps) => {
             type="button"
             onClick={() => handleClick(item.to)}
             className={cn(
-              'w-fit py-[1.6rem] cursor-pointer',
-              isActive && 'border-b-2 border-primary',
+              'w-fit cursor-pointer py-[1.6rem]',
+              isActive && 'border-primary border-b-2',
             )}
           >
-            <p
-              className={cn(
-                'W_B17 text-gray-90',
-                isActive && 'text-primary',
-              )}
-            >
-              {item.label}
-            </p>
+            <p className={cn('W_B17 text-gray-90', isActive && 'text-primary')}>{item.label}</p>
           </button>
         );
       })}
@@ -67,4 +59,3 @@ const HeaderLnb = ({ onClickSearch, setSidebarOpen }: HeaderLnbProps) => {
 };
 
 export default HeaderLnb;
-

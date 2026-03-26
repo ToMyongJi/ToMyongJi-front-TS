@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES6",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "jsx": "react-jsx",
     "moduleResolution": "node",
@@ -19,6 +20,7 @@
       "@libs/*": ["src/shared/libs/*"],
       "@layouts/*": ["src/shared/layouts/*"],
       "@hooks/*": ["src/shared/hooks/*"],
+      "@store/*": ["src/shared/store/*"],
       "@constants/*": ["src/shared/constants/*"],
       "@utils/*": ["src/shared/utils/*"],
       "@apis/*": ["src/shared/apis/*"],

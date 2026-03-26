@@ -1,26 +1,32 @@
-import { useState } from 'react';
-
 import HeaderGnb from '@layouts/header-gnb';
 import Sidebar from '@layouts/sidebar';
 import Footer from '@layouts/footer';
 
 import HeaderLnb from './header-lnb';
 import { Outlet } from 'react-router-dom';
+import { useLayoutStore } from '@store/layoutStore';
 
 const RootLayout = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  const handleClickSearch = () => {
-    setIsSidebarOpen(prev => !prev);
-  };
-
+  const { isSidebarOpen, toggleSidebar, closeSidebar } = useLayoutStore();
   return (
-    <div className="min-h-screen h-full flex flex-col">
+    <div className="flex h-full min-h-screen flex-col">
       <HeaderGnb />
-      <HeaderLnb onClickSearch={handleClickSearch} setSidebarOpen={setIsSidebarOpen} />
-      <div className="flex flex-1 min-h-0">
-        {isSidebarOpen && <Sidebar />}
-        <main className="flex-1 min-h-0 overflow-auto">
+      <HeaderLnb onClickSearch={toggleSidebar} setSidebarOpen={toggleSidebar} />
+      <div className="relative flex flex-1">
+        {isSidebarOpen && (
+          <div className="absolute z-50 h-full md:static">
+            <Sidebar />
+          </div>
+        )}
+        <main className="relative min-h-0 flex-1 overflow-auto">
+          {isSidebarOpen && (
+            <button
+              type="button"
+              className="absolute inset-0 z-40 bg-black/20 max-md:block md:hidden"
+              onClick={closeSidebar}
+              aria-label="사이드바 닫기"
+            />
+          )}
           <Outlet />
         </main>
       </div>
