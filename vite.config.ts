@@ -7,6 +7,10 @@ import vitePluginSvgr from 'vite-plugin-svgr';
 
 // https://vite.dev/config/
 export default defineConfig({
+  resolve: {
+    // Ensure extension-less imports resolve TypeScript files first.
+    extensions: ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.json'],
+  },
   plugins: [
     react(),
     vitePluginSvgr(),

@@ -32,27 +32,26 @@ const ReceiptView = () => {
 
   const {toggleSidebar} = useLayoutStore();
   const clubData = useStudentClubStore((state) => state.selectedClub);
+  const clubId = clubData?.studentClubId;
 
   const selectedYear = year === '전체(년)' ? undefined : Number(year.replace('년', ''));
   const selectedMonth = month === '전체(월)' ? undefined : Number(month.replace('월', ''));
 
   const receiptList = useInfiniteQuery({
-    ...receiptQueries.listInfinite(
-      clubData?.studentClubId,
-      selectedYear,
-      selectedMonth,
-      10,
-      page - 1,
-    ),
+    ...receiptQueries.listInfinite(clubId, selectedYear, selectedMonth, 10, page - 1),
+    enabled: !!clubId,
   });
+
   const totalPages = receiptList.data?.pages[0]?.data.totalPages ?? 0;
-  const receipts = receiptList.data?.pages.flatMap((p) => p.data.data) ?? [];
+  const receipts = receiptList.data?.pages.flatMap((p) => p?.data?.receiptDtoList ?? []) ?? [];
+
 
   const trimmedSearchTerm = searchTerm.trim().toLowerCase();
+  const normalizedReceipts = receipts.filter((item): item is Receipt => Boolean(item));
   const filteredReceipts =
     trimmedSearchTerm.length < 2
-      ? receipts
-      : receipts.filter((item: Receipt) => {
+      ? normalizedReceipts
+      : normalizedReceipts.filter((item) => {
           const target = `${item.date} ${item.content} ${item.deposit} ${item.withdrawal}`.toLowerCase();
           return target.includes(trimmedSearchTerm);
         });
@@ -113,9 +112,9 @@ const ReceiptView = () => {
           <div className="pt-[1.6rem]">
             <table className="w-full table-fixed">
               <TableHeader headerData={HeaderData} />
-              {filteredReceipts.map((item: Receipt) => (
+              {filteredReceipts.map((item: Receipt, index) => (
                 <TableCell
-                  key={item?.receiptId}
+                  key={item.receiptId ?? `${item.date}-${index}`}
                   type={'VIEW'}
                   {...item}
                         />
