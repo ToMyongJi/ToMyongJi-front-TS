@@ -7,8 +7,8 @@ interface TransferStep1Props {
 
 export const TransferStep1 = ({ onCancel, onTransfer }: TransferStep1Props) => {
   return (
-    <div className="flex w-full max-w-[49rem] flex-col gap-[7.2rem]">
-      <div className="flex flex-col">
+    <div className="w-full max-w-[49rem]">
+      <div className="flex flex-col gap-[7.2rem]">
         <div className="flex flex-col gap-[0.8rem] rounded-[1rem] border border-gray-20 px-[2.6rem] py-[3rem]">
           <p className="W_B17 text-black">학생회 이전 시 주의사항</p>
           <p className="W_M15 text-gray-90">
