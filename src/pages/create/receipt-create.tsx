@@ -1,9 +1,17 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { QK } from '@apis/base/key';
+import { receiptMutations } from '@apis/receipt/receipt-mutations';
+import { receiptQueries } from '@apis/receipt/receipt-queries';
+import { Receipt } from '@apis/receipt/receipt';
+
 import dayjs from 'dayjs';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
 import useUserStore from '@store/user-store';
+import useStudentClubStore from '@store/student-club-store';
+import useAuthStore from '@store/auth-store';
 
 import ReceiptButton from '@components/common/receipt-button';
 import TextField from '@components/common/textfield';
@@ -15,6 +23,10 @@ import TableHeader from '@components/table/table-header';
 import TableCell from '@components/table/table-cell';
 import PaginationCustom from '@components/pagination-custom';
 
+const parseWonInput = (raw: string) => {
+  const digits = raw.replace(/,/g, '').replace(/\D/g, '');
+  return digits === '' ? 0 : Number(digits);
+};
 
 const HEADER_DATA = [
   { labels: "", width: "8.46%" },
@@ -27,8 +39,18 @@ const HEADER_DATA = [
 
 
 const ReceiptCreate = () => {
-  const {user} = useUserStore();
-  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+  const queryClient = useQueryClient();
+  const { user } = useUserStore();
+  const { authData } = useAuthStore();
+  const { allClubsFlat, getClubNameById, fetchClubs } = useStudentClubStore();
+  const { data } = useQuery({ ...receiptQueries.club(user?.id) });
+
+  const [receiptForm, setReceiptForm] = useState({
+    date: new Date() as Date | null,
+    content: '',
+    deposit: '',
+    withdrawal: '',
+  });
   const [year, setYear] = useState('전체(년)');
   const [isYearFilterOpen, setIsYearFilterOpen] = useState(false);
   const [month, setMonth] = useState('전체(월)');
@@ -39,6 +61,64 @@ const ReceiptCreate = () => {
 
   const yearOptions = ['전체(년)', ...Array.from({ length: 5 }, (_, i) => `${dayjs().year() - 2 + i}년`)];
   const monthOptions = ['전체(월)', ...Array.from({ length: 12 }, (_, i) => `${i + 1}월`)];
+  const receiptData = data?.data;
+  const selectedYear = year === '전체(년)' ? undefined : Number(year.replace('년', ''));
+  const selectedMonth = month === '전체(월)' ? undefined : Number(month.replace('월', ''));
+
+  const receiptList = useInfiniteQuery({
+    ...receiptQueries.listInfinite(
+      user?.studentClubId,
+      selectedYear,
+      selectedMonth,
+      10,
+      page - 1,
+    ),
+  });
+  const totalPages = receiptList.data?.pages[0]?.data.totalPages ?? 0;
+  const receipts: Receipt[] =
+    receiptList.data?.pages.reduce((acc, p) => {
+      const payload = p.data as unknown as { receiptDtoList?: Receipt[] };
+      const list = payload.receiptDtoList ?? [];
+      return acc.concat(list);
+    }, [] as Receipt[]) ?? [];
+
+  const trimmedSearchTerm = searchTerm.trim().toLowerCase();
+  const filteredReceipts =
+    trimmedSearchTerm.length < 2
+      ? receipts
+      : receipts.filter((item: Receipt) => {
+          const target = `${item.date} ${item.content} ${item.deposit} ${item.withdrawal}`.toLowerCase();
+          return target.includes(trimmedSearchTerm);
+        });
+
+  const createReceipt = useMutation({
+    ...receiptMutations.create(),
+    onSuccess: () => {
+      if (user?.id != null) {
+        queryClient.invalidateQueries({ queryKey: QK.receipt.club(user.id) });
+      }
+      if (user?.studentClubId != null) {
+        queryClient.invalidateQueries({ queryKey: ['receiptList', user.studentClubId] });
+      }
+      setReceiptForm((prev) => ({
+        ...prev,
+        content: '',
+        deposit: '',
+        withdrawal: '',
+      }));
+    },
+    onError: () => {
+      alert('내역 저장에 실패했습니다.');
+    },
+  });
+
+  useEffect(() => {
+    if (authData && allClubsFlat.length === 0) {
+      fetchClubs();
+    }
+  }, [authData, allClubsFlat.length, fetchClubs]);
+
+  const studentClubName = user?.studentClubId != null ? getClubNameById(user.studentClubId) : '';
 
   const handleChipClick = (type: 'YEAR' | 'MONTH') => {
     if (type === 'YEAR') {
@@ -53,18 +133,39 @@ const ReceiptCreate = () => {
       state ? [...prev, id] : prev.filter((receiptId) => receiptId !== id),
     );
 
-    // TODO: 여기에서 id와 state를 사용해서 API 호출 처리
-    // 예: state가 true일 때 선택, false일 때 해제 등의 로직
-    console.log('checked receipt id:', id, 'state:', state);
+  };
+
+  const handleSaveClick = () => {
+    if (user?.id == null || user.userId == null) {
+      alert('로그인 정보를 확인할 수 없습니다.');
+      return;
+    }
+    if (receiptForm.date == null) {
+      alert('날짜를 선택해 주세요.');
+      return;
+    }
+    const trimmedContent = receiptForm.content.trim();
+    if (!trimmedContent) {
+      alert('내용을 입력해 주세요.');
+      return;
+    }
+
+    createReceipt.mutate({
+      userId: user.userId,
+      date: receiptForm.date.toISOString(),
+      content: trimmedContent,
+      deposit: parseWonInput(receiptForm.deposit),
+      withdrawal: parseWonInput(receiptForm.withdrawal),
+    });
   };
 
   return (
     <div className="flex w-full flex-col px-[3rem] pt-[4.2rem] pb-[10rem]">
       <div className="mx-auto w-full max-w-[100rem] flex-col gap-[7.2rem]">
         <section className="flex-col gap-[1.2rem]">
-          <p className="W_Header">인공지능 학생회</p>
+          <p className="W_Header">{studentClubName}</p>
           <div>
-            <p className="W_Header"><span className="W_R14 text-gray-80">잔액</span> 800,000원</p>
+            <p className="W_Header"><span className="W_R14 text-gray-80">잔액</span> {(receiptData?.balance ?? 0).toLocaleString()}원</p>
           </div>
         </section>
         <section className="flex-col gap-[1rem]">
@@ -78,9 +179,9 @@ const ReceiptCreate = () => {
           <div className="flex-row-center gap-[0.8rem] rounded-[10px] border border-gray-20 p-[2rem]">
             <div className="flex h-[4rem] w-[11.2rem] shrink-0 items-center rounded-[0.8rem] border-[1px] border-gray-20 bg-white px-[1.4rem] py-[0.8rem] transition-colors focus-within:border-primary">
               <DatePicker
-                selected={selectedDate}
+                selected={receiptForm.date}
                 onChange={(date: Date | null) => {
-                  setSelectedDate(date);
+                  setReceiptForm((prev) => ({ ...prev, date }));
                 }}
                 dateFormat="yyyy.MM.dd"
                 popperPlacement="bottom"
@@ -89,10 +190,38 @@ const ReceiptCreate = () => {
                 className="W_R15 w-full bg-transparent outline-none placeholder:text-gray-70"
               />
             </div>
-            <TextField placeholder="내용" className="w-[41.4rem]"/>
-            <TextField type="price" placeholder="입금" />
-            <TextField type="price" placeholder="출금" />
-            <Button variant="primary" size="save">저장하기</Button>
+            <TextField
+              placeholder="내용"
+              className="w-[41.4rem]"
+              value={receiptForm.content}
+              onChange={(e) =>
+                setReceiptForm((prev) => ({ ...prev, content: e.target.value }))
+              }
+            />
+            <TextField
+              type="price"
+              placeholder="입금"
+              value={receiptForm.deposit}
+              onChange={(e) =>
+                setReceiptForm((prev) => ({ ...prev, deposit: e.target.value }))
+              }
+            />
+            <TextField
+              type="price"
+              placeholder="출금"
+              value={receiptForm.withdrawal}
+              onChange={(e) =>
+                setReceiptForm((prev) => ({ ...prev, withdrawal: e.target.value }))
+              }
+            />
+            <Button
+              variant="primary"
+              size="save"
+              disabled={createReceipt.isPending}
+              onClick={handleSaveClick}
+            >
+              저장하기
+            </Button>
           </div>
         </section>
         <section className="flex-col gap-[1rem]">
@@ -131,35 +260,32 @@ const ReceiptCreate = () => {
             <SearchBar
               placeholder="검색어 2글자 이상 입력"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setPage(1);
+              }}
             />
           </div>
           <div className="rounded-[1rem] border border-gray-20 px-[2.7rem] pt-[1.6rem]">
             <table className="w-full table-fixed">
               <TableHeader headerData={HEADER_DATA}/>
-              <TableCell
-                mode="EDIT"
-                receiptId={1}
-                date={"d"}
-                content={"d"}
-                deposit={2}
-                withdrawal={123}
-                isChecked={selectedReceiptIds.indexOf(1) !== -1}
-                onToggleChecked={handleCheckClick}
-              />
-              <TableCell
-                mode="EDIT"
-                receiptId={2}
-                date={"d"}
-                content={"d"}
-                deposit={2}
-                withdrawal={123}
-                isChecked={selectedReceiptIds.indexOf(2) !== -1}
-                onToggleChecked={handleCheckClick}
-              />
+              {filteredReceipts.map((receipt: Receipt, index: number) => (
+                <TableCell
+                  key={receipt.receiptId}
+                  mode="EDIT"
+                  isChecked={selectedReceiptIds.indexOf(receipt.receiptId) !== -1}
+                  isLastRow={index === filteredReceipts.length - 1}
+                  onToggleChecked={handleCheckClick}
+                  {...receipt}
+                />
+              ))}
             </table>
-            <div>
-              <PaginationCustom currentPage={page} totalPages={0} onPageChange={(pageNumber) => setPage(pageNumber)}/>
+            <div className="py-[1.6rem]">
+              <PaginationCustom
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={(pageNumber) => setPage(pageNumber)}
+              />
             </div>
           </div>
         </section>

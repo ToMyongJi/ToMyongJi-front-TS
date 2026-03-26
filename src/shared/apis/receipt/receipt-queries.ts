@@ -1,5 +1,5 @@
 import {QK} from '@apis/base/key';
-import {buildInfiniteQuery} from '@apis/base/factory';
+import { buildInfiniteQuery, buildQuery } from '@apis/base/factory';
 import {receiptApi} from '@apis/receipt/receipt';
 
 type PageOf<T> = T extends (...args: infer _A) => infer R ? Awaited<R> : never;
@@ -33,4 +33,5 @@ export const receiptQueries = {
         getNextPageParam: pagePager(),
       }
     ),
+  club: (id?: number) => buildQuery(QK.receipt.club(id), () => receiptApi.club(id)),
 };
