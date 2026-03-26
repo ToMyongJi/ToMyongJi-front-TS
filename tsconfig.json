@@ -12,6 +12,7 @@
     "resolveJsonModule": true,
     "allowJs": true,
     "checkJs": false,
+    "noEmit": true,
     "baseUrl": "./",
     "paths": {
       "@styles/*": ["src/shared/styles/*"],
