@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { QK } from '@apis/base/key';
 import { receiptMutations } from '@apis/receipt/receipt-mutations';
@@ -40,6 +41,8 @@ const HEADER_DATA = [
 
 const ReceiptCreate = () => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
   const { user } = useUserStore();
   const { authData } = useAuthStore();
   const { allClubsFlat, getClubNameById, fetchClubs } = useStudentClubStore();
@@ -172,7 +175,7 @@ const ReceiptCreate = () => {
           <div className="flex items-center justify-between">
             <p className="W_Title">내역 추가</p>
             <div className="flex items-center gap-[0.8rem]">
-              <ReceiptButton receiptType="toss" />
+              <ReceiptButton receiptType="toss" onClick={() => navigate('/tossbank-create')} />
               <ReceiptButton receiptType="excel" />
             </div>
           </div>

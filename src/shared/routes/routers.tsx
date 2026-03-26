@@ -7,6 +7,7 @@ import ReceiptCreate from '@pages/create/receipt-create';
 import AdminPage from '@pages/main/admin-page';
 import MainPage from '@pages/main/main-page';
 import Mypage from '@pages/mypage/mypage';
+import TossbankCreate from '@pages/create/tossbank-create';
 import ButtonTestPage from '@pages/test/button-test';
 import ReceiptView from '@pages/view/receipt-view';
 import ProtectedRouter from '@routes/protected-router';
@@ -36,6 +37,7 @@ export const router = createBrowserRouter([
         element: <ProtectedRouter />,
         children: [
           { path: 'receipt-create', element: <ReceiptCreate /> },
+          { path: 'tossbank-create', element: <TossbankCreate/> },
           { path: 'mypage', element: <Mypage /> },
         ],
       },
