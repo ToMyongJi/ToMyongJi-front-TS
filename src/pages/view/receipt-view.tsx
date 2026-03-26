@@ -115,7 +115,7 @@ const ReceiptView = () => {
               <TableHeader headerData={HeaderData} />
               {filteredReceipts.map((item: Receipt) => (
                 <TableCell
-                  key={item.receiptId}
+                  key={item?.receiptId}
                   type={'VIEW'}
                   {...item}
                         />
