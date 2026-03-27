@@ -19,7 +19,7 @@ export const TransferStep1 = ({ onCancel, onTransfer }: TransferStep1Props) => {
         </div>
         <div className="flex w-full justify-end gap-[0.8rem]">
           <Button
-            variant="primary_outline"
+            variant="gray_outline"
             size="regular"
             type="button"
             className="w-[11rem]"

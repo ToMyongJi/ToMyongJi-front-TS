@@ -2,6 +2,7 @@ import type { MemberItem } from '@components/mypage/member-list';
 import { TransferStep1 } from '@components/mypage/transfer-step1';
 import { TransferStep2 } from '@components/mypage/transfer-step2';
 import { TransferStep3 } from '@components/mypage/transfer-step3';
+import { TransferStep4 } from '@components/mypage/transfer-step4';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -9,7 +10,8 @@ export const ClubTransfer = () => {
   const navigate = useNavigate();
 
   const [checkedMembers, setCheckedMembers] = useState<MemberItem[]>([]);
-
+  const [presidentName, setPresidentName] = useState('');
+  const [presidentStudentNumber, setPresidentStudentNumber] = useState('');
   const [step, setStep] = useState(1);
 
   const handleCancel = () => {
@@ -31,6 +33,11 @@ export const ClubTransfer = () => {
     if (step === 2) {
       setStep((prev) => prev + 1);
       console.log('체크된 멤버 이름:', checkedMembers);
+    }
+    if (step === 3) {
+      setStep((prev) => prev + 1);
+      console.log('회장 이름:', presidentName);
+      console.log('회장 학번:', presidentStudentNumber);
     }
   };
 
@@ -61,7 +68,17 @@ export const ClubTransfer = () => {
           selectedMemberIds={checkedMembers.map((member) => member.memberId)}
         />
       )}
-      {step === 3 && <TransferStep3 />}
+      {step === 3 && (
+        <TransferStep3
+          onPreviousStep={handleCancel}
+          onNextStep={handleNext}
+          presidentName={presidentName}
+          presidentStudentNumber={presidentStudentNumber}
+          onChangePresidentName={(value) => setPresidentName(value)}
+          onChangePresidentStudentNumber={(value) => setPresidentStudentNumber(value)}
+        />
+      )}
+      {step === 4 && <TransferStep4 />}
     </div>
   );
 };
