@@ -7,6 +7,10 @@ const LNB_MENULIST = [
   { label: '작성', to: '/receipt-create' },
   { label: '마이페이지', to: '/mypage' },
 ];
+const LNM_ADMIN_MENULIST = [
+  { label: '조회', to: '/receipt-view' },
+  { label: '학생회 관리', to: '/student-club-management' },
+];
 
 type HeaderLnbProps = {
   onClickSearch?: () => void;
