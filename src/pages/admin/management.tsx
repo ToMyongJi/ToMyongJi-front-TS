@@ -1,4 +1,7 @@
 import { collegeQuery } from '@apis/college/college-queries';
+import Button from '@components/common/button';
+import TextField from '@components/common/textfield';
+import MemberList from '@components/mypage/member-list';
 import { useStudentClubStore } from '@store/studentClubStore';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo } from 'react';
@@ -61,9 +64,38 @@ export const Management = () => {
   }
 
   return (
-    <div className="mb-[10rem] px-[3rem] pt-[4.2rem] xl:px-[9.3rem]">
-      <p className="W_Header text-black">{club.studentClubName}</p>
-      <p className="W_B17 mt-[1.6rem] text-gray-60">학생회 관리</p>
+    <div className="mx-auto w-full max-w-[45rem] px-[1.5rem]">
+      <div className="mt-[4.2rem] mb-[42rem] flex flex-col items-center justify-center gap-[1.8rem]">
+        <p className="W_Header text-black">{club.studentClubName}</p>
+        {/* 회장 관리 */}
+        <div className="flex w-full flex-col justify-center gap-[2rem] rounded-[1rem] border-1 border-gray-20 px-[1.6rem] py-[2rem] sm:px-[2.6rem] sm:py-[3rem]">
+          <p className="W_B17 text-black">회장 관리</p>
+          <div className="flex h-[4.4rem] items-center gap-[1.9rem] border-gray-10 border-b">
+            <p className="W_SB15 text-black">현재 회장</p>
+            <p className="W_SB15 text-gray-90">0000000 김회장</p>
+          </div>
+          <div className="flex h-[4rem] items-center gap-[1.6rem]">
+            <p className="W_SB15 flex-1 text-black">새 회장</p>
+            <TextField placeholder="학번" className="flex-1" />
+            <TextField placeholder="이름" className="flex-1" />
+            <Button size="regular" variant="primary" className="h-[4rem] max-w-[6.3rem] flex-1">
+              변경
+            </Button>
+          </div>
+        </div>
+        {/* 소속부원 관리 */}
+        <div className="flex w-full flex-col justify-center gap-[2rem] rounded-[1rem] border-1 border-gray-20 px-[1.6rem] py-[2rem] sm:px-[2.6rem] sm:py-[3rem]">
+          <p className="W_B17 text-black">소속부원 관리</p>
+          <div className="flex h-[4rem] items-center gap-[1.6rem]">
+            <TextField placeholder="학번" className="flex-1" />
+            <TextField placeholder="이름" className="flex-1" />
+            <Button size="regular" variant="primary" className="h-[4rem] max-w-[6.3rem] flex-1">
+              추가
+            </Button>
+          </div>
+          <MemberList buttonType="delete" members={[]} emptyText="등록된 부원이 없습니다." />
+        </div>
+      </div>
     </div>
   );
 };
