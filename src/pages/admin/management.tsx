@@ -16,10 +16,13 @@ export const Management = () => {
   const [newMemberName, setNewMemberName] = useState('');
 
   const { data, isLoading } = useQuery(collegeQuery.collegeAndClubs());
+
+  // 버튼 활성화 조건
   const canChangePresident =
     newPresidentStudentNum.trim().length > 0 && newPresidentName.trim().length > 0;
   const canAddMember = newMemberStudentNum.trim().length > 0 && newMemberName.trim().length > 0;
 
+  // 학생회 조회
   const club = useMemo(() => {
     if (!clubIdParam) return null;
     const id = Number(clubIdParam);
@@ -28,6 +31,7 @@ export const Management = () => {
     return flat.find((c) => c.studentClubId === id) ?? null;
   }, [clubIdParam, data]);
 
+  // 학생회 선택
   useEffect(() => {
     if (!club) return;
     setSelectedClub({
