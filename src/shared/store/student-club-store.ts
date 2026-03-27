@@ -62,7 +62,7 @@ const useStudentClubStore = create<StudentClubState>((set, get) => ({
   // ID로 동아리 이름 찾기
   getClubNameById: (clubId) => {
     const club = get().allClubsFlat.find((c) => c.studentClubId === clubId);
-    return club ? club.studentClubName : '알 수 없는 동아리';
+    return club ? club.studentClubName : '관리자';
   },
 
   // 현재 선택된 동아리 설정
