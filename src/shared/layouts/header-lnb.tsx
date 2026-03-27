@@ -1,4 +1,6 @@
+import Role from '@constants/role';
 import { cn } from '@libs/cn';
+import useUserStore from '@store/user-store';
 import type { Dispatch, SetStateAction } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -9,7 +11,7 @@ const LNB_MENULIST = [
 ];
 const LNM_ADMIN_MENULIST = [
   { label: '조회', to: '/receipt-view' },
-  { label: '학생회 관리', to: '/student-club-management' },
+  { label: '학생회 관리', to: '/management' },
 ];
 
 type HeaderLnbProps = {
@@ -18,6 +20,8 @@ type HeaderLnbProps = {
 };
 
 const HeaderLnb = ({ onClickSearch, setSidebarOpen }: HeaderLnbProps) => {
+  const { user } = useUserStore();
+  const isAdmin = user?.role === Role.ADMIN;
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const normalize = (p: string) => (p !== '/' && p.endsWith('/') ? p.slice(0, -1) : p);
@@ -42,7 +46,7 @@ const HeaderLnb = ({ onClickSearch, setSidebarOpen }: HeaderLnbProps) => {
 
   return (
     <div className="flex gap-[3rem] border-gray-20 border-b px-[4rem]">
-      {LNB_MENULIST.map((item, index) => {
+      {(isAdmin ? LNM_ADMIN_MENULIST : LNB_MENULIST).map((item, index) => {
         const isActive = setPathActive(pathname, item.to);
         return (
           <button

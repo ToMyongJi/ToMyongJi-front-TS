@@ -1,5 +1,6 @@
 import RootLayout from '@layouts/root-layout';
 import AdminPage from '@pages/admin/admin-page';
+import { Management } from '@pages/admin/management';
 import FindAccount from '@pages/auth/find-account';
 import Login from '@pages/auth/login';
 import Register from '@pages/auth/register';
@@ -41,15 +42,18 @@ export const router = createBrowserRouter([
           { path: 'mypage', element: <Mypage /> },
         ],
       },
-      // ✅ 학생회장만 접근할 수 있는 라우터 (여기에 추가)
+      // 학생회장만 접근할 수 있는 라우터
       {
         element: <PresidentRouter />,
         children: [{ path: 'club-transfer', element: <ClubTransfer /> }],
       },
-      // ✅ 관리자만 접근할 수 있는 라우터 (여기에 추가)
+      // 관리자만 접근할 수 있는 라우터
       {
         element: <AdminRouter />,
-        children: [{ path: 'home-admin', element: <AdminPage /> }],
+        children: [
+          { path: 'home-admin', element: <AdminPage /> },
+          { path: 'management', element: <Management /> },
+        ],
       },
     ],
   },
