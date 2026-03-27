@@ -1,7 +1,8 @@
 import Role from '@constants/role';
 import { cn } from '@libs/cn';
+import { useLayoutStore } from '@store/layoutStore';
+import { useStudentClubStore } from '@store/studentClubStore';
 import useUserStore from '@store/user-store';
-import type { Dispatch, SetStateAction } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const LNB_MENULIST = [
@@ -15,13 +16,16 @@ const LNM_ADMIN_MENULIST = [
 ];
 
 type HeaderLnbProps = {
-  onClickSearch?: () => void;
-  setSidebarOpen?: Dispatch<SetStateAction<boolean>>;
+  openSidebar?: () => void;
+  closeSidebar?: () => void;
 };
 
-const HeaderLnb = ({ onClickSearch, setSidebarOpen }: HeaderLnbProps) => {
+const HeaderLnb = ({ openSidebar, closeSidebar }: HeaderLnbProps) => {
+  const isSidebarOpen = useLayoutStore((s) => s.isSidebarOpen);
   const { user } = useUserStore();
   const isAdmin = user?.role === Role.ADMIN;
+  const selectedClub = useStudentClubStore((s) => s.selectedClub);
+  const clearSelectedClub = useStudentClubStore((s) => s.clearSelectedClub);
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const normalize = (p: string) => (p !== '/' && p.endsWith('/') ? p.slice(0, -1) : p);
@@ -34,23 +38,44 @@ const HeaderLnb = ({ onClickSearch, setSidebarOpen }: HeaderLnbProps) => {
   };
 
   const handleClick = (path: string) => {
+    const viewTabActive = pathname.startsWith('/receipt-view');
+    const mgmtTabActive = pathname.startsWith('/management');
+
     if (path === '/receipt-view') {
-      onClickSearch?.();
+      if (isSidebarOpen && (!isAdmin || viewTabActive)) {
+        closeSidebar?.();
+        clearSelectedClub();
+        navigate('/');
+        return;
+      }
+      if (isAdmin && selectedClub?.studentClubId != null) {
+        navigate(`/receipt-view/${selectedClub.studentClubId}`);
+      }
+      openSidebar?.();
       return;
     }
-    if (setSidebarOpen) {
-      setSidebarOpen(false);
+    if (path === '/management' && isAdmin) {
+      if (isSidebarOpen && mgmtTabActive) {
+        closeSidebar?.();
+        clearSelectedClub();
+        navigate('/');
+        return;
+      }
+      navigate('/management');
+      openSidebar?.();
+      return;
     }
+    closeSidebar?.();
     navigate(path);
   };
 
   return (
     <div className="flex gap-[3rem] border-gray-20 border-b px-[4rem]">
-      {(isAdmin ? LNM_ADMIN_MENULIST : LNB_MENULIST).map((item, index) => {
+      {(isAdmin ? LNM_ADMIN_MENULIST : LNB_MENULIST).map((item) => {
         const isActive = setPathActive(pathname, item.to);
         return (
           <button
-            key={index}
+            key={item.to}
             type="button"
             onClick={() => handleClick(item.to)}
             className={cn(

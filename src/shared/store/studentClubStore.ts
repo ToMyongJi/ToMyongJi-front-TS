@@ -1,6 +1,6 @@
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
 import type { college } from '@apis/college/college';
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 export type StudentClub = Pick<college, 'studentClubId' | 'studentClubName' | 'verification'>;
 
@@ -23,4 +23,3 @@ export const useStudentClubStore = create<StudentClubState>()(
     },
   ),
 );
-

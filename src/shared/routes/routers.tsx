@@ -53,6 +53,7 @@ export const router = createBrowserRouter([
         children: [
           { path: 'home-admin', element: <AdminPage /> },
           { path: 'management', element: <Management /> },
+          { path: 'management/:clubId', element: <Management /> },
         ],
       },
     ],
