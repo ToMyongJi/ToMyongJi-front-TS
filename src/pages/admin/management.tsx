@@ -4,14 +4,21 @@ import TextField from '@components/common/textfield';
 import MemberList from '@components/mypage/member-list';
 import { useStudentClubStore } from '@store/studentClubStore';
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 export const Management = () => {
   const { clubId: clubIdParam } = useParams<{ clubId: string }>();
   const setSelectedClub = useStudentClubStore((s) => s.setSelectedClub);
+  const [newPresidentStudentNum, setNewPresidentStudentNum] = useState('');
+  const [newPresidentName, setNewPresidentName] = useState('');
+  const [newMemberStudentNum, setNewMemberStudentNum] = useState('');
+  const [newMemberName, setNewMemberName] = useState('');
 
   const { data, isLoading } = useQuery(collegeQuery.collegeAndClubs());
+  const canChangePresident =
+    newPresidentStudentNum.trim().length > 0 && newPresidentName.trim().length > 0;
+  const canAddMember = newMemberStudentNum.trim().length > 0 && newMemberName.trim().length > 0;
 
   const club = useMemo(() => {
     if (!clubIdParam) return null;
@@ -76,9 +83,24 @@ export const Management = () => {
           </div>
           <div className="flex h-[4rem] items-center gap-[1.6rem]">
             <p className="W_SB15 flex-1 text-black">새 회장</p>
-            <TextField placeholder="학번" className="flex-1" />
-            <TextField placeholder="이름" className="flex-1" />
-            <Button size="regular" variant="primary" className="h-[4rem] max-w-[6.3rem] flex-1">
+            <TextField
+              placeholder="학번"
+              className="flex-1"
+              value={newPresidentStudentNum}
+              onChange={(e) => setNewPresidentStudentNum(e.target.value)}
+            />
+            <TextField
+              placeholder="이름"
+              className="flex-1"
+              value={newPresidentName}
+              onChange={(e) => setNewPresidentName(e.target.value)}
+            />
+            <Button
+              size="regular"
+              variant="primary"
+              className="h-[4rem] max-w-[6.3rem] flex-1"
+              disabled={!canChangePresident}
+            >
               변경
             </Button>
           </div>
@@ -87,9 +109,24 @@ export const Management = () => {
         <div className="flex w-full flex-col justify-center gap-[2rem] rounded-[1rem] border-1 border-gray-20 px-[1.6rem] py-[2rem] sm:px-[2.6rem] sm:py-[3rem]">
           <p className="W_B17 text-black">소속부원 관리</p>
           <div className="flex h-[4rem] items-center gap-[1.6rem]">
-            <TextField placeholder="학번" className="flex-1" />
-            <TextField placeholder="이름" className="flex-1" />
-            <Button size="regular" variant="primary" className="h-[4rem] max-w-[6.3rem] flex-1">
+            <TextField
+              placeholder="학번"
+              className="flex-1"
+              value={newMemberStudentNum}
+              onChange={(e) => setNewMemberStudentNum(e.target.value)}
+            />
+            <TextField
+              placeholder="이름"
+              className="flex-1"
+              value={newMemberName}
+              onChange={(e) => setNewMemberName(e.target.value)}
+            />
+            <Button
+              size="regular"
+              variant="primary"
+              className="h-[4rem] max-w-[6.3rem] flex-1"
+              disabled={!canAddMember}
+            >
               추가
             </Button>
           </div>
