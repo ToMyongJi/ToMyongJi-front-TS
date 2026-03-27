@@ -1,15 +1,16 @@
+import Footer from '@layouts/footer';
 import HeaderGnb from '@layouts/header-gnb';
 import Sidebar from '@layouts/sidebar';
-import Footer from '@layouts/footer';
-
-import HeaderLnb from './header-lnb';
-import { Outlet } from 'react-router-dom';
+import { AuthTokenWatcher } from '@routes/auth-token-watcher';
 import { useLayoutStore } from '@store/layoutStore';
+import { Outlet } from 'react-router-dom';
+import HeaderLnb from './header-lnb';
 
 const RootLayout = () => {
   const { isSidebarOpen, toggleSidebar, closeSidebar } = useLayoutStore();
   return (
     <div className="flex h-full min-h-screen flex-col">
+      <AuthTokenWatcher />
       <HeaderGnb />
       <HeaderLnb onClickSearch={toggleSidebar} setSidebarOpen={toggleSidebar} />
       <div className="relative flex flex-1">
