@@ -41,6 +41,8 @@ export const ClubTransfer = () => {
     }
   };
 
+  const isNextDisabled = presidentName.trim() === '' || presidentStudentNumber.trim() === '';
+
   const handleCheck = (member: MemberItem, checked: boolean) => {
     if (checked) {
       setCheckedMembers((prev) => [...prev, member]);
@@ -76,6 +78,7 @@ export const ClubTransfer = () => {
           presidentStudentNumber={presidentStudentNumber}
           onChangePresidentName={(value) => setPresidentName(value)}
           onChangePresidentStudentNumber={(value) => setPresidentStudentNumber(value)}
+          isNextDisabled={isNextDisabled}
         />
       )}
       {step === 4 && <TransferStep4 />}

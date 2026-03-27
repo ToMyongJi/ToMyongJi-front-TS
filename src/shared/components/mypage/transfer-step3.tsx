@@ -8,6 +8,7 @@ interface TransferStep3Props {
   presidentStudentNumber: string;
   onChangePresidentName: (value: string) => void;
   onChangePresidentStudentNumber: (value: string) => void;
+  isNextDisabled: boolean;
 }
 
 export const TransferStep3 = ({
@@ -17,6 +18,7 @@ export const TransferStep3 = ({
   presidentStudentNumber,
   onChangePresidentName,
   onChangePresidentStudentNumber,
+  isNextDisabled,
 }: TransferStep3Props) => {
   return (
     <div className="w-full max-w-[49rem]">
@@ -53,6 +55,7 @@ export const TransferStep3 = ({
           type="button"
           className="w-[11rem]"
           onClick={onNextStep}
+          disabled={isNextDisabled}
         >
           다음
         </Button>
