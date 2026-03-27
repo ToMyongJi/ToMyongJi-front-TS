@@ -41,12 +41,12 @@ const HeaderLnb = ({ openSidebar, closeSidebar }: HeaderLnbProps) => {
     const mgmtTabActive = pathname.startsWith('/management');
 
     if (path === '/receipt-view') {
-      if (isSidebarOpen && (!isAdmin || viewTabActive)) {
+      if (isSidebarOpen && viewTabActive) {
         closeSidebar?.();
 
         return;
       }
-      if (isAdmin && selectedClub?.studentClubId != null) {
+      if (selectedClub?.studentClubId != null) {
         navigate(`/receipt-view/${selectedClub.studentClubId}`);
       }
       openSidebar?.();
@@ -59,7 +59,11 @@ const HeaderLnb = ({ openSidebar, closeSidebar }: HeaderLnbProps) => {
 
         return;
       }
-      navigate(`/management/${selectedClub?.studentClubId}`);
+      if (selectedClub?.studentClubId != null) {
+        navigate(`/management/${selectedClub.studentClubId}`);
+      } else {
+        navigate('/management');
+      }
       openSidebar?.();
       return;
     }
