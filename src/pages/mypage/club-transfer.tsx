@@ -3,16 +3,30 @@ import { TransferStep1 } from '@components/mypage/transfer-step1';
 import { TransferStep2 } from '@components/mypage/transfer-step2';
 import { TransferStep3 } from '@components/mypage/transfer-step3';
 import { TransferStep4 } from '@components/mypage/transfer-step4';
-import { useState } from 'react';
+import useAuthStore from '@store/auth-store';
+import useUserStore from '@store/user-store';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export const ClubTransfer = () => {
   const navigate = useNavigate();
+  const { clearAuthData } = useAuthStore();
+  const { clearUser } = useUserStore();
 
   const [checkedMembers, setCheckedMembers] = useState<MemberItem[]>([]);
   const [presidentName, setPresidentName] = useState('');
   const [presidentStudentNumber, setPresidentStudentNumber] = useState('');
   const [step, setStep] = useState(1);
+
+  useEffect(() => {
+    if (step !== 4) return;
+    const timer = window.setTimeout(() => {
+      clearAuthData();
+      clearUser();
+      navigate('/login', { replace: true });
+    }, 3000);
+    return () => window.clearTimeout(timer);
+  }, [step, clearAuthData, clearUser, navigate]);
 
   const handleCancel = () => {
     if (step === 1) {
@@ -54,7 +68,7 @@ export const ClubTransfer = () => {
   return (
     <div className="mt-[4.2rem] mb-[10rem] flex flex-col items-center justify-center px-[1.5rem]">
       <div className="mb-[1.8rem] flex w-full max-w-[49rem] flex-col">
-        <p className="W_Title text-black">학생회 이전</p>
+        {step !== 4 && <p className="W_Title text-black">학생회 이전</p>}
       </div>
       {step === 1 && <TransferStep1 onCancel={handleCancel} onTransfer={handleNext} />}
       {step === 2 && (
