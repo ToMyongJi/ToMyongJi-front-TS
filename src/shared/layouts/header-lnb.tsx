@@ -25,7 +25,6 @@ const HeaderLnb = ({ openSidebar, closeSidebar }: HeaderLnbProps) => {
   const { user } = useUserStore();
   const isAdmin = user?.role === Role.ADMIN;
   const selectedClub = useStudentClubStore((s) => s.selectedClub);
-  const clearSelectedClub = useStudentClubStore((s) => s.clearSelectedClub);
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const normalize = (p: string) => (p !== '/' && p.endsWith('/') ? p.slice(0, -1) : p);
@@ -44,8 +43,7 @@ const HeaderLnb = ({ openSidebar, closeSidebar }: HeaderLnbProps) => {
     if (path === '/receipt-view') {
       if (isSidebarOpen && (!isAdmin || viewTabActive)) {
         closeSidebar?.();
-        clearSelectedClub();
-        navigate('/');
+
         return;
       }
       if (isAdmin && selectedClub?.studentClubId != null) {
@@ -54,14 +52,14 @@ const HeaderLnb = ({ openSidebar, closeSidebar }: HeaderLnbProps) => {
       openSidebar?.();
       return;
     }
+
     if (path === '/management' && isAdmin) {
       if (isSidebarOpen && mgmtTabActive) {
         closeSidebar?.();
-        clearSelectedClub();
-        navigate('/');
+
         return;
       }
-      navigate('/management');
+      navigate(`/management/${selectedClub?.studentClubId}`);
       openSidebar?.();
       return;
     }
