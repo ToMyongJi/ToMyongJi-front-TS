@@ -115,6 +115,25 @@ const ReceiptCreate = () => {
     },
   });
 
+  const deleteReceipt = useMutation({
+    ...receiptMutations.delete(),
+  });
+
+  const updateReceipt = useMutation({
+    ...receiptMutations.update(),
+    onSuccess: () => {
+      if (user?.id != null) {
+        queryClient.invalidateQueries({ queryKey: QK.receipt.club(user.id) });
+      }
+      if (user?.studentClubId != null) {
+        queryClient.invalidateQueries({ queryKey: ['receiptList', user.studentClubId] });
+      }
+    },
+    onError: () => {
+      alert('내역 수정에 실패했습니다.');
+    },
+  });
+
   useEffect(() => {
     if (authData && allClubsFlat.length === 0) {
       fetchClubs();
@@ -136,6 +155,31 @@ const ReceiptCreate = () => {
       state ? [...prev, id] : prev.filter((receiptId) => receiptId !== id),
     );
 
+  };
+
+  const handleReceiptDelete = async () => {
+    if (selectedReceiptIds.length === 0) {
+      alert('삭제할 내역을 선택해 주세요.');
+      return;
+    }
+
+    try {
+      for (const receiptId of selectedReceiptIds) {
+        await deleteReceipt.mutateAsync(receiptId);
+      }
+
+      if (user?.id != null) {
+        queryClient.invalidateQueries({ queryKey: QK.receipt.club(user.id) });
+      }
+      if (user?.studentClubId != null) {
+        queryClient.invalidateQueries({ queryKey: ['receiptList', user.studentClubId] });
+      }
+
+      setSelectedReceiptIds([]);
+      alert('성공적으로 삭제했습니다.');
+    } catch {
+      alert('삭제에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+    }
   };
 
   const handleSaveClick = () => {
@@ -257,7 +301,14 @@ const ReceiptCreate = () => {
               </div>
               <div className="flex gap-[3rem]">
                 <Button variant="primary_outline" size="regular">영수증 추출</Button>
-                <Button variant="danger" size="regular">선택 목록 삭제</Button>
+                <Button
+                  variant="danger"
+                  size="regular"
+                  onClick={handleReceiptDelete}
+                  disabled={deleteReceipt.isPending}
+                >
+                  선택 목록 삭제
+                </Button>
               </div>
             </div>
             <SearchBar
@@ -271,17 +322,21 @@ const ReceiptCreate = () => {
           </div>
           <div className="rounded-[1rem] border border-gray-20 px-[2.7rem] pt-[1.6rem]">
             <table className="w-full table-fixed">
-              <TableHeader headerData={HEADER_DATA}/>
-              {filteredReceipts.map((receipt: Receipt, index: number) => (
-                <TableCell
-                  key={receipt.receiptId}
-                  mode="EDIT"
-                  isChecked={selectedReceiptIds.indexOf(receipt.receiptId) !== -1}
-                  isLastRow={index === filteredReceipts.length - 1}
-                  onToggleChecked={handleCheckClick}
-                  {...receipt}
-                />
-              ))}
+              <TableHeader headerData={HEADER_DATA} />
+              <tbody>
+                {filteredReceipts.map((receipt: Receipt, index: number) => (
+                  <TableCell
+                    key={receipt.receiptId}
+                    mode="EDIT"
+                    isChecked={selectedReceiptIds.indexOf(receipt.receiptId) !== -1}
+                    isLastRow={index === filteredReceipts.length - 1}
+                    isSavePending={updateReceipt.isPending}
+                    onToggleChecked={handleCheckClick}
+                    onSave={(body) => updateReceipt.mutateAsync(body)}
+                    {...receipt}
+                  />
+                ))}
+              </tbody>
             </table>
             <div className="py-[1.6rem]">
               <PaginationCustom
