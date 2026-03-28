@@ -133,7 +133,7 @@ const Login = () => {
               <CheckBox checked={rememberMe} onChange={(checked) => setRememberMe(checked)} />
               <span>아이디 저장</span>
             </div>
-            <Link to="/find-account">아이디 찾기</Link>
+            <Link to="/find-account">아이디·비밀번호 찾기</Link>
           </div>
 
           {/* 로그인 버튼 (피그마 디자인에 맞춰 색상 지정, disabled 처리 포함) */}

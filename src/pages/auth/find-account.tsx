@@ -31,7 +31,7 @@ const FindAccount = () => {
   return (
     <div className="flex items-center justify-center">
       <div className="my-[6rem] flex w-full max-w-[35.2rem] flex-col gap-[1.8rem]">
-        <p className="W_Title text-left text-black">아이디 찾기</p>
+        <p className="W_Title text-left text-black">아이디·비밀번호 찾기</p>
         {/* 이메일 입력 창 */}
         <div className="flex flex-col items-center gap-[1.6rem] rounded-[1rem] border-1 border-gray-20 px-[2.6rem] py-[3rem]">
           <div className="flex w-full items-center gap-[1rem]">
