@@ -8,7 +8,7 @@ const FindAccount = () => {
 
   return (
     <div className="flex items-center justify-center">
-      <div className="my-[6rem] flex w-full max-w-[35.2rem] flex-col gap-[1.8rem]">
+      <div className="my-[6rem] flex w-full max-w-[35.2rem] flex-col gap-[4rem]">
         <p className="W_Title text-left text-black">아이디·비밀번호 찾기</p>
         <FindAccountTabs active={tab} onChange={setTab} />
         {tab === 'findId' ? <FindIdForm /> : <FindPasswordForm />}

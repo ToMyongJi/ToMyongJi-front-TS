@@ -22,7 +22,10 @@ const FindAccountTabs = ({ active, onChange }: FindAccountTabsProps) => {
             key={tab.id}
             type="button"
             onClick={() => onChange(tab.id)}
-            className={cn('w-fit cursor-pointer py-[1.6rem]', isActive && 'border-primary border-b-2')}
+            className={cn(
+              'w-full cursor-pointer py-[1.6rem]',
+              isActive && 'border-primary border-b-2',
+            )}
           >
             <p className={cn('W_B17 text-gray-90', isActive && 'text-primary')}>{tab.label}</p>
           </button>
