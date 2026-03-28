@@ -43,6 +43,12 @@ export type UpdateReceiptRequest = {
   withdrawal?: number;
 };
 
+export type ExportCsvRequest = {
+  userId?: string;
+  year?: number;
+  month?: number;
+}
+
 export type UploadTossBankRequest = {
   file: File;
   userId: string;
@@ -61,6 +67,10 @@ export const receiptApi = {
     http.put<Rsp<Receipt>, UpdateReceiptRequest>(ENDPOINTS.receipt.root, body),
   delete: (receiptId: number) =>
     http.delete<Rsp<null>>(ENDPOINTS.receipt.specific(receiptId)),
+  uploadCsv: (userIndexId: number) =>
+    http.post<Rsp<null>>(ENDPOINTS.csv.upload(userIndexId)),
+  exportCsv: (body: ExportCsvRequest) =>
+    http.post<Blob, ExportCsvRequest>(ENDPOINTS.csv.export, body, { responseType: 'blob' }),
   upLoadToss: (body: UploadTossBankRequest) => {
     const formData = new FormData();
     formData.append('file', body.file);

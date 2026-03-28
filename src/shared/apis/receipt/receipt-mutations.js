@@ -4,5 +4,7 @@ export const receiptMutations = {
     create: () => buildMutation(receiptApi.create),
     update: () => buildMutation(receiptApi.update),
     delete: () => buildMutation(receiptApi.delete),
+    uploadCsv: () => buildMutation(receiptApi.uploadCsv),
+    exportCsv: () => buildMutation(receiptApi.exportCsv),
     uploadToss: () => buildMutation(receiptApi.upLoadToss),
 };

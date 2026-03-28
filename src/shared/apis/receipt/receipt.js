@@ -8,6 +8,8 @@ export const receiptApi = {
     create: (body) => http.post(ENDPOINTS.receipt.root, body),
     update: (body) => http.put(ENDPOINTS.receipt.root, body),
     delete: (receiptId) => http.delete(ENDPOINTS.receipt.specific(receiptId)),
+    uploadCsv: (userIndexId) => http.post(ENDPOINTS.csv.upload(userIndexId)),
+    exportCsv: (body) => http.post(ENDPOINTS.csv.export, body, { responseType: 'blob' }),
     upLoadToss: (body) => {
         var _a;
         const formData = new FormData();

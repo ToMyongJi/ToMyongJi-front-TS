@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { QK } from '@apis/base/key';
@@ -33,6 +33,33 @@ const parseWonInput = (raw) => {
     const digits = raw.replace(/,/g, '').replace(/\D/g, '');
     return digits === '' ? 0 : Number(digits);
 };
+const flattenInfiniteReceiptPages = (pages) => {
+    var _a;
+    return (_a = pages === null || pages === void 0 ? void 0 : pages.reduce((acc, page) => {
+        var _a;
+        const payload = page.data;
+        return acc.concat((_a = payload.receiptDtoList) !== null && _a !== void 0 ? _a : []);
+    }, [])) !== null && _a !== void 0 ? _a : [];
+};
+const filterReceiptsBySearch = (receipts, searchTerm) => {
+    const needle = searchTerm.trim().toLowerCase();
+    if (needle.length < 2)
+        return receipts;
+    return receipts.filter((item) => {
+        const haystack = `${item.date} ${item.content} ${item.deposit} ${item.withdrawal}`.toLowerCase();
+        return haystack.includes(needle);
+    });
+};
+const downloadBlob = (blob, filename) => {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+};
 const HEADER_DATA = [
     { labels: "", width: "8.46%" },
     { labels: "날짜", width: "12.8%" },
@@ -42,7 +69,7 @@ const HEADER_DATA = [
     { labels: "", width: "8.46%" },
 ];
 const ReceiptCreate = () => {
-    var _a, _b, _c, _d, _e, _f;
+    var _a, _b, _c, _d, _e;
     const queryClient = useQueryClient();
     const navigate = useNavigate();
     const { user } = useUserStore();
@@ -69,41 +96,29 @@ const ReceiptCreate = () => {
     const selectedMonth = month === '전체(월)' ? undefined : Number(month.replace('월', ''));
     const receiptList = useInfiniteQuery(Object.assign({}, receiptQueries.listInfinite(user === null || user === void 0 ? void 0 : user.studentClubId, selectedYear, selectedMonth, 10, page - 1)));
     const totalPages = (_c = (_b = (_a = receiptList.data) === null || _a === void 0 ? void 0 : _a.pages[0]) === null || _b === void 0 ? void 0 : _b.data.totalPages) !== null && _c !== void 0 ? _c : 0;
-    const receipts = (_e = (_d = receiptList.data) === null || _d === void 0 ? void 0 : _d.pages.reduce((acc, p) => {
-        var _a;
-        const payload = p.data;
-        const list = (_a = payload.receiptDtoList) !== null && _a !== void 0 ? _a : [];
-        return acc.concat(list);
-    }, [])) !== null && _e !== void 0 ? _e : [];
-    const trimmedSearchTerm = searchTerm.trim().toLowerCase();
-    const filteredReceipts = trimmedSearchTerm.length < 2
-        ? receipts
-        : receipts.filter((item) => {
-            const target = `${item.date} ${item.content} ${item.deposit} ${item.withdrawal}`.toLowerCase();
-            return target.includes(trimmedSearchTerm);
-        });
+    const receipts = flattenInfiniteReceiptPages((_d = receiptList.data) === null || _d === void 0 ? void 0 : _d.pages);
+    const filteredReceipts = filterReceiptsBySearch(receipts, searchTerm);
+    const invalidateReceiptCaches = useCallback(() => {
+        if ((user === null || user === void 0 ? void 0 : user.id) != null) {
+            queryClient.invalidateQueries({ queryKey: QK.receipt.club(user.id) });
+        }
+        if ((user === null || user === void 0 ? void 0 : user.studentClubId) != null) {
+            queryClient.invalidateQueries({ queryKey: ['receiptList', user.studentClubId] });
+        }
+    }, [queryClient, user === null || user === void 0 ? void 0 : user.id, user === null || user === void 0 ? void 0 : user.studentClubId]);
     const createReceipt = useMutation(Object.assign(Object.assign({}, receiptMutations.create()), { onSuccess: () => {
-            if ((user === null || user === void 0 ? void 0 : user.id) != null) {
-                queryClient.invalidateQueries({ queryKey: QK.receipt.club(user.id) });
-            }
-            if ((user === null || user === void 0 ? void 0 : user.studentClubId) != null) {
-                queryClient.invalidateQueries({ queryKey: ['receiptList', user.studentClubId] });
-            }
+            invalidateReceiptCaches();
             setReceiptForm((prev) => (Object.assign(Object.assign({}, prev), { content: '', deposit: '', withdrawal: '' })));
         }, onError: () => {
             alert('내역 저장에 실패했습니다.');
         } }));
     const deleteReceipt = useMutation(Object.assign({}, receiptMutations.delete()));
     const updateReceipt = useMutation(Object.assign(Object.assign({}, receiptMutations.update()), { onSuccess: () => {
-            if ((user === null || user === void 0 ? void 0 : user.id) != null) {
-                queryClient.invalidateQueries({ queryKey: QK.receipt.club(user.id) });
-            }
-            if ((user === null || user === void 0 ? void 0 : user.studentClubId) != null) {
-                queryClient.invalidateQueries({ queryKey: ['receiptList', user.studentClubId] });
-            }
+            invalidateReceiptCaches();
         }, onError: () => {
             alert('내역 수정에 실패했습니다.');
         } }));
+    const exportCsv = useMutation(receiptMutations.exportCsv());
     useEffect(() => {
         if (authData && allClubsFlat.length === 0) {
             fetchClubs();
@@ -126,13 +141,10 @@ const ReceiptCreate = () => {
             return;
         }
         try {
-            yield Promise.all(selectedReceiptIds.map((receiptId) => deleteReceipt.mutateAsync(receiptId)));
-            if ((user === null || user === void 0 ? void 0 : user.id) != null) {
-                queryClient.invalidateQueries({ queryKey: QK.receipt.club(user.id) });
+            for (const receiptId of selectedReceiptIds) {
+                yield deleteReceipt.mutateAsync(receiptId);
             }
-            if ((user === null || user === void 0 ? void 0 : user.studentClubId) != null) {
-                queryClient.invalidateQueries({ queryKey: ['receiptList', user.studentClubId] });
-            }
+            invalidateReceiptCaches();
             setSelectedReceiptIds([]);
             alert('성공적으로 삭제했습니다.');
         }
@@ -162,11 +174,31 @@ const ReceiptCreate = () => {
             withdrawal: parseWonInput(receiptForm.withdrawal),
         });
     };
-    return (_jsx("div", { className: "flex w-full flex-col px-[3rem] pt-[4.2rem] pb-[10rem]", children: _jsxs("div", { className: "mx-auto w-full max-w-[100rem] flex-col gap-[7.2rem]", children: [_jsxs("section", { className: "flex-col gap-[1.2rem]", children: [_jsx("p", { className: "W_Header", children: studentClubName }), _jsx("div", { children: _jsxs("p", { className: "W_Header", children: [_jsx("span", { className: "W_R14 text-gray-80", children: "\uC794\uC561" }), " ", ((_f = receiptData === null || receiptData === void 0 ? void 0 : receiptData.balance) !== null && _f !== void 0 ? _f : 0).toLocaleString(), "\uC6D0"] }) })] }), _jsxs("section", { className: "flex-col gap-[1rem]", children: [_jsxs("div", { className: "flex items-center justify-between", children: [_jsx("p", { className: "W_Title", children: "\uB0B4\uC5ED \uCD94\uAC00" }), _jsxs("div", { className: "flex items-center gap-[0.8rem]", children: [_jsx(ReceiptButton, { receiptType: "toss", onClick: () => navigate('/tossbank-create') }), _jsx(ReceiptButton, { receiptType: "excel" })] })] }), _jsxs("div", { className: "flex-row-center gap-[0.8rem] rounded-[10px] border border-gray-20 p-[2rem]", children: [_jsx("div", { className: "flex h-[4rem] w-[11.2rem] shrink-0 items-center rounded-[0.8rem] border-[1px] border-gray-20 bg-white px-[1.4rem] py-[0.8rem] transition-colors focus-within:border-primary", children: _jsx(DatePicker, { selected: receiptForm.date, onChange: (date) => {
+    const handleExportCsv = () => {
+        if ((user === null || user === void 0 ? void 0 : user.userId) == null) {
+            alert('로그인 정보를 확인할 수 없습니다.');
+            return;
+        }
+        exportCsv.mutate({
+            userId: user.userId,
+            year: selectedYear,
+            month: selectedMonth,
+        }, {
+            onSuccess: (blob) => {
+                const y = selectedYear != null ? String(selectedYear) : 'all';
+                const m = selectedMonth != null ? String(selectedMonth) : 'all';
+                downloadBlob(blob, `receipts_${y}_${m}.csv`);
+            },
+            onError: () => {
+                alert('영수증 추출에 실패했습니다.');
+            },
+        });
+    };
+    return (_jsx("div", { className: "flex w-full flex-col px-[3rem] pt-[4.2rem] pb-[10rem]", children: _jsxs("div", { className: "mx-auto w-full max-w-[100rem] flex-col gap-[7.2rem]", children: [_jsxs("section", { className: "flex-col gap-[1.2rem]", children: [_jsx("p", { className: "W_Header", children: studentClubName }), _jsx("div", { children: _jsxs("p", { className: "W_Header", children: [_jsx("span", { className: "W_R14 text-gray-80", children: "\uC794\uC561" }), " ", ((_e = receiptData === null || receiptData === void 0 ? void 0 : receiptData.balance) !== null && _e !== void 0 ? _e : 0).toLocaleString(), "\uC6D0"] }) })] }), _jsxs("section", { className: "flex-col gap-[1rem]", children: [_jsxs("div", { className: "flex items-center justify-between", children: [_jsx("p", { className: "W_Title", children: "\uB0B4\uC5ED \uCD94\uAC00" }), _jsxs("div", { className: "flex items-center gap-[0.8rem]", children: [_jsx(ReceiptButton, { receiptType: "toss", onClick: () => navigate('/tossbank-create') }), _jsx(ReceiptButton, { receiptType: "excel" })] })] }), _jsxs("div", { className: "flex-row-center gap-[0.8rem] rounded-[10px] border border-gray-20 p-[2rem]", children: [_jsx("div", { className: "flex h-[4rem] w-[11.2rem] shrink-0 items-center rounded-[0.8rem] border-[1px] border-gray-20 bg-white px-[1.4rem] py-[0.8rem] transition-colors focus-within:border-primary", children: _jsx(DatePicker, { selected: receiptForm.date, onChange: (date) => {
                                             setReceiptForm((prev) => (Object.assign(Object.assign({}, prev), { date })));
                                         }, dateFormat: "yyyy.MM.dd", popperPlacement: "bottom", popperClassName: "receipt-datepicker-popper", calendarClassName: "receipt-datepicker-calendar", className: "W_R15 w-full bg-transparent outline-none placeholder:text-gray-70" }) }), _jsx(TextField, { placeholder: "\uB0B4\uC6A9", className: "w-[41.4rem]", value: receiptForm.content, onChange: (e) => setReceiptForm((prev) => (Object.assign(Object.assign({}, prev), { content: e.target.value }))) }), _jsx(TextField, { type: "price", placeholder: "\uC785\uAE08", value: receiptForm.deposit, onChange: (e) => setReceiptForm((prev) => (Object.assign(Object.assign({}, prev), { deposit: e.target.value }))) }), _jsx(TextField, { type: "price", placeholder: "\uCD9C\uAE08", value: receiptForm.withdrawal, onChange: (e) => setReceiptForm((prev) => (Object.assign(Object.assign({}, prev), { withdrawal: e.target.value }))) }), _jsx(Button, { variant: "primary", size: "save", disabled: createReceipt.isPending, onClick: handleSaveClick, children: "\uC800\uC7A5\uD558\uAE30" })] })] }), _jsxs("section", { className: "flex-col gap-[1rem]", children: [_jsx("p", { className: "W_Title", children: "\uD559\uC0DD\uD68C\uBE44 \uC0AC\uC6A9 \uB0B4\uC5ED" }), _jsxs("div", { className: "flex-row-between", children: [_jsxs("div", { className: "flex gap-[0.8rem]", children: [_jsxs("div", { className: "relative", children: [_jsx(Chip, { label: year, isActive: isYearFilterOpen, onClick: () => handleChipClick('YEAR') }), isYearFilterOpen &&
                                                     _jsx(Dropdown, { className: "absolute top-0", onClick: () => setIsYearFilterOpen(false), datas: yearOptions, previewData: year, setPreViewData: setYear })] }), _jsxs("div", { className: "relative", children: [_jsx(Chip, { label: month, isActive: isMonthFilterOpen, onClick: () => handleChipClick('MONTH') }), isMonthFilterOpen &&
-                                                    _jsx(Dropdown, { className: "absolute top-0", onClick: () => setIsMonthFilterOpen(false), datas: monthOptions, previewData: month, setPreViewData: setMonth })] }), _jsxs("div", { className: "flex gap-[3rem]", children: [_jsx(Button, { variant: "primary_outline", size: "regular", children: "\uC601\uC218\uC99D \uCD94\uCD9C" }), _jsx(Button, { variant: "danger", size: "regular", onClick: handleReceiptDelete, disabled: deleteReceipt.isPending, children: "\uC120\uD0DD \uBAA9\uB85D \uC0AD\uC81C" })] })] }), _jsx(SearchBar, { placeholder: "\uAC80\uC0C9\uC5B4 2\uAE00\uC790 \uC774\uC0C1 \uC785\uB825", value: searchTerm, onChange: (e) => {
+                                                    _jsx(Dropdown, { className: "absolute top-0", onClick: () => setIsMonthFilterOpen(false), datas: monthOptions, previewData: month, setPreViewData: setMonth })] }), _jsxs("div", { className: "flex gap-[3rem]", children: [_jsx(Button, { variant: "primary_outline", size: "regular", onClick: handleExportCsv, disabled: exportCsv.isPending, children: "\uC601\uC218\uC99D \uCD94\uCD9C" }), _jsx(Button, { variant: "danger", size: "regular", onClick: handleReceiptDelete, disabled: deleteReceipt.isPending, children: "\uC120\uD0DD \uBAA9\uB85D \uC0AD\uC81C" })] })] }), _jsx(SearchBar, { placeholder: "\uAC80\uC0C9\uC5B4 2\uAE00\uC790 \uC774\uC0C1 \uC785\uB825", value: searchTerm, onChange: (e) => {
                                         setSearchTerm(e.target.value);
                                         setPage(1);
                                     } })] }), _jsxs("div", { className: "rounded-[1rem] border border-gray-20 px-[2.7rem] pt-[1.6rem]", children: [_jsxs("table", { className: "w-full table-fixed", children: [_jsx(TableHeader, { headerData: HEADER_DATA }), _jsx("tbody", { children: filteredReceipts.map((receipt, index) => (_jsx(TableCell, Object.assign({ mode: "EDIT", isChecked: selectedReceiptIds.indexOf(receipt.receiptId) !== -1, isLastRow: index === filteredReceipts.length - 1, isSavePending: updateReceipt.isPending, onToggleChecked: handleCheckClick, onSave: (body) => updateReceipt.mutateAsync(body) }, receipt), receipt.receiptId))) })] }), _jsx("div", { className: "py-[1.6rem]", children: _jsx(PaginationCustom, { currentPage: page, totalPages: totalPages, onPageChange: (pageNumber) => setPage(pageNumber) }) })] })] })] }) }));

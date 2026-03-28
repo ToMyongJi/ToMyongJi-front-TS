@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { QK } from '@apis/base/key';
@@ -27,6 +27,34 @@ import PaginationCustom from '@components/pagination-custom';
 const parseWonInput = (raw: string) => {
   const digits = raw.replace(/,/g, '').replace(/\D/g, '');
   return digits === '' ? 0 : Number(digits);
+};
+
+const flattenInfiniteReceiptPages = (
+  pages: Array<{ data: unknown }> | undefined,
+): Receipt[] =>
+  pages?.reduce((acc, page) => {
+    const payload = page.data as unknown as { receiptDtoList?: Receipt[] };
+    return acc.concat(payload.receiptDtoList ?? []);
+  }, [] as Receipt[]) ?? [];
+
+const filterReceiptsBySearch = (receipts: Receipt[], searchTerm: string): Receipt[] => {
+  const needle = searchTerm.trim().toLowerCase();
+  if (needle.length < 2) return receipts;
+  return receipts.filter((item) => {
+    const haystack = `${item.date} ${item.content} ${item.deposit} ${item.withdrawal}`.toLowerCase();
+    return haystack.includes(needle);
+  });
+};
+
+const downloadBlob = (blob: Blob, filename: string) => {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 };
 
 const HEADER_DATA = [
@@ -78,31 +106,22 @@ const ReceiptCreate = () => {
     ),
   });
   const totalPages = receiptList.data?.pages[0]?.data.totalPages ?? 0;
-  const receipts: Receipt[] =
-    receiptList.data?.pages.reduce((acc, p) => {
-      const payload = p.data as unknown as { receiptDtoList?: Receipt[] };
-      const list = payload.receiptDtoList ?? [];
-      return acc.concat(list);
-    }, [] as Receipt[]) ?? [];
+  const receipts = flattenInfiniteReceiptPages(receiptList.data?.pages);
+  const filteredReceipts = filterReceiptsBySearch(receipts, searchTerm);
 
-  const trimmedSearchTerm = searchTerm.trim().toLowerCase();
-  const filteredReceipts =
-    trimmedSearchTerm.length < 2
-      ? receipts
-      : receipts.filter((item: Receipt) => {
-          const target = `${item.date} ${item.content} ${item.deposit} ${item.withdrawal}`.toLowerCase();
-          return target.includes(trimmedSearchTerm);
-        });
+  const invalidateReceiptCaches = useCallback(() => {
+    if (user?.id != null) {
+      queryClient.invalidateQueries({ queryKey: QK.receipt.club(user.id) });
+    }
+    if (user?.studentClubId != null) {
+      queryClient.invalidateQueries({ queryKey: ['receiptList', user.studentClubId] });
+    }
+  }, [queryClient, user?.id, user?.studentClubId]);
 
   const createReceipt = useMutation({
     ...receiptMutations.create(),
     onSuccess: () => {
-      if (user?.id != null) {
-        queryClient.invalidateQueries({ queryKey: QK.receipt.club(user.id) });
-      }
-      if (user?.studentClubId != null) {
-        queryClient.invalidateQueries({ queryKey: ['receiptList', user.studentClubId] });
-      }
+      invalidateReceiptCaches();
       setReceiptForm((prev) => ({
         ...prev,
         content: '',
@@ -122,17 +141,14 @@ const ReceiptCreate = () => {
   const updateReceipt = useMutation({
     ...receiptMutations.update(),
     onSuccess: () => {
-      if (user?.id != null) {
-        queryClient.invalidateQueries({ queryKey: QK.receipt.club(user.id) });
-      }
-      if (user?.studentClubId != null) {
-        queryClient.invalidateQueries({ queryKey: ['receiptList', user.studentClubId] });
-      }
+      invalidateReceiptCaches();
     },
     onError: () => {
       alert('내역 수정에 실패했습니다.');
     },
   });
+
+  const exportCsv = useMutation(receiptMutations.exportCsv());
 
   useEffect(() => {
     if (authData && allClubsFlat.length === 0) {
@@ -168,13 +184,7 @@ const ReceiptCreate = () => {
         await deleteReceipt.mutateAsync(receiptId);
       }
 
-      if (user?.id != null) {
-        queryClient.invalidateQueries({ queryKey: QK.receipt.club(user.id) });
-      }
-      if (user?.studentClubId != null) {
-        queryClient.invalidateQueries({ queryKey: ['receiptList', user.studentClubId] });
-      }
-
+      invalidateReceiptCaches();
       setSelectedReceiptIds([]);
       alert('성공적으로 삭제했습니다.');
     } catch {
@@ -204,6 +214,39 @@ const ReceiptCreate = () => {
       deposit: parseWonInput(receiptForm.deposit),
       withdrawal: parseWonInput(receiptForm.withdrawal),
     });
+  };
+
+  const handleExportCsv = () => {
+    if (user?.userId == null) {
+      alert('로그인 정보를 확인할 수 없습니다.');
+      return;
+    }
+
+    if (selectedYear === undefined){
+      alert('년도를 선택해주세요')
+      return;
+    }
+
+    if(selectedMonth === undefined){
+      alert('월을 선택해주세요')
+      return;
+    }
+
+    exportCsv.mutate(
+      {
+        userId: user.userId,
+        year: selectedYear,
+        month: selectedMonth,
+      },
+      {
+        onSuccess: (blob) => {
+          downloadBlob(blob, `${selectedYear}년-${selectedMonth}월-영수증.csv`);
+        },
+        onError: () => {
+          alert('영수증 추출에 실패했습니다.');
+        },
+      },
+    );
   };
 
   return (
@@ -300,7 +343,14 @@ const ReceiptCreate = () => {
                 }
               </div>
               <div className="flex gap-[3rem]">
-                <Button variant="primary_outline" size="regular">영수증 추출</Button>
+                <Button
+                  variant="primary_outline"
+                  size="regular"
+                  onClick={handleExportCsv}
+                  disabled={exportCsv.isPending}
+                >
+                  영수증 추출
+                </Button>
                 <Button
                   variant="danger"
                   size="regular"
