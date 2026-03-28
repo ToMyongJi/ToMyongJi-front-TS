@@ -5,4 +5,5 @@ export const receiptMutations = {
   create: () => buildMutation(receiptApi.create),
   update: () => buildMutation(receiptApi.update),
   delete: () => buildMutation(receiptApi.delete),
+  uploadToss: () => buildMutation(receiptApi.upLoadToss),
 };

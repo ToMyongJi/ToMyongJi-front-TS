@@ -43,6 +43,12 @@ export type UpdateReceiptRequest = {
   withdrawal?: number;
 };
 
+export type UploadTossBankRequest = {
+  file: File;
+  userId: string;
+  keyword?: string;
+}
+
 
 export const receiptApi = {
   list: (clubId?: number, params?: {page?: number; size? : number; year?:number; month?: number}) =>
@@ -54,5 +60,12 @@ export const receiptApi = {
   update: (body: UpdateReceiptRequest) =>
     http.put<Rsp<Receipt>, UpdateReceiptRequest>(ENDPOINTS.receipt.root, body),
   delete: (receiptId: number) =>
-    http.delete<Rsp<null>>(ENDPOINTS.receipt.specific(receiptId))
+    http.delete<Rsp<null>>(ENDPOINTS.receipt.specific(receiptId)),
+  upLoadToss: (body: UploadTossBankRequest) => {
+    const formData = new FormData();
+    formData.append('file', body.file);
+    formData.append('userId', body.userId);
+    formData.append('keyword', body.keyword ?? '');
+    return http.postForm<Rsp<null>>(ENDPOINTS.parse.breakdown, formData);
+  },
 }
