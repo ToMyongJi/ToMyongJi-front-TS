@@ -60,6 +60,6 @@ export const ENDPOINTS = {
     member: '/api/admin/member',
     clubPresident: (clubId: number) => `/api/admin/president/${clubId}`,
     clubMember: (clubId: number) => `/api/admin/member/${clubId}`,
-    deltet: (memberId: number) => `/api/admin/member/${memberId}`,
+    delete: (memberId: number) => `/api/admin/member/${memberId}`,
   },
 };
