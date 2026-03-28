@@ -34,4 +34,5 @@ export const receiptQueries = {
       }
     ),
   club: (id?: number) => buildQuery(QK.receipt.club(id), () => receiptApi.club(id)),
+  search: (keyword: string) => buildQuery(QK.receipt.search(keyword), () => receiptApi.search(keyword)),
 };

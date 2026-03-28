@@ -18,4 +18,5 @@ export const receiptQueries = {
         getNextPageParam: pagePager(),
     }),
     club: (id) => buildQuery(QK.receipt.club(id), () => receiptApi.club(id)),
+    search: (keyword) => buildQuery(QK.receipt.search(keyword), () => receiptApi.search(keyword)),
 };

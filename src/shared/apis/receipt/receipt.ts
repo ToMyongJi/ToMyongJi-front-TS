@@ -67,6 +67,8 @@ export const receiptApi = {
     http.put<Rsp<Receipt>, UpdateReceiptRequest>(ENDPOINTS.receipt.root, body),
   delete: (receiptId: number) =>
     http.delete<Rsp<null>>(ENDPOINTS.receipt.specific(receiptId)),
+  search: (keyword: string) =>
+    http.get<Rsp<Receipt[]>>(ENDPOINTS.receipt.keyword, {params: {keyword}}),
   uploadCsv: (userIndexId: number) =>
     http.post<Rsp<null>>(ENDPOINTS.csv.upload(userIndexId)),
   exportCsv: (body: ExportCsvRequest) =>

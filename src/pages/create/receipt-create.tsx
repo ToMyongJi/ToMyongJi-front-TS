@@ -37,15 +37,6 @@ const flattenInfiniteReceiptPages = (
     return acc.concat(payload.receiptDtoList ?? []);
   }, [] as Receipt[]) ?? [];
 
-const filterReceiptsBySearch = (receipts: Receipt[], searchTerm: string): Receipt[] => {
-  const needle = searchTerm.trim().toLowerCase();
-  if (needle.length < 2) return receipts;
-  return receipts.filter((item) => {
-    const haystack = `${item.date} ${item.content} ${item.deposit} ${item.withdrawal}`.toLowerCase();
-    return haystack.includes(needle);
-  });
-};
-
 const downloadBlob = (blob: Blob, filename: string) => {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
@@ -87,6 +78,7 @@ const ReceiptCreate = () => {
   const [month, setMonth] = useState('전체(월)');
   const [isMonthFilterOpen, setIsMonthFilterOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [page, setPage] = useState(1);
   const [selectedReceiptIds, setSelectedReceiptIds] = useState<number[]>([]);
 
@@ -105,9 +97,20 @@ const ReceiptCreate = () => {
       page - 1,
     ),
   });
+  const trimmedDebouncedSearch = debouncedSearch.trim();
+  const isSearchMode = trimmedDebouncedSearch.length >= 2;
+
+  const searchReceiptQuery = useQuery({
+    ...receiptQueries.search(trimmedDebouncedSearch),
+    enabled: isSearchMode,
+  });
+
   const totalPages = receiptList.data?.pages[0]?.data.totalPages ?? 0;
   const receipts = flattenInfiniteReceiptPages(receiptList.data?.pages);
-  const filteredReceipts = filterReceiptsBySearch(receipts, searchTerm);
+  const displayReceipts: Receipt[] = isSearchMode
+    ? (searchReceiptQuery.data?.data ?? [])
+    : receipts;
+  const effectiveTotalPages = isSearchMode ? 1 : totalPages;
 
   const invalidateReceiptCaches = useCallback(() => {
     if (user?.id != null) {
@@ -155,6 +158,15 @@ const ReceiptCreate = () => {
       fetchClubs();
     }
   }, [authData, allClubsFlat.length, fetchClubs]);
+
+  useEffect(() => {
+    const id = window.setTimeout(() => setDebouncedSearch(searchTerm), 300);
+    return () => window.clearTimeout(id);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    if (isSearchMode) setPage(1);
+  }, [isSearchMode]);
 
   const studentClubName = user?.studentClubId != null ? getClubNameById(user.studentClubId) : '';
 
@@ -374,24 +386,33 @@ const ReceiptCreate = () => {
             <table className="w-full table-fixed">
               <TableHeader headerData={HEADER_DATA} />
               <tbody>
-                {filteredReceipts.map((receipt: Receipt, index: number) => (
-                  <TableCell
-                    key={receipt.receiptId}
-                    mode="EDIT"
-                    isChecked={selectedReceiptIds.indexOf(receipt.receiptId) !== -1}
-                    isLastRow={index === filteredReceipts.length - 1}
-                    isSavePending={updateReceipt.isPending}
-                    onToggleChecked={handleCheckClick}
-                    onSave={(body) => updateReceipt.mutateAsync(body)}
-                    {...receipt}
-                  />
-                ))}
+                {displayReceipts.length > 0
+                  ? displayReceipts.map((receipt: Receipt, index: number) => (
+                      <TableCell
+                        key={receipt.receiptId}
+                        mode="EDIT"
+                        isChecked={selectedReceiptIds.indexOf(receipt.receiptId) !== -1}
+                        isLastRow={index === displayReceipts.length - 1}
+                        isSavePending={updateReceipt.isPending}
+                        onToggleChecked={handleCheckClick}
+                        onSave={(body) => updateReceipt.mutateAsync(body)}
+                        {...receipt}
+                      />
+                    ))
+                  : isSearchMode && searchReceiptQuery.isSuccess ? (
+                      <tr>
+                        <td colSpan={6} className="W_M15 py-[4rem] text-center text-gray-70">
+                          데이터가 존재하지 않습니다.
+                        </td>
+                      </tr>
+                    )
+                  : null}
               </tbody>
             </table>
             <div className="py-[1.6rem]">
               <PaginationCustom
                 currentPage={page}
-                totalPages={totalPages}
+                totalPages={effectiveTotalPages}
                 onPageChange={(pageNumber) => setPage(pageNumber)}
               />
             </div>

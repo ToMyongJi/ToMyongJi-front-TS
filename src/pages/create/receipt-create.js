@@ -41,15 +41,6 @@ const flattenInfiniteReceiptPages = (pages) => {
         return acc.concat((_a = payload.receiptDtoList) !== null && _a !== void 0 ? _a : []);
     }, [])) !== null && _a !== void 0 ? _a : [];
 };
-const filterReceiptsBySearch = (receipts, searchTerm) => {
-    const needle = searchTerm.trim().toLowerCase();
-    if (needle.length < 2)
-        return receipts;
-    return receipts.filter((item) => {
-        const haystack = `${item.date} ${item.content} ${item.deposit} ${item.withdrawal}`.toLowerCase();
-        return haystack.includes(needle);
-    });
-};
 const downloadBlob = (blob, filename) => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -69,7 +60,7 @@ const HEADER_DATA = [
     { labels: "", width: "8.46%" },
 ];
 const ReceiptCreate = () => {
-    var _a, _b, _c, _d, _e;
+    var _a, _b, _c, _d, _e, _f, _g;
     const queryClient = useQueryClient();
     const navigate = useNavigate();
     const { user } = useUserStore();
@@ -87,6 +78,7 @@ const ReceiptCreate = () => {
     const [month, setMonth] = useState('전체(월)');
     const [isMonthFilterOpen, setIsMonthFilterOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
     const [page, setPage] = useState(1);
     const [selectedReceiptIds, setSelectedReceiptIds] = useState([]);
     const yearOptions = ['전체(년)', ...Array.from({ length: 5 }, (_, i) => `${dayjs().year() - 2 + i}년`)];
@@ -95,9 +87,15 @@ const ReceiptCreate = () => {
     const selectedYear = year === '전체(년)' ? undefined : Number(year.replace('년', ''));
     const selectedMonth = month === '전체(월)' ? undefined : Number(month.replace('월', ''));
     const receiptList = useInfiniteQuery(Object.assign({}, receiptQueries.listInfinite(user === null || user === void 0 ? void 0 : user.studentClubId, selectedYear, selectedMonth, 10, page - 1)));
+    const trimmedDebouncedSearch = debouncedSearch.trim();
+    const isSearchMode = trimmedDebouncedSearch.length >= 2;
+    const searchReceiptQuery = useQuery(Object.assign(Object.assign({}, receiptQueries.search(trimmedDebouncedSearch)), { enabled: isSearchMode }));
     const totalPages = (_c = (_b = (_a = receiptList.data) === null || _a === void 0 ? void 0 : _a.pages[0]) === null || _b === void 0 ? void 0 : _b.data.totalPages) !== null && _c !== void 0 ? _c : 0;
     const receipts = flattenInfiniteReceiptPages((_d = receiptList.data) === null || _d === void 0 ? void 0 : _d.pages);
-    const filteredReceipts = filterReceiptsBySearch(receipts, searchTerm);
+    const displayReceipts = isSearchMode
+        ? ((_f = (_e = searchReceiptQuery.data) === null || _e === void 0 ? void 0 : _e.data) !== null && _f !== void 0 ? _f : [])
+        : receipts;
+    const effectiveTotalPages = isSearchMode ? 1 : totalPages;
     const invalidateReceiptCaches = useCallback(() => {
         if ((user === null || user === void 0 ? void 0 : user.id) != null) {
             queryClient.invalidateQueries({ queryKey: QK.receipt.club(user.id) });
@@ -124,6 +122,14 @@ const ReceiptCreate = () => {
             fetchClubs();
         }
     }, [authData, allClubsFlat.length, fetchClubs]);
+    useEffect(() => {
+        const id = window.setTimeout(() => setDebouncedSearch(searchTerm), 300);
+        return () => window.clearTimeout(id);
+    }, [searchTerm]);
+    useEffect(() => {
+        if (isSearchMode)
+            setPage(1);
+    }, [isSearchMode]);
     const studentClubName = (user === null || user === void 0 ? void 0 : user.studentClubId) != null ? getClubNameById(user.studentClubId) : '';
     const handleChipClick = (type) => {
         if (type === 'YEAR') {
@@ -179,28 +185,34 @@ const ReceiptCreate = () => {
             alert('로그인 정보를 확인할 수 없습니다.');
             return;
         }
+        if (selectedYear === undefined) {
+            alert('년도를 선택해주세요');
+            return;
+        }
+        if (selectedMonth === undefined) {
+            alert('월을 선택해주세요');
+            return;
+        }
         exportCsv.mutate({
             userId: user.userId,
             year: selectedYear,
             month: selectedMonth,
         }, {
             onSuccess: (blob) => {
-                const y = selectedYear != null ? String(selectedYear) : 'all';
-                const m = selectedMonth != null ? String(selectedMonth) : 'all';
-                downloadBlob(blob, `receipts_${y}_${m}.csv`);
+                downloadBlob(blob, `${selectedYear}년-${selectedMonth}월-영수증.csv`);
             },
             onError: () => {
                 alert('영수증 추출에 실패했습니다.');
             },
         });
     };
-    return (_jsx("div", { className: "flex w-full flex-col px-[3rem] pt-[4.2rem] pb-[10rem]", children: _jsxs("div", { className: "mx-auto w-full max-w-[100rem] flex-col gap-[7.2rem]", children: [_jsxs("section", { className: "flex-col gap-[1.2rem]", children: [_jsx("p", { className: "W_Header", children: studentClubName }), _jsx("div", { children: _jsxs("p", { className: "W_Header", children: [_jsx("span", { className: "W_R14 text-gray-80", children: "\uC794\uC561" }), " ", ((_e = receiptData === null || receiptData === void 0 ? void 0 : receiptData.balance) !== null && _e !== void 0 ? _e : 0).toLocaleString(), "\uC6D0"] }) })] }), _jsxs("section", { className: "flex-col gap-[1rem]", children: [_jsxs("div", { className: "flex items-center justify-between", children: [_jsx("p", { className: "W_Title", children: "\uB0B4\uC5ED \uCD94\uAC00" }), _jsxs("div", { className: "flex items-center gap-[0.8rem]", children: [_jsx(ReceiptButton, { receiptType: "toss", onClick: () => navigate('/tossbank-create') }), _jsx(ReceiptButton, { receiptType: "excel" })] })] }), _jsxs("div", { className: "flex-row-center gap-[0.8rem] rounded-[10px] border border-gray-20 p-[2rem]", children: [_jsx("div", { className: "flex h-[4rem] w-[11.2rem] shrink-0 items-center rounded-[0.8rem] border-[1px] border-gray-20 bg-white px-[1.4rem] py-[0.8rem] transition-colors focus-within:border-primary", children: _jsx(DatePicker, { selected: receiptForm.date, onChange: (date) => {
+    return (_jsx("div", { className: "flex w-full flex-col px-[3rem] pt-[4.2rem] pb-[10rem]", children: _jsxs("div", { className: "mx-auto w-full max-w-[100rem] flex-col gap-[7.2rem]", children: [_jsxs("section", { className: "flex-col gap-[1.2rem]", children: [_jsx("p", { className: "W_Header", children: studentClubName }), _jsx("div", { children: _jsxs("p", { className: "W_Header", children: [_jsx("span", { className: "W_R14 text-gray-80", children: "\uC794\uC561" }), " ", ((_g = receiptData === null || receiptData === void 0 ? void 0 : receiptData.balance) !== null && _g !== void 0 ? _g : 0).toLocaleString(), "\uC6D0"] }) })] }), _jsxs("section", { className: "flex-col gap-[1rem]", children: [_jsxs("div", { className: "flex items-center justify-between", children: [_jsx("p", { className: "W_Title", children: "\uB0B4\uC5ED \uCD94\uAC00" }), _jsxs("div", { className: "flex items-center gap-[0.8rem]", children: [_jsx(ReceiptButton, { receiptType: "toss", onClick: () => navigate('/tossbank-create') }), _jsx(ReceiptButton, { receiptType: "excel" })] })] }), _jsxs("div", { className: "flex-row-center gap-[0.8rem] rounded-[10px] border border-gray-20 p-[2rem]", children: [_jsx("div", { className: "flex h-[4rem] w-[11.2rem] shrink-0 items-center rounded-[0.8rem] border-[1px] border-gray-20 bg-white px-[1.4rem] py-[0.8rem] transition-colors focus-within:border-primary", children: _jsx(DatePicker, { selected: receiptForm.date, onChange: (date) => {
                                             setReceiptForm((prev) => (Object.assign(Object.assign({}, prev), { date })));
                                         }, dateFormat: "yyyy.MM.dd", popperPlacement: "bottom", popperClassName: "receipt-datepicker-popper", calendarClassName: "receipt-datepicker-calendar", className: "W_R15 w-full bg-transparent outline-none placeholder:text-gray-70" }) }), _jsx(TextField, { placeholder: "\uB0B4\uC6A9", className: "w-[41.4rem]", value: receiptForm.content, onChange: (e) => setReceiptForm((prev) => (Object.assign(Object.assign({}, prev), { content: e.target.value }))) }), _jsx(TextField, { type: "price", placeholder: "\uC785\uAE08", value: receiptForm.deposit, onChange: (e) => setReceiptForm((prev) => (Object.assign(Object.assign({}, prev), { deposit: e.target.value }))) }), _jsx(TextField, { type: "price", placeholder: "\uCD9C\uAE08", value: receiptForm.withdrawal, onChange: (e) => setReceiptForm((prev) => (Object.assign(Object.assign({}, prev), { withdrawal: e.target.value }))) }), _jsx(Button, { variant: "primary", size: "save", disabled: createReceipt.isPending, onClick: handleSaveClick, children: "\uC800\uC7A5\uD558\uAE30" })] })] }), _jsxs("section", { className: "flex-col gap-[1rem]", children: [_jsx("p", { className: "W_Title", children: "\uD559\uC0DD\uD68C\uBE44 \uC0AC\uC6A9 \uB0B4\uC5ED" }), _jsxs("div", { className: "flex-row-between", children: [_jsxs("div", { className: "flex gap-[0.8rem]", children: [_jsxs("div", { className: "relative", children: [_jsx(Chip, { label: year, isActive: isYearFilterOpen, onClick: () => handleChipClick('YEAR') }), isYearFilterOpen &&
                                                     _jsx(Dropdown, { className: "absolute top-0", onClick: () => setIsYearFilterOpen(false), datas: yearOptions, previewData: year, setPreViewData: setYear })] }), _jsxs("div", { className: "relative", children: [_jsx(Chip, { label: month, isActive: isMonthFilterOpen, onClick: () => handleChipClick('MONTH') }), isMonthFilterOpen &&
                                                     _jsx(Dropdown, { className: "absolute top-0", onClick: () => setIsMonthFilterOpen(false), datas: monthOptions, previewData: month, setPreViewData: setMonth })] }), _jsxs("div", { className: "flex gap-[3rem]", children: [_jsx(Button, { variant: "primary_outline", size: "regular", onClick: handleExportCsv, disabled: exportCsv.isPending, children: "\uC601\uC218\uC99D \uCD94\uCD9C" }), _jsx(Button, { variant: "danger", size: "regular", onClick: handleReceiptDelete, disabled: deleteReceipt.isPending, children: "\uC120\uD0DD \uBAA9\uB85D \uC0AD\uC81C" })] })] }), _jsx(SearchBar, { placeholder: "\uAC80\uC0C9\uC5B4 2\uAE00\uC790 \uC774\uC0C1 \uC785\uB825", value: searchTerm, onChange: (e) => {
                                         setSearchTerm(e.target.value);
                                         setPage(1);
-                                    } })] }), _jsxs("div", { className: "rounded-[1rem] border border-gray-20 px-[2.7rem] pt-[1.6rem]", children: [_jsxs("table", { className: "w-full table-fixed", children: [_jsx(TableHeader, { headerData: HEADER_DATA }), _jsx("tbody", { children: filteredReceipts.map((receipt, index) => (_jsx(TableCell, Object.assign({ mode: "EDIT", isChecked: selectedReceiptIds.indexOf(receipt.receiptId) !== -1, isLastRow: index === filteredReceipts.length - 1, isSavePending: updateReceipt.isPending, onToggleChecked: handleCheckClick, onSave: (body) => updateReceipt.mutateAsync(body) }, receipt), receipt.receiptId))) })] }), _jsx("div", { className: "py-[1.6rem]", children: _jsx(PaginationCustom, { currentPage: page, totalPages: totalPages, onPageChange: (pageNumber) => setPage(pageNumber) }) })] })] })] }) }));
+                                    } })] }), _jsxs("div", { className: "rounded-[1rem] border border-gray-20 px-[2.7rem] pt-[1.6rem]", children: [_jsxs("table", { className: "w-full table-fixed", children: [_jsx(TableHeader, { headerData: HEADER_DATA }), _jsx("tbody", { children: isSearchMode && searchReceiptQuery.isError ? (_jsx("tr", { children: _jsx("td", { colSpan: 6, className: "W_R14 border-b border-gray-20 py-[2rem] text-center text-gray-70", children: "\uAC80\uC0C9\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4. \uC7A0\uC2DC \uD6C4 \uB2E4\uC2DC \uC2DC\uB3C4\uD574 \uC8FC\uC138\uC694." }) })) : isSearchMode && searchReceiptQuery.isPending ? (_jsx("tr", { children: _jsx("td", { colSpan: 6, className: "W_R14 border-b border-gray-20 py-[2rem] text-center text-gray-70", children: "\uAC80\uC0C9 \uC911\u2026" }) })) : isSearchMode && displayReceipts.length === 0 ? (_jsx("tr", { children: _jsx("td", { colSpan: 6, className: "W_R14 border-b border-gray-20 py-[2rem] text-center text-gray-70", children: "\uAC80\uC0C9 \uACB0\uACFC\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4." }) })) : (displayReceipts.map((receipt, index) => (_jsx(TableCell, Object.assign({ mode: "EDIT", isChecked: selectedReceiptIds.indexOf(receipt.receiptId) !== -1, isLastRow: index === displayReceipts.length - 1, isSavePending: updateReceipt.isPending, onToggleChecked: handleCheckClick, onSave: (body) => updateReceipt.mutateAsync(body) }, receipt), receipt.receiptId)))) })] }), _jsx("div", { className: "py-[1.6rem]", children: _jsx(PaginationCustom, { currentPage: page, totalPages: effectiveTotalPages, onPageChange: (pageNumber) => setPage(pageNumber) }) })] })] })] }) }));
 };
 export default ReceiptCreate;
