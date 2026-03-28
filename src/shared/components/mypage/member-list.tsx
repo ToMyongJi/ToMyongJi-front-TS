@@ -13,6 +13,7 @@ interface MemberListProps {
   buttonType?: 'delete' | 'check';
   onCheck?: (member: MemberItem, checked: boolean) => void;
   selectedMemberIds?: number[];
+  emptyText?: string;
 }
 
 const MemberList = ({
@@ -21,9 +22,14 @@ const MemberList = ({
   buttonType,
   onCheck,
   selectedMemberIds,
+  emptyText,
 }: MemberListProps) => {
   if (members.length === 0) {
-    return <p className="W_R14 text-center text-gray-70">소속 부원이 없습니다.</p>;
+    return (
+      <p className="W_M15 flex h-[4.4rem] items-center justify-center text-center text-gray-70">
+        {emptyText ?? '소속 부원이 없습니다.'}
+      </p>
+    );
   }
 
   return (

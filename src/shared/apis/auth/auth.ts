@@ -50,6 +50,7 @@ export type findIdRequest = {
 };
 
 export type emailCheckResponse = Rsp<boolean>;
+
 export const authApi = {
   login: (body: authLoginRequest) =>
     http.post<authLoginResponse, typeof body>(ENDPOINTS.auth.login, body),

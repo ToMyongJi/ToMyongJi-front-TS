@@ -7,12 +7,12 @@ import { Outlet } from 'react-router-dom';
 import HeaderLnb from './header-lnb';
 
 const RootLayout = () => {
-  const { isSidebarOpen, toggleSidebar, closeSidebar } = useLayoutStore();
+  const { isSidebarOpen, closeSidebar, openSidebar } = useLayoutStore();
   return (
     <div className="flex h-full min-h-screen flex-col">
       <AuthTokenWatcher />
       <HeaderGnb />
-      <HeaderLnb onClickSearch={toggleSidebar} setSidebarOpen={toggleSidebar} />
+      <HeaderLnb openSidebar={openSidebar} closeSidebar={closeSidebar} />
       <div className="relative flex flex-1">
         {isSidebarOpen && (
           <div className="absolute z-50 h-full md:static">
