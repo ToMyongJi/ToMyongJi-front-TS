@@ -84,13 +84,13 @@ const ResetPassword = () => {
   if (phase === 'success') {
     return (
       <div className="flex items-center justify-center">
-        <div className="my-[6rem] flex w-full max-w-[35.2rem] flex-col items-center gap-[2.4rem]">
-          <div className="flex w-full flex-col items-center gap-[2rem] rounded-[1rem] border-1 border-gray-20 px-[2.6rem] py-[4rem]">
+        <div className="my-[10rem] flex w-full max-w-[35.2rem] flex-col items-center gap-[2rem]">
+          <div className="flex w-full flex-col items-center gap-[2rem] rounded-[1rem] border-1 border-gray-20 px-[2.6rem] py-[3rem]">
             <img src={tomyongjiCheck} alt="" className="h-[6.6rem] w-[6.6rem]" />
             <p className="W_Title text-center text-black">비밀번호 재설정 완료</p>
             <Button
               variant="primary"
-              size="md"
+              size="regular"
               className="w-full"
               onClick={() => navigate('/login')}
             >
