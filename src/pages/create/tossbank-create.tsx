@@ -1,9 +1,58 @@
+import { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
+import { receiptMutations } from '@apis/receipt/receipt-mutations';
+
 import BasicCard from '@components/common/basic-card';
 import Button from '@components/common/button';
 
 import TossBankImage from "@assets/icons/toss-bank.png";
+import FileIcon from "@assets/icons/file.svg?react";
+import CancelIcon from "@assets/icons/cancel.svg?react";
+
+import useUserStore from '@store/user-store';
 
 const TossbankCreate = () => {
+  const [file, setFile] = useState<File | null>(null);
+  const [keyword, setKeyword] = useState<string>(" ");
+
+  const { user } = useUserStore();
+  const uploadTossBank = useMutation(receiptMutations.uploadToss());
+  const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      setFile(files[0]);
+    }
+  };
+
+  const handleUpload = () => {
+    if (user?.userId == null) {
+      alert('로그인 정보를 확인할 수 없습니다.');
+      return;
+    }
+
+    if(file) {
+      uploadTossBank.mutate({file, userId: user.userId, keyword}, {
+        onSuccess: () => {
+          alert("성공적으로 업로드가 되었습니다.");
+          navigate('/receipt-create')
+        },
+        onError: (e) => {
+          alert(e.message);
+        }
+      })
+    } else{
+      alert("파일을 선택해주세요")
+    }
+  }
+
   return (
     <div className="flex w-full flex-col px-[3rem] pt-[4.2rem] pb-[10rem]">
       <div className="mx-auto w-full max-w-[100rem] flex-col gap-[1.8rem]">
@@ -39,17 +88,33 @@ const TossbankCreate = () => {
               </ol>
             </section>
           </BasicCard>
-        <BasicCard className="flex-row-center py-[2rem]">
-          <Button variant="primary_outline" size="md">
-            파일 선택
-          </Button>
-        </BasicCard>
+        {!file && <BasicCard className="flex-row-center py-[2rem]">
+          <input
+            type="file"
+            ref={fileInputRef}
+            accept=".pdf"
+            onChange={handleChange}
+            className="hidden"
+          />
+          <div className="flex-col-center gap-[1rem]">
+            <Button variant="primary_outline" size="md" onClick={handleClick}>
+              파일 선택
+            </Button>
+          </div>
+        </BasicCard>}
+        {file && <BasicCard className="flex items-center justify-between px-[2.6rem] py-[2rem]">
+          <div className="flex items-center gap-[0.5rem]">
+            <FileIcon className="text-gray-70" />
+            <p className="W_M15">{file.name}</p>
+          </div>
+          <CancelIcon className="cursor-pointer text-error" onClick={() => setFile(null)}/>
+        </BasicCard>}
         <div className="mt-[5.4rem] flex justify-end gap-[0.8rem]">
-          <Button variant="gray_outline" className="px-[4rem]" size="md">
+          <Button variant="gray_outline" className="px-[4rem]" size="md" onClick={() => navigate(-1)}>
             취소
           </Button>
-          <Button variant="primary" className="px-[3.4rem]" size="md">
-            업로드
+          <Button variant="primary" className="px-[3.4rem]" size="md" disabled={!file || uploadTossBank.isPending} onClick={handleUpload}>
+            {uploadTossBank.isPending ? "업로드 중" : "업로드"}
           </Button>
         </div>
       </div>
