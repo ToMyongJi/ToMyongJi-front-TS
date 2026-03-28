@@ -49,7 +49,10 @@ export type findIdRequest = {
   email: string;
 };
 
-export type resetPasswordResponse = Rsp<{ token: string; newPassword: string }>;
+export type resetPasswordConfirmRequest = {
+  token: string;
+  newPassword: string;
+};
 
 export type emailCheckResponse = Rsp<boolean>;
 
@@ -71,5 +74,6 @@ export const authApi = {
     http.post<Rsp<null>, typeof body>(ENDPOINTS.auth.forgotPassword, body),
   resetPasswordSendEmail: (body: sendEmailRequest) =>
     http.post<Rsp<null>, typeof body>(ENDPOINTS.auth.resetPasswordSendEmail, body),
-  resetPassword: () => http.post<resetPasswordResponse>(ENDPOINTS.auth.resetPassword),
+  resetPassword: (body: resetPasswordConfirmRequest) =>
+    http.post<Rsp<null>, typeof body>(ENDPOINTS.auth.resetPassword, body),
 };

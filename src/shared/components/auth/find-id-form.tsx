@@ -41,6 +41,7 @@ const FindIdForm = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={!!foundId}
+            isError={!!error}
           />
         </div>
         {foundId ? (

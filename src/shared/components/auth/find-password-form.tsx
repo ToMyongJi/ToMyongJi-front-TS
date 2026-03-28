@@ -15,7 +15,7 @@ const FindPasswordForm = () => {
   const navigate = useNavigate();
 
   const { mutate: sendResetEmail, isPending } = useMutation({
-    ...authMutations.forgotPassword(),
+    ...authMutations.resetPasswordSendEmail(),
     onSuccess: () => {
       setSent(true);
       setError(null);
@@ -41,6 +41,7 @@ const FindPasswordForm = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={sent}
+            isError={!!error}
           />
         </div>
         {sent ? (
