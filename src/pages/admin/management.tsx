@@ -70,7 +70,7 @@ export const Management = () => {
     ...adminMutations.patchPresident(),
     onSuccess: () => {
       if (parsedClubId !== null) {
-        queryClient.invalidateQueries({ queryKey: ['admin', 'president', parsedClubId] });
+        queryClient.invalidateQueries({ queryKey: ['admin', 'member', parsedClubId] });
       }
       setNewPresidentStudentNum('');
       setNewPresidentName('');

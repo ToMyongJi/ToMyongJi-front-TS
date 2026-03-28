@@ -65,4 +65,6 @@ export const authApi = {
   clubVerify: (body: clubVerifyRequest) =>
     http.post<Rsp<null>, typeof body>(ENDPOINTS.auth.verify, body),
   findId: (body: findIdRequest) => http.post<Rsp<string>, typeof body>(ENDPOINTS.auth.findId, body),
+  forgotPassword: (body: sendEmailRequest) =>
+    http.post<Rsp<null>, typeof body>(ENDPOINTS.auth.forgotPassword, body),
 };

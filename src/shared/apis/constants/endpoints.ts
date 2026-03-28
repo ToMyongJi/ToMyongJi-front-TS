@@ -13,6 +13,7 @@ export const ENDPOINTS = {
     login: '/api/users/login',
     signup: '/api/users/signup',
     findId: '/api/users/find-id',
+    forgotPassword: '/api/users/forgot-password',
     verify: '/api/users/clubVerify',
     check: (userId: string) => `/api/users/${userId}`,
     delete: '/api/users/delete',
