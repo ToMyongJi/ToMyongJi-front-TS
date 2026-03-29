@@ -112,9 +112,8 @@ const ResetPassword = () => {
     <div className="flex items-center justify-center">
       <div className="my-[6rem] flex w-full max-w-[35.2rem] flex-col gap-[1.8rem]">
         <p className="W_Title text-left text-black">비밀번호 재설정</p>
-
         <div className="flex flex-col gap-[1.6rem] rounded-[1rem] border-1 border-gray-20 px-[2.6rem] py-[3rem]">
-          <div className="flex w-full flex-col gap-[0.6rem]">
+          <div className="flex w-full flex-col gap-[1.6rem]">
             <div className="flex w-full items-center gap-[1rem]">
               <p className="W_B15 w-[9.6rem] shrink-0 text-left text-gray-90">새 비밀번호</p>
               <TextField
@@ -128,13 +127,13 @@ const ResetPassword = () => {
               />
             </div>
             {newPasswordPolicyInvalid && (
-              <p className="W_SB12 pl-[10.6rem] text-error">
-                비밀번호는 8~20자이며 특수문자를 한 개 이상 포함해야 합니다.
+              <p className="W_R12 text-error">
+                8~20자의 영문, 숫자, 특수문자를 조합하여 작성해 주세요.
               </p>
             )}
           </div>
 
-          <div className="flex w-full flex-col gap-[0.6rem]">
+          <div className="flex w-full flex-col gap-[1.6rem]">
             <div className="flex w-full items-center gap-[1rem]">
               <p className="W_B15 w-[9.6rem] shrink-0 text-left text-gray-90">비밀번호 확인</p>
               <TextField
@@ -147,12 +146,10 @@ const ResetPassword = () => {
                 isError={confirmMismatch}
               />
             </div>
-            {confirmMismatch && (
-              <p className="W_SB12 pl-[10.6rem] text-error">비밀번호가 일치하지 않습니다.</p>
-            )}
+            {confirmMismatch && <p className="W_R12 text-error">비밀번호가 일치하지 않습니다.</p>}
           </div>
 
-          {serverError && <p className="W_SB12 text-error">{serverError}</p>}
+          {serverError && <p className="W_R12 text-error">{serverError}</p>}
         </div>
 
         <Button
