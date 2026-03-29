@@ -13,10 +13,11 @@ import CancelIcon from "@assets/icons/cancel.svg?react";
 import useUserStore from '@store/user-store';
 
 const TossbankCreate = () => {
+  const { user } = useUserStore();
+
   const [file, setFile] = useState<File | null>(null);
   const [keyword, setKeyword] = useState<string>(" ");
 
-  const { user } = useUserStore();
   const uploadTossBank = useMutation(receiptMutations.uploadToss());
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -44,8 +45,9 @@ const TossbankCreate = () => {
           alert("성공적으로 업로드가 되었습니다.");
           navigate('/receipt-create')
         },
-        onError: (e) => {
-          alert(e.message);
+        onError: (error: unknown) => {
+          const message = error instanceof Error ? error.message : '업로드에 실패했습니다.';
+          alert(message);
         }
       })
     } else{

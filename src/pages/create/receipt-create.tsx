@@ -275,7 +275,7 @@ const ReceiptCreate = () => {
             <p className="W_Title">내역 추가</p>
             <div className="flex items-center gap-[0.8rem]">
               <ReceiptButton receiptType="toss" onClick={() => navigate('/tossbank-create')} />
-              <ReceiptButton receiptType="excel" />
+              <ReceiptButton receiptType="excel" onClick={() => navigate('/csv-create')}/>
             </div>
           </div>
           <div className="flex-row-center gap-[0.8rem] rounded-[10px] border border-gray-20 p-[2rem]">

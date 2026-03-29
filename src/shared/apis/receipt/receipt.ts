@@ -49,6 +49,11 @@ export type ExportCsvRequest = {
   month?: number;
 }
 
+export type UploadCsvRequest = {
+  userIndexId: number;
+  file: File;
+}
+
 export type UploadTossBankRequest = {
   file: File;
   userId: string;
@@ -69,8 +74,11 @@ export const receiptApi = {
     http.delete<Rsp<null>>(ENDPOINTS.receipt.specific(receiptId)),
   search: (keyword: string) =>
     http.get<Rsp<Receipt[]>>(ENDPOINTS.receipt.keyword, {params: {keyword}}),
-  uploadCsv: (userIndexId: number) =>
-    http.post<Rsp<null>>(ENDPOINTS.csv.upload(userIndexId)),
+  uploadCsv: (body: UploadCsvRequest) => {
+    const formData = new FormData();
+    formData.append('file', body.file);
+    return http.post<Rsp<null>>(ENDPOINTS.csv.upload(body.userIndexId), formData)
+  },
   exportCsv: (body: ExportCsvRequest) =>
     http.post<Blob, ExportCsvRequest>(ENDPOINTS.csv.export, body, { responseType: 'blob' }),
   upLoadToss: (body: UploadTossBankRequest) => {

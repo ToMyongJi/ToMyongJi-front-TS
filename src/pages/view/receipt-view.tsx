@@ -46,7 +46,11 @@ const ReceiptView = () => {
     ),
   });
   const totalPages = receiptList.data?.pages[0]?.data.totalPages ?? 0;
-  const receipts = receiptList.data?.pages.flatMap((p) => p.data.receiptDtoList) ?? [];
+  const receipts =
+    receiptList.data?.pages.reduce((acc: Receipt[], page) => {
+      const payload = page.data as unknown as { receiptDtoList?: Receipt[] };
+      return acc.concat(payload.receiptDtoList ?? []);
+    }, []) ?? [];
 
   const trimmedSearchTerm = searchTerm.trim().toLowerCase();
   const filteredReceipts =
