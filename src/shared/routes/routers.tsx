@@ -4,6 +4,7 @@ import { Management } from '@pages/admin/management';
 import FindAccount from '@pages/auth/find-account';
 import Login from '@pages/auth/login';
 import Register from '@pages/auth/register';
+import ResetPassword from '@pages/auth/reset-password';
 import NotLogin from '@pages/common/not-login';
 import ReceiptCreate from '@pages/create/receipt-create';
 import MainPage from '@pages/main/main-page';
@@ -34,6 +35,8 @@ export const router = createBrowserRouter([
           { path: 'login', element: <Login /> },
           { path: 'register', element: <Register /> },
           { path: 'find-account', element: <FindAccount /> },
+          { path: 'password/reset', element: <ResetPassword /> },
+          { path: 'password/reset/:token', element: <ResetPassword /> },
         ],
       },
       // 로그인된 사용자만 접근할 수 있는 라우터 (영수증 생성, 마이페이지)

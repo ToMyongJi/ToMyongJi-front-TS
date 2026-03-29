@@ -13,11 +13,14 @@ export const ENDPOINTS = {
     login: '/api/users/login',
     signup: '/api/users/signup',
     findId: '/api/users/find-id',
+    forgotPassword: '/api/users/forgot-password',
     verify: '/api/users/clubVerify',
     check: (userId: string) => `/api/users/${userId}`,
     delete: '/api/users/delete',
     emailCheck: '/api/users/verifyCode', //이메일 인증코드 확인
     email: '/api/users/emailCheck', //이메일 전송 (url이 emailCheck라서 헷갈릴까봐 적어둠.)
+    resetPasswordSendEmail: '/api/password/reset-request', //비밀번호 재설정 이메일 전송
+    resetPassword: '/api/password/reset-confirm', //비밀번호 재설정 확인
   },
 
   csv: {
