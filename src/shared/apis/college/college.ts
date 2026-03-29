@@ -45,6 +45,7 @@ export type getClubMemberResponse = Rsp<
     name: string;
   }[]
 >;
+
 export const collegeApi = {
   collegesAndClubs: () => http.get<collegeGetAllResponse>(ENDPOINTS.college.all),
   getAllClub: () => http.get<getClubResponse>(ENDPOINTS.club.root),
