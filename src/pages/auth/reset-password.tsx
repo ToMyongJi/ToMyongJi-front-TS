@@ -30,14 +30,20 @@ const ResetPassword = () => {
   );
 
   const [newPassword, setNewPassword] = useState('');
+  const [newPasswordTouched, setNewPasswordTouched] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [confirmPasswordTouched, setConfirmPasswordTouched] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [phase, setPhase] = useState<'form' | 'success'>('form');
 
   const confirmMismatch =
-    confirmPassword.length > 0 && newPassword.length > 0 && newPassword !== confirmPassword;
+    confirmPasswordTouched &&
+    confirmPassword.length > 0 &&
+    newPassword.length > 0 &&
+    newPassword !== confirmPassword;
 
-  const newPasswordPolicyInvalid = newPassword.length > 0 && !isPasswordPolicyOk(newPassword);
+  const newPasswordPolicyInvalid =
+    newPasswordTouched && newPassword.length > 0 && !isPasswordPolicyOk(newPassword);
 
   const canSubmit =
     newPassword.length > 0 &&
@@ -117,6 +123,7 @@ const ResetPassword = () => {
                 className="w-full"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
+                onBlur={() => setNewPasswordTouched(true)}
                 isError={newPasswordPolicyInvalid}
               />
             </div>
@@ -136,6 +143,7 @@ const ResetPassword = () => {
                 className="w-full"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                onBlur={() => setConfirmPasswordTouched(true)}
                 isError={confirmMismatch}
               />
             </div>
