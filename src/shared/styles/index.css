@@ -51,3 +51,27 @@
     display: none;
   }
 }
+
+.receipt-datepicker-popper {
+  z-index: 30;
+}
+
+.receipt-datepicker-calendar {
+  font-size: 1.5rem;
+  border-radius: 0.8rem;
+}
+
+.receipt-datepicker-calendar .react-datepicker__month {
+  margin: 0.8rem;
+}
+
+.receipt-datepicker-calendar .react-datepicker__day-name,
+.receipt-datepicker-calendar .react-datepicker__day {
+  width: 3.1rem;
+  line-height: 3.1rem;
+}
+
+.receipt-datepicker-calendar .react-datepicker__day {
+  font-size: 1.2rem;
+  font-weight: 500;
+}

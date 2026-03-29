@@ -4,7 +4,7 @@ import { collegeQuery } from '@apis/college/college-queries';
 import Button from '@components/common/button';
 import TextField from '@components/common/textfield';
 import MemberList, { type MemberItem } from '@components/mypage/member-list';
-import { useStudentClubStore } from '@store/studentClubStore';
+import {useStudentClubStore} from '@store/sidebar-store';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
