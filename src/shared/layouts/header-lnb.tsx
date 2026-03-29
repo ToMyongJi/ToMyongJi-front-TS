@@ -1,20 +1,31 @@
+import Role from '@constants/role';
 import { cn } from '@libs/cn';
+import { useLayoutStore } from '@store/layoutStore';
+import { useStudentClubStore } from '@store/studentClubStore';
+import useUserStore from '@store/user-store';
 import { useLocation, useNavigate } from 'react-router-dom';
-import {useLayoutStore} from '@store/layout-store';
 
 const LNB_MENULIST = [
   { label: '조회', to: '/receipt-view' },
   { label: '작성', to: '/receipt-create' },
   { label: '마이페이지', to: '/mypage' },
 ];
+const LNM_ADMIN_MENULIST = [
+  { label: '조회', to: '/receipt-view' },
+  { label: '학생회 관리', to: '/management' },
+];
 
 type HeaderLnbProps = {
-  onClickSearch?: () => void;
+  openSidebar?: () => void;
+  closeSidebar?: () => void;
 };
 
-const HeaderLnb = ({ onClickSearch }: HeaderLnbProps) => {
+const HeaderLnb = ({ openSidebar, closeSidebar }: HeaderLnbProps) => {
+  const isSidebarOpen = useLayoutStore((s) => s.isSidebarOpen);
+  const { user } = useUserStore();
+  const isAdmin = user?.role === Role.ADMIN;
+  const selectedClub = useStudentClubStore((s) => s.selectedClub);
   const { pathname } = useLocation();
-  const {closeSidebar} = useLayoutStore();
   const navigate = useNavigate();
   const normalize = (p: string) => (p !== '/' && p.endsWith('/') ? p.slice(0, -1) : p);
 
@@ -26,23 +37,47 @@ const HeaderLnb = ({ onClickSearch }: HeaderLnbProps) => {
   };
 
   const handleClick = (path: string) => {
+    const viewTabActive = pathname.startsWith('/receipt-view');
+    const mgmtTabActive = pathname.startsWith('/management');
+
     if (path === '/receipt-view') {
-      onClickSearch?.();
+      if (isSidebarOpen && viewTabActive) {
+        closeSidebar?.();
+
+        return;
+      }
+      if (selectedClub?.studentClubId != null) {
+        navigate(`/receipt-view/${selectedClub.studentClubId}`);
+      }
+      openSidebar?.();
       return;
     }
-    else{
-      closeSidebar();
+
+    if (path === '/management' && isAdmin) {
+      if (isSidebarOpen && mgmtTabActive) {
+        closeSidebar?.();
+
+        return;
+      }
+      if (selectedClub?.studentClubId != null) {
+        navigate(`/management/${selectedClub.studentClubId}`);
+      } else {
+        navigate('/management');
+      }
+      openSidebar?.();
+      return;
     }
+    closeSidebar?.();
     navigate(path);
   };
 
   return (
     <div className="flex gap-[3rem] border-gray-20 border-b px-[4rem]">
-      {LNB_MENULIST.map((item, index) => {
+      {(isAdmin ? LNM_ADMIN_MENULIST : LNB_MENULIST).map((item) => {
         const isActive = setPathActive(pathname, item.to);
         return (
           <button
-            key={index}
+            key={item.to}
             type="button"
             onClick={() => handleClick(item.to)}
             className={cn(

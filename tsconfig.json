@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES6",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "jsx": "react-jsx",
     "moduleResolution": "node",
@@ -11,6 +12,7 @@
     "resolveJsonModule": true,
     "allowJs": true,
     "checkJs": false,
+    "noEmit": true,
     "baseUrl": "./",
     "paths": {
       "@styles/*": ["src/shared/styles/*"],

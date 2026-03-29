@@ -6,7 +6,7 @@ import type {Rsp} from '@apis/constants/statuscode';
 const http = new HttpClient(axiosInstance);
 
 export type PaginationList<T> = {
-  data: T[];
+  receiptDtoList: T[];
   pageNumber: number;
   pageSize: number;
   totalElements: number;
