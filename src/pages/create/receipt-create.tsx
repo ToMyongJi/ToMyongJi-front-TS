@@ -399,23 +399,22 @@ const ReceiptCreate = () => {
                         {...receipt}
                       />
                     ))
-                  : isSearchMode && searchReceiptQuery.isSuccess ? (
+                  :  (
                       <tr>
                         <td colSpan={6} className="W_M15 py-[4rem] text-center text-gray-70">
                           데이터가 존재하지 않습니다.
                         </td>
                       </tr>
-                    )
-                  : null}
+                    )}
               </tbody>
             </table>
-            <div className="py-[1.6rem]">
+            {totalPages > 0 && <div className="py-[1.6rem]">
               <PaginationCustom
                 currentPage={page}
                 totalPages={effectiveTotalPages}
                 onPageChange={(pageNumber) => setPage(pageNumber)}
               />
-            </div>
+            </div>}
           </div>
         </section>
       </div>
