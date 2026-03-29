@@ -27,6 +27,7 @@ export const QK = {
   college: {
     getAllClub: () => ['college', 'getAllClub'] as const,
     getCollegeByClub: (collegeId: number) => ['college', 'getCollegeByClub', collegeId] as const,
+    getClubMember: () => ['college', 'getClubMember'] as const,
   },
   admin: {
     president: (clubId: number) => ['admin', 'president', clubId] as const,

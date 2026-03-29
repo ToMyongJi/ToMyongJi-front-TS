@@ -31,7 +31,9 @@ export const ENDPOINTS = {
   club: {
     root: '/api/club',
     transfer: '/api/club/transfer',
+    transferAndUser: '/api/club/transfer-and-user',
     college: (collegeId: number) => `/api/club/${collegeId}`,
+    getClubMember: `/api/club/members`,
   },
 
   college: {
