@@ -114,23 +114,33 @@ const ReceiptView = () => {
             <table className="w-full table-fixed">
               <TableHeader headerData={HeaderData} />
               <tbody>
-                {filteredReceipts.map((item: Receipt, index: number) => (
-                  <TableCell
-                    key={item.receiptId}
-                    mode="VIEW"
-                    isLastRow={index === filteredReceipts.length - 1}
-                    {...item}
-                  />
-                ))}
+                {filteredReceipts.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="W_M15 py-[4rem] text-center text-gray-70">
+                      데이터가 존재하지 않습니다.
+                    </td>
+                  </tr>
+                ) : (
+                  filteredReceipts.map((item: Receipt, index: number) => (
+                    <TableCell
+                      key={item.receiptId}
+                      mode="VIEW"
+                      isLastRow={index === filteredReceipts.length - 1}
+                      {...item}
+                    />
+                  ))
+                )}
               </tbody>
             </table>
-            <div className="py-[1.6rem]">
-              <PaginationCustom
-                currentPage={page}
-                totalPages={totalPages}
-                onPageChange={(pageNumber) => setPage(pageNumber)}/>
-            </div>
-
+            {totalPages > 0 && (
+              <div className="py-[1.6rem]">
+                <PaginationCustom
+                  currentPage={page}
+                  totalPages={totalPages}
+                  onPageChange={(pageNumber) => setPage(pageNumber)}
+                />
+              </div>
+            )}
           </div>
         </section>
       </div>
