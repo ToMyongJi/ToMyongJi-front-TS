@@ -1,7 +1,7 @@
 import Role from '@constants/role';
 import { cn } from '@libs/cn';
-import { useLayoutStore } from '@store/layoutStore';
-import { useStudentClubStore } from '@store/studentClubStore';
+import { useLayoutStore } from '@store/layout-store';
+import {useStudentClubStore} from '@store/sidebar-store';
 import useUserStore from '@store/user-store';
 import { useLocation, useNavigate } from 'react-router-dom';
 

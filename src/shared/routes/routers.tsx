@@ -9,6 +9,8 @@ import ReceiptCreate from '@pages/create/receipt-create';
 import MainPage from '@pages/main/main-page';
 import { ClubTransfer } from '@pages/mypage/club-transfer';
 import Mypage from '@pages/mypage/mypage';
+import CsvCreate from '@pages/create/csv-create';
+import TossbankCreate from '@pages/create/tossbank-create';
 import ButtonTestPage from '@pages/test/button-test';
 import ReceiptView from '@pages/view/receipt-view';
 import ProtectedRouter from '@routes/protected-router';
@@ -38,7 +40,9 @@ export const router = createBrowserRouter([
       {
         element: <ProtectedRouter />,
         children: [
+          { path: 'csv-create', element: <CsvCreate/>},
           { path: 'receipt-create', element: <ReceiptCreate /> },
+          { path: 'tossbank-create', element: <TossbankCreate/> },
           { path: 'mypage', element: <Mypage /> },
         ],
       },

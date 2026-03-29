@@ -3,9 +3,9 @@ export const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 export const ENDPOINTS = {
   receipt: {
     root: '/api/receipt',
-    specific: (receiptId: string) => `/api/receipt/${receiptId}`,
+    specific: (receiptId: number) => `/api/receipt/${receiptId}`,
     keyword: '/api/receipt/keyword',
-    club: (clubId: string) => `/api/receipt/club/${clubId}`,
+    club: (id?: number) => `/api/receipt/club/${id}`,
     paging: (clubId?: number) => `/api/receipt/club/${clubId}/paging`,
   },
 

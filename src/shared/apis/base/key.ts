@@ -16,6 +16,8 @@ export const QK = {
   receipt: {
     list: (clubId?: number, size?: number, y?: number, m?: number, page?: number) =>
       ['receiptList', clubId, size, y, m, page] as const,
+    club: (id?: number) => ['receipt', id] as const,
+    search: (keyword: string) => ['receiptSearch', keyword] as const,
   },
 
   collegeAndClubs: {

@@ -22,7 +22,70 @@ export type Receipt = {
   withdrawal: number;
 }
 
+export type ClubReceipt = {
+  receiptList: Receipt[];
+  balance: number;
+}
+
+export type CreateReceiptRequest = {
+  userId: string;
+  date?: string;
+  content?: string;
+  deposit?: number;
+  withdrawal?: number;
+};
+
+export type UpdateReceiptRequest = {
+  receiptId: number;
+  date?: string;
+  content?: string;
+  deposit?: number;
+  withdrawal?: number;
+};
+
+export type ExportCsvRequest = {
+  userId?: string;
+  year?: number;
+  month?: number;
+}
+
+export type UploadCsvRequest = {
+  userIndexId: number;
+  file: File;
+}
+
+export type UploadTossBankRequest = {
+  file: File;
+  userId: string;
+  keyword?: string;
+}
+
+
 export const receiptApi = {
   list: (clubId?: number, params?: {page?: number; size? : number; year?:number; month?: number}) =>
-    http.get<Rsp<PaginationList<Receipt>>>(ENDPOINTS.receipt.paging(clubId), {params})
+    http.get<Rsp<PaginationList<Receipt>>>(ENDPOINTS.receipt.paging(clubId), {params}),
+  club: (id?: number) =>
+    http.get<Rsp<ClubReceipt>>(ENDPOINTS.receipt.club(id)),
+  create: (body: CreateReceiptRequest) =>
+    http.post<Rsp<Receipt>, CreateReceiptRequest>(ENDPOINTS.receipt.root, body),
+  update: (body: UpdateReceiptRequest) =>
+    http.put<Rsp<Receipt>, UpdateReceiptRequest>(ENDPOINTS.receipt.root, body),
+  delete: (receiptId: number) =>
+    http.delete<Rsp<null>>(ENDPOINTS.receipt.specific(receiptId)),
+  search: (keyword: string) =>
+    http.get<Rsp<Receipt[]>>(ENDPOINTS.receipt.keyword, {params: {keyword}}),
+  uploadCsv: (body: UploadCsvRequest) => {
+    const formData = new FormData();
+    formData.append('file', body.file);
+    return http.post<Rsp<null>>(ENDPOINTS.csv.upload(body.userIndexId), formData)
+  },
+  exportCsv: (body: ExportCsvRequest) =>
+    http.post<Blob, ExportCsvRequest>(ENDPOINTS.csv.export, body, { responseType: 'blob' }),
+  upLoadToss: (body: UploadTossBankRequest) => {
+    const formData = new FormData();
+    formData.append('file', body.file);
+    formData.append('userId', body.userId);
+    formData.append('keyword', body.keyword ?? '');
+    return http.postForm<Rsp<null>>(ENDPOINTS.parse.breakdown, formData);
+  },
 }

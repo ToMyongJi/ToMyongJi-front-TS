@@ -1,8 +1,8 @@
 import {useState} from 'react';
 import {useInfiniteQuery} from '@tanstack/react-query';
 import {receiptQueries} from '@apis/receipt/receipt-queries';
-import {useStudentClubStore} from '@store/studentClubStore';
-import { useLayoutStore } from '@store/layoutStore';
+import {useStudentClubStore} from '@store/sidebar-store';
+import { useLayoutStore } from '@store/layout-store';
 import { Receipt } from '@apis/receipt/receipt';
 import dayjs from 'dayjs';
 import InfoIcon from "@assets/icons/info.svg?react";
@@ -32,26 +32,31 @@ const ReceiptView = () => {
 
   const {toggleSidebar} = useLayoutStore();
   const clubData = useStudentClubStore((state) => state.selectedClub);
-  const clubId = clubData?.studentClubId;
 
   const selectedYear = year === '전체(년)' ? undefined : Number(year.replace('년', ''));
   const selectedMonth = month === '전체(월)' ? undefined : Number(month.replace('월', ''));
 
   const receiptList = useInfiniteQuery({
-    ...receiptQueries.listInfinite(clubId, selectedYear, selectedMonth, 10, page - 1),
-    enabled: !!clubId,
+    ...receiptQueries.listInfinite(
+      clubData?.studentClubId,
+      selectedYear,
+      selectedMonth,
+      10,
+      page - 1,
+    ),
   });
-
   const totalPages = receiptList.data?.pages[0]?.data.totalPages ?? 0;
-  const receipts = receiptList.data?.pages.flatMap((p) => p?.data?.receiptDtoList ?? []) ?? [];
-
+  const receipts =
+    receiptList.data?.pages.reduce((acc: Receipt[], page) => {
+      const payload = page.data as unknown as { receiptDtoList?: Receipt[] };
+      return acc.concat(payload.receiptDtoList ?? []);
+    }, []) ?? [];
 
   const trimmedSearchTerm = searchTerm.trim().toLowerCase();
-  const normalizedReceipts = receipts.filter((item): item is Receipt => Boolean(item));
   const filteredReceipts =
     trimmedSearchTerm.length < 2
-      ? normalizedReceipts
-      : normalizedReceipts.filter((item) => {
+      ? receipts
+      : receipts.filter((item: Receipt) => {
           const target = `${item.date} ${item.content} ${item.deposit} ${item.withdrawal}`.toLowerCase();
           return target.includes(trimmedSearchTerm);
         });
@@ -112,21 +117,34 @@ const ReceiptView = () => {
           <div className="pt-[1.6rem]">
             <table className="w-full table-fixed">
               <TableHeader headerData={HeaderData} />
-              {filteredReceipts.map((item: Receipt, index) => (
-                <TableCell
-                  key={item.receiptId ?? `${item.date}-${index}`}
-                  type={'VIEW'}
-                  {...item}
-                        />
-              ))}
+              <tbody>
+                {filteredReceipts.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="W_M15 py-[4rem] text-center text-gray-70">
+                      데이터가 존재하지 않습니다.
+                    </td>
+                  </tr>
+                ) : (
+                  filteredReceipts.map((item: Receipt, index: number) => (
+                    <TableCell
+                      key={item.receiptId}
+                      mode="VIEW"
+                      isLastRow={index === filteredReceipts.length - 1}
+                      {...item}
+                    />
+                  ))
+                )}
+              </tbody>
             </table>
-            <div className="py-[1.6rem]">
-              <PaginationCustom
-                currentPage={page}
-                totalPages={totalPages}
-                onPageChange={(pageNumber) => setPage(pageNumber)}/>
-            </div>
-
+            {totalPages > 0 && (
+              <div className="py-[1.6rem]">
+                <PaginationCustom
+                  currentPage={page}
+                  totalPages={totalPages}
+                  onPageChange={(pageNumber) => setPage(pageNumber)}
+                />
+              </div>
+            )}
           </div>
         </section>
       </div>
