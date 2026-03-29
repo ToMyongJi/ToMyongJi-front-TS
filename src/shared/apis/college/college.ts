@@ -11,11 +11,13 @@ export type college = {
   verification: boolean;
 };
 
-export type collegeGetAllResponse = Rsp<{
-  collegeId: number;
-  collegeName: string;
-  clubs: college[];
-}>;
+export type collegeGetAllResponse = Rsp<
+  {
+    collegeId: number;
+    collegeName: string;
+    clubs: college[];
+  }[]
+>;
 
 export type transferAndUserRequest = {
   presidentInfo: {

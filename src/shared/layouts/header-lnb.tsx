@@ -1,7 +1,7 @@
 import Role from '@constants/role';
 import { cn } from '@libs/cn';
 import { useLayoutStore } from '@store/layout-store';
-import {useStudentClubStore} from '@store/sidebar-store';
+import { useSidebarStore } from '@store/sidebar-store';
 import useUserStore from '@store/user-store';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -24,7 +24,7 @@ const HeaderLnb = ({ openSidebar, closeSidebar }: HeaderLnbProps) => {
   const isSidebarOpen = useLayoutStore((s) => s.isSidebarOpen);
   const { user } = useUserStore();
   const isAdmin = user?.role === Role.ADMIN;
-  const selectedClub = useStudentClubStore((s) => s.selectedClub);
+  const selectedClub = useSidebarStore((s) => s.selectedClub);
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const normalize = (p: string) => (p !== '/' && p.endsWith('/') ? p.slice(0, -1) : p);

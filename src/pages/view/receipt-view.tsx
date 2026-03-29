@@ -1,9 +1,9 @@
 import {useState} from 'react';
 import {useInfiniteQuery} from '@tanstack/react-query';
 import {receiptQueries} from '@apis/receipt/receipt-queries';
-import {useStudentClubStore} from '@store/sidebar-store';
+import { useSidebarStore } from '@store/sidebar-store';
 import { useLayoutStore } from '@store/layout-store';
-import { Receipt } from '@apis/receipt/receipt';
+import type { Receipt } from '@apis/receipt/receipt';
 import dayjs from 'dayjs';
 import InfoIcon from "@assets/icons/info.svg?react";
 import MenuIcon from "@assets/icons/menu.svg?react";
@@ -31,7 +31,7 @@ const ReceiptView = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const {toggleSidebar} = useLayoutStore();
-  const clubData = useStudentClubStore((state) => state.selectedClub);
+  const clubData = useSidebarStore((state) => state.selectedClub);
 
   const selectedYear = year === '전체(년)' ? undefined : Number(year.replace('년', ''));
   const selectedMonth = month === '전체(월)' ? undefined : Number(month.replace('월', ''));
