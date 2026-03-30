@@ -5,13 +5,12 @@ import FindAccount from '@pages/auth/find-account';
 import Login from '@pages/auth/login';
 import Register from '@pages/auth/register';
 import ResetPassword from '@pages/auth/reset-password';
-import NotLogin from '@pages/common/not-login';
+import CsvCreate from '@pages/create/csv-create';
 import ReceiptCreate from '@pages/create/receipt-create';
+import TossbankCreate from '@pages/create/tossbank-create';
 import MainPage from '@pages/main/main-page';
 import { ClubTransfer } from '@pages/mypage/club-transfer';
 import Mypage from '@pages/mypage/mypage';
-import CsvCreate from '@pages/create/csv-create';
-import TossbankCreate from '@pages/create/tossbank-create';
 import ButtonTestPage from '@pages/test/button-test';
 import ReceiptView from '@pages/view/receipt-view';
 import ProtectedRouter from '@routes/protected-router';
@@ -25,7 +24,6 @@ export const router = createBrowserRouter([
     element: <RootLayout />,
     children: [
       { index: true, element: <MainPage /> },
-      { path: 'not-login', element: <NotLogin /> },
       { path: 'receipt-view/:clubid', element: <ReceiptView /> },
       { path: 'test/buttons', element: <ButtonTestPage /> },
       // 이미 로그인된 사용자의 접근을 막는 라우터 (로그인, 회원가입)
@@ -43,9 +41,9 @@ export const router = createBrowserRouter([
       {
         element: <ProtectedRouter />,
         children: [
-          { path: 'csv-create', element: <CsvCreate/>},
+          { path: 'csv-create', element: <CsvCreate /> },
           { path: 'receipt-create', element: <ReceiptCreate /> },
-          { path: 'tossbank-create', element: <TossbankCreate/> },
+          { path: 'tossbank-create', element: <TossbankCreate /> },
           { path: 'mypage', element: <Mypage /> },
         ],
       },

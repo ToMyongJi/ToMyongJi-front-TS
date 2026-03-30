@@ -2,7 +2,7 @@ import Footer from '@layouts/footer';
 import HeaderGnb from '@layouts/header-gnb';
 import Sidebar from '@layouts/sidebar';
 import { AuthTokenWatcher } from '@routes/auth-token-watcher';
-import {useLayoutStore} from '@store/layout-store';
+import { useLayoutStore } from '@store/layout-store';
 import { Outlet } from 'react-router-dom';
 import HeaderLnb from './header-lnb';
 

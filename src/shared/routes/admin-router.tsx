@@ -1,4 +1,5 @@
 import Role from '@constants/role';
+import NotLogin from '@pages/common/not-login';
 import useAuthStore from '@store/auth-store';
 import useUserStore from '@store/user-store';
 import { Navigate, Outlet } from 'react-router-dom';
@@ -11,7 +12,7 @@ const AdminRouter = () => {
   const isAdmin = user?.role === Role.ADMIN;
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <NotLogin />;
   }
 
   if (!isAdmin) {
