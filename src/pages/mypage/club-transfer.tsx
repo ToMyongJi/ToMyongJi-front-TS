@@ -1,3 +1,4 @@
+import { collegeApi } from '@apis/college/college';
 import { collegeQuery } from '@apis/college/college-queries';
 import type { MemberItem } from '@components/mypage/member-list';
 import { TransferStep1 } from '@components/mypage/transfer-step1';
@@ -6,16 +7,17 @@ import { TransferStep3 } from '@components/mypage/transfer-step3';
 import { TransferStep4 } from '@components/mypage/transfer-step4';
 import useAuthStore from '@store/auth-store';
 import useUserStore from '@store/user-store';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export const ClubTransfer = () => {
   const navigate = useNavigate();
   const { clearAuthData } = useAuthStore();
-  const { clearUser } = useUserStore();
+  const { user, clearUser } = useUserStore();
 
   const [checkedMembers, setCheckedMembers] = useState<MemberItem[]>([]);
+  const [checkedStudentNumbers, setCheckedStudentNumbers] = useState<string[]>([]);
   const [presidentName, setPresidentName] = useState('');
   const [presidentStudentNumber, setPresidentStudentNumber] = useState('');
   const [step, setStep] = useState(1);
@@ -27,6 +29,16 @@ export const ClubTransfer = () => {
     studentNum: member.studentNum,
     name: member.name,
   }));
+
+  const mutateTransfer = useMutation({
+    mutationFn: collegeApi.transferAndUser,
+    onSuccess: (data) => {
+      console.log(data);
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
 
   useEffect(() => {
     if (step !== 4) return;
@@ -44,6 +56,8 @@ export const ClubTransfer = () => {
     }
     if (step === 2) {
       setStep((prev) => prev - 1);
+      setCheckedMembers([]);
+      setCheckedStudentNumbers([]);
     }
     if (step === 3) {
       setStep((prev) => prev - 1);
@@ -56,13 +70,23 @@ export const ClubTransfer = () => {
       console.log('members', clubMember);
     }
     if (step === 2) {
+      setCheckedStudentNumbers(checkedMembers.map((member) => member.studentNum));
       setStep((prev) => prev + 1);
-      console.log('체크된 멤버 이름:', checkedMembers);
+      console.log('체크된 멤버 학번:', checkedStudentNumbers);
     }
     if (step === 3) {
       setStep((prev) => prev + 1);
       console.log('회장 이름:', presidentName);
       console.log('회장 학번:', presidentStudentNumber);
+
+      mutateTransfer.mutate({
+        presidentInfo: {
+          clubId: user?.studentClubId ?? 0,
+          studentNum: presidentStudentNumber,
+          name: presidentName,
+        },
+        remainingMemberIds: checkedStudentNumbers,
+      });
     }
   };
 
@@ -76,6 +100,24 @@ export const ClubTransfer = () => {
     }
   };
 
+  // const mockMembers = [
+  //   {
+  //     memberId: 1,
+  //     studentNum: '20200001',
+  //     name: '홍길동',
+  //   },
+  //   {
+  //     memberId: 2,
+  //     studentNum: '20200002',
+  //     name: '이순신',
+  //   },
+  //   {
+  //     memberId: 3,
+  //     studentNum: '20200003',
+  //     name: '김유신',
+  //   },
+  // ];
+
   return (
     <div className="mt-[4.2rem] mb-[10rem] flex flex-col items-center justify-center px-[1.5rem]">
       <div className="mb-[1.8rem] flex w-full max-w-[49rem] flex-col">
@@ -87,6 +129,7 @@ export const ClubTransfer = () => {
           onPreviousStep={handleCancel}
           nextStep={handleNext}
           members={members ?? []}
+          // members={mockMembers}
           onCheck={handleCheck}
           selectedMemberIds={checkedMembers.map((member) => member.memberId)}
           emptyText="데이터가 존재하지 않습니다."

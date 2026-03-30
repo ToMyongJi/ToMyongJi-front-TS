@@ -105,6 +105,7 @@ const Mypage = () => {
   };
 
   const info = myInfo?.data;
+
   const members = memberData?.data?.map((member, index) => ({
     memberId: index + 1,
     studentNum: member.studentNum,

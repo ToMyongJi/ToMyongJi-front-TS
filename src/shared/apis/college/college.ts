@@ -25,7 +25,7 @@ export type transferAndUserRequest = {
     studentNum: string;
     name: string;
   };
-  remaingMemberIds: string[];
+  remainingMemberIds: string[];
 };
 
 export type transferAndUserResponse = Rsp<{
