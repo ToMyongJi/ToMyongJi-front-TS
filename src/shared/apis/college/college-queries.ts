@@ -9,4 +9,5 @@ export const collegeQuery = {
     buildQuery(QK.college.getCollegeByClub(collegeId), () =>
       collegeApi.getCollegeByClub(collegeId),
     ),
+  getClubMember: () => buildQuery(QK.college.getClubMember(), () => collegeApi.getClubMember()),
 };

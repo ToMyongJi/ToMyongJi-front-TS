@@ -4,13 +4,13 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 
 export type StudentClub = Pick<college, 'studentClubId' | 'studentClubName' | 'verification'>;
 
-interface StudentClubState {
+interface SidebarState {
   selectedClub: StudentClub | null;
   setSelectedClub: (club: StudentClub) => void;
   clearSelectedClub: () => void;
 }
 
-export const useStudentClubStore = create<StudentClubState>()(
+export const useSidebarStore = create<SidebarState>()(
   persist(
     (set) => ({
       selectedClub: null,
@@ -18,7 +18,7 @@ export const useStudentClubStore = create<StudentClubState>()(
       clearSelectedClub: () => set({ selectedClub: null }),
     }),
     {
-      name: 'student-club-store',
+      name: 'sidebar-store',
       storage: createJSONStorage(() => localStorage),
     },
   ),

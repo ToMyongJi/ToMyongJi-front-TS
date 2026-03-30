@@ -4,7 +4,7 @@ import ArrowDownIcon from '@assets/icons/arrow-down.svg?react';
 import ArrowUpIcon from '@assets/icons/arrow-up.svg?react';
 import { cn } from '@libs/cn';
 import { useLayoutStore } from '@store/layout-store';
-import { useStudentClubStore } from '@store/sidebar-store';
+import { useSidebarStore } from '@store/sidebar-store';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -17,7 +17,7 @@ const Sidebar = () => {
   const [isActiveCollege, setIsActiveCollege] = useState<string>('');
   const [isActiveClubs, setIsActiveClubs] = useState<string>('');
 
-  const { setSelectedClub, selectedClub } = useStudentClubStore();
+  const { setSelectedClub, selectedClub } = useSidebarStore();
 
   const { data: collegeAndClubs } = useQuery(collegeQuery.collegeAndClubs());
 
@@ -87,7 +87,8 @@ const Sidebar = () => {
                       'W_SB13 w-full cursor-pointer py-[1.4rem] pl-[4rem] text-start text-gray-90',
                       (activeClubIdFromPath
                         ? activeClubIdFromPath === String(club.studentClubId)
-                        : !setActiveSideBar(isActiveClubs, club.studentClubName)) && 'bg-background',
+                        : !setActiveSideBar(isActiveClubs, club.studentClubName)) &&
+                        'bg-background',
                     )}
                   >
                     {club?.studentClubName}

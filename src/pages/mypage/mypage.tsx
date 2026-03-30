@@ -27,26 +27,28 @@ const Mypage = () => {
   const [newStudentNum, setNewStudentNum] = useState('');
   const [newName, setNewName] = useState('');
 
+  // 소속 이름 조회
+  const { data: collegeData } = useQuery({
+    ...collegeQuery.getAllClub(),
+    enabled: !!user?.studentClubId,
+  });
+
   // 내 정보 조회
   const { data: myInfo } = useQuery({
     ...myQuery.getMyInfo(user?.id ?? 0),
     enabled: !!user?.id,
   });
 
-  // 부원 조회
-  const { data: memberData } = useQuery({
-    ...myQuery.viewMember(user?.id ?? 0),
-    enabled: user?.role === Role.PRESIDENT && !!user?.studentClubId,
-  });
-
-  // 전체 학생회 조회 -> 내 정보 조회로 얻은 studentClubId로 학생회 이름 조회하기 위함.
-  const college = useQuery({
-    ...collegeQuery.getAllClub(),
-  });
-
-  const studentClubName =
-    college.data?.data?.find((club) => club.studentClubId === user?.studentClubId)
+  // 학생회 이름 매핑
+  const collegeName =
+    collegeData?.data?.find((college) => college.studentClubId === user?.studentClubId)
       ?.studentClubName ?? '';
+
+  // 소속 부원 조회
+  const { data: memberData } = useQuery({
+    ...collegeQuery.getClubMember(),
+    enabled: !!user?.studentClubId,
+  });
 
   const addMemberMutation = useMutation({
     ...myMutations.addMember(),
@@ -103,7 +105,12 @@ const Mypage = () => {
   };
 
   const info = myInfo?.data;
-  const members = Array.isArray(memberData?.data) ? memberData.data : [];
+
+  const members = memberData?.data?.map((member, index) => ({
+    memberId: index + 1,
+    studentNum: member.studentNum,
+    name: member.name,
+  }));
   const isPresident = user?.role === Role.PRESIDENT;
 
   return (
@@ -118,7 +125,7 @@ const Mypage = () => {
               { label: '학번', value: info?.studentNum },
               {
                 label: '소속 이름',
-                value: studentClubName,
+                value: collegeName,
               },
               { label: '자격', value: user?.role ? roleLabel[user.role] : '' },
             ].map(({ label, value }) => (
@@ -137,7 +144,7 @@ const Mypage = () => {
             <div className="flex flex-col gap-[2rem] rounded-[1rem] border border-gray-20 px-[2.6rem] py-[3rem]">
               {/* 소속 이름 */}
               <div className="flex items-center gap-[1.6rem]">
-                <p className="W_B17 text-black">{studentClubName}</p>
+                <p className="W_B17 text-black">{collegeName}</p>
               </div>
 
               {/* 부원 추가 */}
@@ -167,7 +174,7 @@ const Mypage = () => {
               </div>
 
               <MemberList
-                members={members}
+                members={members ?? []}
                 onDelete={(member) => deleteMemberMutation.mutate(Number(member.studentNum))}
                 buttonType="delete"
               />
