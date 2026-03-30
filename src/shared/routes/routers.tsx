@@ -24,10 +24,8 @@ export const router = createBrowserRouter([
     element: <RootLayout />,
     children: [
       { index: true, element: <MainPage /> },
-      // { path: 'not-login', element: <NotLogin /> },
       { path: 'receipt-view/:clubid', element: <ReceiptView /> },
       { path: 'test/buttons', element: <ButtonTestPage /> },
-      // { path: 'loading', element: <Loading /> },
       // 이미 로그인된 사용자의 접근을 막는 라우터 (로그인, 회원가입)
       {
         element: <PublicRouter />,
