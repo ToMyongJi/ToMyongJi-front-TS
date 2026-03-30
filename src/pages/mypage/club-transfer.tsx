@@ -34,9 +34,11 @@ export const ClubTransfer = () => {
     mutationFn: collegeApi.transferAndUser,
     onSuccess: (data) => {
       console.log(data);
+      setStep((prev) => prev + 1);
     },
     onError: (error) => {
       console.log(error);
+      alert('학생회 이전에 실패했어요.');
     },
   });
 
@@ -75,18 +77,22 @@ export const ClubTransfer = () => {
       console.log('체크된 멤버 학번:', checkedStudentNumbers);
     }
     if (step === 3) {
-      setStep((prev) => prev + 1);
       console.log('회장 이름:', presidentName);
       console.log('회장 학번:', presidentStudentNumber);
-
-      mutateTransfer.mutate({
-        presidentInfo: {
-          clubId: user?.studentClubId ?? 0,
-          studentNum: presidentStudentNumber,
-          name: presidentName,
-        },
-        remainingMemberIds: checkedStudentNumbers,
-      });
+      if (user?.studentClubId) {
+        mutateTransfer.mutate({
+          presidentInfo: {
+            clubId: user?.studentClubId,
+            studentNum: presidentStudentNumber,
+            name: presidentName,
+          },
+          remainingMemberIds: checkedStudentNumbers,
+        });
+      }
+      if (!user?.studentClubId) {
+        alert('소속 학생회를 찾을 수 없어요.');
+        return;
+      }
     }
   };
 
@@ -99,24 +105,6 @@ export const ClubTransfer = () => {
       setCheckedMembers((prev) => prev.filter((m) => m.memberId !== member.memberId));
     }
   };
-
-  // const mockMembers = [
-  //   {
-  //     memberId: 1,
-  //     studentNum: '20200001',
-  //     name: '홍길동',
-  //   },
-  //   {
-  //     memberId: 2,
-  //     studentNum: '20200002',
-  //     name: '이순신',
-  //   },
-  //   {
-  //     memberId: 3,
-  //     studentNum: '20200003',
-  //     name: '김유신',
-  //   },
-  // ];
 
   return (
     <div className="mt-[4.2rem] mb-[10rem] flex flex-col items-center justify-center px-[1.5rem]">
