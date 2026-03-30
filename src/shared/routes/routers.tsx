@@ -5,8 +5,6 @@ import FindAccount from '@pages/auth/find-account';
 import Login from '@pages/auth/login';
 import Register from '@pages/auth/register';
 import ResetPassword from '@pages/auth/reset-password';
-import Loading from '@pages/common/loading';
-import NotLogin from '@pages/common/not-login';
 import CsvCreate from '@pages/create/csv-create';
 import ReceiptCreate from '@pages/create/receipt-create';
 import TossbankCreate from '@pages/create/tossbank-create';
@@ -26,10 +24,10 @@ export const router = createBrowserRouter([
     element: <RootLayout />,
     children: [
       { index: true, element: <MainPage /> },
-      { path: 'not-login', element: <NotLogin /> },
+      // { path: 'not-login', element: <NotLogin /> },
       { path: 'receipt-view/:clubid', element: <ReceiptView /> },
       { path: 'test/buttons', element: <ButtonTestPage /> },
-      { path: 'loading', element: <Loading /> },
+      // { path: 'loading', element: <Loading /> },
       // 이미 로그인된 사용자의 접근을 막는 라우터 (로그인, 회원가입)
       {
         element: <PublicRouter />,
