@@ -1,5 +1,6 @@
 // src/shared/routes/president-router.tsx
 import Role from '@constants/role';
+import NotLogin from '@pages/common/not-login';
 import { Navigate, Outlet } from 'react-router-dom';
 import useAuthStore from '../store/auth-store';
 import useUserStore from '../store/user-store';
@@ -13,7 +14,7 @@ const PresidentRouter = () => {
 
   // 1. 로그인이 안 되어 있다면 로그인 페이지로 리다이렉트
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <NotLogin />;
   }
 
   // 2. 로그인은 되어있지만 학생회장이 아니라면 마이페이지로 리다이렉트
