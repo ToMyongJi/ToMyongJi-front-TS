@@ -7,6 +7,7 @@ interface TransferStep2Props {
   members: MemberItem[];
   onCheck: (member: MemberItem, checked: boolean) => void;
   selectedMemberIds: number[];
+  emptyText: string;
 }
 
 export const TransferStep2 = ({
@@ -15,16 +16,18 @@ export const TransferStep2 = ({
   members,
   onCheck,
   selectedMemberIds,
+  emptyText,
 }: TransferStep2Props) => {
   return (
     <div className="w-full max-w-[49rem]">
       <div className="mb-[1.8rem] flex flex-col gap-[2rem] rounded-[1rem] border-1 border-gray-20 px-[2.6rem] py-[3rem]">
         <p className="W_B17 text-black">잔류 인원 선택</p>
         <MemberList
-          members={members}
+          members={members ?? []}
           buttonType="check"
           onCheck={onCheck}
           selectedMemberIds={selectedMemberIds}
+          emptyText={emptyText}
         />
       </div>
       <div className="flex w-full justify-end gap-[0.8rem]">
