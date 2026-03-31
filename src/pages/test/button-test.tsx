@@ -6,9 +6,11 @@ import { ReceiptButton } from '@components/common/receipt-button';
 import SearchBar from '@components/common/search-bar';
 import SelectButton from '@components/common/select-button';
 import TextField from '@components/common/textfield';
+import { useModal } from '@hooks/use-modal';
 import { useState } from 'react';
 
 export default function ButtonTestPage() {
+  const { alert, confirm } = useModal();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isChecked, setIsChecked] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -16,9 +18,50 @@ export default function ButtonTestPage() {
   const [searchKeyword, setSearchKeyword] = useState('');
   const [textFieldValue, setTextFieldValue] = useState('');
 
-  const handleModal = () => {
+  const handleAlertModal = async () => {
+    await alert({
+      title: '저장 완료',
+      description: '정상적으로 저장되었습니다.',
+      confirmText: '닫기',
+    });
+  };
 
-  }
+  const handleConfirmModal = async () => {
+    const ok = await confirm({
+      title: '삭제 확인',
+      description: '정말 삭제하시겠어요?',
+      confirmText: '삭제',
+      cancelText: '취소',
+    });
+
+    if (ok) {
+      await alert({
+        title: '삭제 완료',
+        description: '데이터가 삭제되었습니다.',
+      });
+    }
+  };
+
+  const handleAsyncConfirmSuccess = async () => {
+    await confirm({
+      title: '비동기 확인(성공 시 닫힘)',
+      description: '확인을 누르면 1초 뒤 성공 처리됩니다.',
+      onConfirm: async () => {
+        await new Promise((resolve) => {
+          window.setTimeout(resolve, 1000);
+        });
+        // 여기서 api 함수 사용하면 됨
+      },
+    });
+  };
+
+  const handleKeepOpenExample = async () => {
+    await confirm({
+      title: '조건 미충족',
+      description: '이 케이스는 의도적으로 닫히지 않습니다.',
+      onConfirm: () => false,
+    });
+  };
 
   return (
     <div className="space-y-12 p-8">
@@ -226,7 +269,25 @@ export default function ButtonTestPage() {
 
       {/*14. Custom Modal*/}
       <section className="space-y-4">
+        <h2 className="W_Title border-b pb-2 text-black">14. CustomModal</h2>
+        <p className="W_R15 text-gray-80">
+          Alert는 확인 시 즉시 닫히고, Confirm은 onConfirm 결과에 따라 닫힘을 제어할 수 있습니다.
+        </p>
 
+        <div className="flex flex-wrap items-center gap-4">
+          <Button variant="primary_outline" size="regular" onClick={handleAlertModal}>
+            Alert 기본
+          </Button>
+          <Button variant="primary_outline" size="regular" onClick={handleConfirmModal}>
+            Confirm 기본
+          </Button>
+          <Button variant="primary_outline" size="regular" onClick={handleAsyncConfirmSuccess}>
+            Confirm 비동기 성공
+          </Button>
+          <Button variant="primary_outline" size="regular" onClick={handleKeepOpenExample}>
+            Confirm 닫힘 유지(false)
+          </Button>
+        </div>
       </section>
     </div>
   );
