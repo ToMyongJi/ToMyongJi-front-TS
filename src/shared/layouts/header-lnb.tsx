@@ -46,9 +46,6 @@ const HeaderLnb = ({ openSidebar, closeSidebar }: HeaderLnbProps) => {
 
         return;
       }
-      if (selectedClub?.studentClubId != null) {
-        navigate(`/receipt-view/${selectedClub.studentClubId}`);
-      }
       openSidebar?.();
       return;
     }

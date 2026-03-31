@@ -43,7 +43,7 @@ const Sidebar = () => {
 
     if (pathname.startsWith('/management')) {
       navigate(`/management/${club.studentClubId}`);
-    } else if (!pathname.startsWith('/receipt-create')) {
+    } else {
       navigate(`/receipt-view/${club.studentClubId}`);
     }
 
