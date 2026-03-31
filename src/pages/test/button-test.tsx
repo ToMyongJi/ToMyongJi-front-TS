@@ -16,6 +16,10 @@ export default function ButtonTestPage() {
   const [searchKeyword, setSearchKeyword] = useState('');
   const [textFieldValue, setTextFieldValue] = useState('');
 
+  const handleModal = () => {
+
+  }
+
   return (
     <div className="space-y-12 p-8">
       <h1 className="W_Header text-primary">버튼 컴포넌트 테스트 페이지</h1>
@@ -218,6 +222,11 @@ export default function ButtonTestPage() {
           <TextField type="price" placeholder="출금" />
           <TextField placeholder="가격필드(에러)" isError={true} />
         </div>
+      </section>
+
+      {/*14. Custom Modal*/}
+      <section className="space-y-4">
+
       </section>
     </div>
   );
