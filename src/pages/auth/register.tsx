@@ -6,6 +6,7 @@ import SelectButton from '@components/common/select-button';
 import TextField from '@components/common/textfield';
 import Role from '@constants/role';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useModal } from '@hooks/use-modal';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { useState } from 'react';
@@ -65,6 +66,8 @@ const Register = () => {
   const sendEmailMutation = useMutation(authMutations.sendEmail());
   const emailCheckMutation = useMutation(authMutations.emailCheck());
   const clubVerifyMutation = useMutation(authMutations.clubVerify());
+
+  const { alert } = useModal();
 
   const navigate = useNavigate();
 
@@ -130,13 +133,21 @@ const Register = () => {
       {
         onSuccess: () => {
           setIsEmailSent(true);
-          setEmailMessage('인증코드를 발송했습니다. 이메일을 확인해주세요.');
+          alert({
+            title: '인증코드 발송',
+            description: '인증코드를 발송했습니다. 이메일을 확인해주세요.',
+            confirmText: '확인',
+          });
           setEmailMessageType('success');
         },
         onError: () => {
           setIsEmailSent(false);
           setIsEmailVerified(false);
-          setEmailMessage('이메일 발송에 실패했습니다. 다시 시도해주세요.');
+          alert({
+            title: '인증코드 발송 실패',
+            description: '인증코드 발송에 실패했습니다. 다시 시도해주세요.',
+            confirmText: '확인',
+          });
           setEmailMessageType('error');
         },
       },
@@ -182,9 +193,10 @@ const Register = () => {
           setIsClubVerified(true);
         },
         onError: () => {
-          setError('studentClubId', {
-            type: 'manual',
-            message: '소속 인증에 실패했습니다.',
+          alert({
+            title: '소속 인증 실패',
+            description: '소속 인증에 실패했습니다. 다시 시도해주세요.',
+            confirmText: '확인',
           });
           setIsClubVerified(false);
         },
@@ -196,6 +208,11 @@ const Register = () => {
     console.log('회원가입 데이터:', data);
     signupMutation.mutate(data, {
       onSuccess: () => {
+        alert({
+          title: '회원가입 완료',
+          description: '회원가입이 완료되었습니다.',
+          confirmText: '확인',
+        });
         navigate('/login');
       },
       onError: () => {
