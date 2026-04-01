@@ -18,9 +18,11 @@ const LNM_ADMIN_MENULIST = [
 type HeaderLnbProps = {
   openSidebar?: () => void;
   closeSidebar?: () => void;
+  /** true이면 페이지 이동을 막습니다. 조회 탭은 사이드바를 열지 않고, 관리자 학생회 관리 탭만 사이드바를 토글합니다. */
+  navigationDisabled?: boolean;
 };
 
-const HeaderLnb = ({ openSidebar, closeSidebar }: HeaderLnbProps) => {
+const HeaderLnb = ({ openSidebar, closeSidebar, navigationDisabled = false }: HeaderLnbProps) => {
   const isSidebarOpen = useLayoutStore((s) => s.isSidebarOpen);
   const { user } = useUserStore();
   const isAdmin = user?.role === Role.ADMIN;
@@ -40,10 +42,38 @@ const HeaderLnb = ({ openSidebar, closeSidebar }: HeaderLnbProps) => {
     const viewTabActive = pathname.startsWith('/receipt-view');
     const mgmtTabActive = pathname.startsWith('/management');
 
+    if (navigationDisabled) {
+      if (path === '/receipt-view') {
+        return;
+      }
+      if (path === '/management' && isAdmin) {
+        if (isSidebarOpen && mgmtTabActive) {
+          closeSidebar?.();
+          return;
+        }
+        openSidebar?.();
+        return;
+      }
+      return;
+    }
+
     if (path === '/receipt-view') {
       if (isSidebarOpen && viewTabActive) {
         closeSidebar?.();
 
+        return;
+      }
+      // 관리자는 학생회 관리 화면(/management)에 있을 때 조회만 누르면 URL이 그대로라
+      // 사이드바가 계속 management 기준으로 동작하므로, 조회 전환 시 영수증 조회 경로로 이동합니다.
+      if (isAdmin && pathname.startsWith('/management')) {
+        const clubIdFromPath = pathname.match(/^\/management\/(\d+)/)?.[1];
+        const clubId =
+          clubIdFromPath ??
+          (selectedClub?.studentClubId != null ? String(selectedClub.studentClubId) : undefined);
+        if (clubId != null) {
+          navigate(`/receipt-view/${clubId}`);
+        }
+        openSidebar?.();
         return;
       }
       openSidebar?.();
@@ -53,7 +83,6 @@ const HeaderLnb = ({ openSidebar, closeSidebar }: HeaderLnbProps) => {
     if (path === '/management' && isAdmin) {
       if (isSidebarOpen && mgmtTabActive) {
         closeSidebar?.();
-
         return;
       }
       if (selectedClub?.studentClubId != null) {

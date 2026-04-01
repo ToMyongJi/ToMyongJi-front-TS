@@ -9,7 +9,12 @@ import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-const Sidebar = () => {
+type SidebarProps = {
+  /** true이면 단과/동아리 UI는 유지하되 영수증·관리 경로로 이동하지 않습니다. */
+  navigationDisabled?: boolean;
+};
+
+const Sidebar = ({ navigationDisabled = false }: SidebarProps) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { closeSidebar } = useLayoutStore();
@@ -41,10 +46,12 @@ const Sidebar = () => {
       verification: club.verification,
     });
 
-    if (pathname.startsWith('/management')) {
-      navigate(`/management/${club.studentClubId}`);
-    } else {
-      navigate(`/receipt-view/${club.studentClubId}`);
+    if (!navigationDisabled) {
+      if (pathname.startsWith('/management')) {
+        navigate(`/management/${club.studentClubId}`);
+      } else {
+        navigate(`/receipt-view/${club.studentClubId}`);
+      }
     }
 
     // md 이하일 때 사이드바 닫기 및 오버레이 제거

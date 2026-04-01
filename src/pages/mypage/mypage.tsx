@@ -53,7 +53,7 @@ const Mypage = () => {
   const addMemberMutation = useMutation({
     ...myMutations.addMember(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['my', 'viewMember'] });
+      queryClient.invalidateQueries({ queryKey: ['college', 'getClubMember'] });
       setNewStudentNum('');
       setNewName('');
       alert('부원 추가에 성공했습니다.');
@@ -66,7 +66,7 @@ const Mypage = () => {
   const deleteMemberMutation = useMutation({
     ...myMutations.deleteMember(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['my', 'viewMember'] });
+      queryClient.invalidateQueries({ queryKey: ['college', 'getClubMember'] });
       alert('부원 삭제에 성공했습니다.');
     },
     onError: () => {
