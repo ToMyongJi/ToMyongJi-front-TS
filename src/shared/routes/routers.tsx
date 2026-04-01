@@ -5,6 +5,7 @@ import FindAccount from '@pages/auth/find-account';
 import Login from '@pages/auth/login';
 import Register from '@pages/auth/register';
 import ResetPassword from '@pages/auth/reset-password';
+import Maintenance from '@pages/common/maintenance';
 import CsvCreate from '@pages/create/csv-create';
 import ReceiptCreate from '@pages/create/receipt-create';
 import TossbankCreate from '@pages/create/tossbank-create';
@@ -26,6 +27,17 @@ export const router = createBrowserRouter([
       { index: true, element: <MainPage /> },
       { path: 'receipt-view/:clubid', element: <ReceiptView /> },
       { path: 'test/buttons', element: <ButtonTestPage /> },
+      {
+        path: 'maintenance',
+        element: (
+          <Maintenance
+            maintenance={{
+              date: '0월 00일 00:00 ~ 0월 00일 00:00',
+              description: '서버 성능 개선 및 안정화',
+            }}
+          />
+        ),
+      },
       // 이미 로그인된 사용자의 접근을 막는 라우터 (로그인, 회원가입)
       {
         element: <PublicRouter />,
