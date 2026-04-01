@@ -1,3 +1,4 @@
+import { maintenanceCopy } from '@constants/maintenance';
 import RootLayout from '@layouts/root-layout';
 import AdminPage from '@pages/admin/admin-page';
 import { Management } from '@pages/admin/management';
@@ -29,14 +30,7 @@ export const router = createBrowserRouter([
       { path: 'test/buttons', element: <ButtonTestPage /> },
       {
         path: 'maintenance',
-        element: (
-          <Maintenance
-            maintenance={{
-              date: '0월 00일 00:00 ~ 0월 00일 00:00',
-              description: '서버 성능 개선 및 안정화',
-            }}
-          />
-        ),
+        element: <Maintenance maintenance={maintenanceCopy} />,
       },
       // 이미 로그인된 사용자의 접근을 막는 라우터 (로그인, 회원가입)
       {

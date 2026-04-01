@@ -6,7 +6,12 @@ import useAuthStore from '../store/auth-store';
 import useStudentClubStore from '../store/student-club-store';
 import useUserStore from '../store/user-store';
 
-const HeaderGnb = () => {
+type HeaderGnbProps = {
+  /** true이면 로고·로그인 등 앱 내 경로 이동만 막습니다(로그아웃은 허용). */
+  navigationDisabled?: boolean;
+};
+
+const HeaderGnb = ({ navigationDisabled = false }: HeaderGnbProps) => {
   const navigate = useNavigate();
   const { authData, clearAuthData } = useAuthStore();
   const { user, clearUser } = useUserStore();
@@ -27,9 +32,23 @@ const HeaderGnb = () => {
     navigate('/');
   };
 
+  const goHome = () => {
+    if (navigationDisabled) return;
+    navigate('/');
+  };
+
+  const goLogin = () => {
+    if (navigationDisabled) return;
+    navigate('/login');
+  };
+
   return (
     <div className="flex-row-between border-gray-10 border-b px-[4rem] py-[1.3rem]">
-      <button type="button" className="cursor-pointer" onClick={() => navigate('/')}>
+      <button
+        type="button"
+        className={navigationDisabled ? 'cursor-default' : 'cursor-pointer'}
+        onClick={goHome}
+      >
         <MainLogo className="h-[3.8rem] w-[4.3rem]" />
       </button>
 
@@ -45,7 +64,7 @@ const HeaderGnb = () => {
           variant="primary_outline"
           size="sm"
           className="h-[3.2rem] w-[8rem]"
-          onClick={() => navigate('/login')}
+          onClick={goLogin}
         >
           로그인
         </Button>
