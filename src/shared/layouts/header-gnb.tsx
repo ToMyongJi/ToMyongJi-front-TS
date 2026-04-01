@@ -7,7 +7,6 @@ import useStudentClubStore from '../store/student-club-store';
 import useUserStore from '../store/user-store';
 
 type HeaderGnbProps = {
-  /** true이면 로고·로그인 등 앱 내 경로 이동만 막습니다(로그아웃은 허용). */
   navigationDisabled?: boolean;
 };
 
@@ -33,7 +32,6 @@ const HeaderGnb = ({ navigationDisabled = false }: HeaderGnbProps) => {
   };
 
   const goHome = () => {
-    if (navigationDisabled) return;
     navigate('/');
   };
 
@@ -44,11 +42,7 @@ const HeaderGnb = ({ navigationDisabled = false }: HeaderGnbProps) => {
 
   return (
     <div className="flex-row-between border-gray-10 border-b px-[4rem] py-[1.3rem]">
-      <button
-        type="button"
-        className={navigationDisabled ? 'cursor-default' : 'cursor-pointer'}
-        onClick={goHome}
-      >
+      <button type="button" className="cursor-pointer" onClick={goHome}>
         <MainLogo className="h-[3.8rem] w-[4.3rem]" />
       </button>
 
