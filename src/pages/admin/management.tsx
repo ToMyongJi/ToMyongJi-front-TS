@@ -223,7 +223,7 @@ export const Management = () => {
           <div className="flex h-[4.4rem] items-center gap-[1.9rem] border-gray-10 border-b">
             <p className="W_SB15 text-black">현재 회장</p>
             {presidentLoading ? (
-              <p className="W_SB15 text-gray-90">불러오는 중…</p>
+              <p className="size-[2.5rem] shrink-0 animate-spin rounded-full border-4 border-gray-20 border-t-primary" />
             ) : hasPresident && president ? (
               <p className="W_SB15 text-gray-90">
                 {president.studentNum} {president.name}
