@@ -4,7 +4,7 @@ import { myMutations } from '@apis/my/my-mutations';
 import { myQuery } from '@apis/my/my-queries';
 import Button from '@components/common/button';
 import TextField from '@components/common/textfield';
-import MemberList from '@components/mypage/member-list';
+import MemberList, { type MemberItem } from '@components/mypage/member-list';
 import Role from '@constants/role';
 import { useModal } from '@hooks/use-modal';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -125,6 +125,16 @@ const Mypage = () => {
     }
   };
 
+  const handleDeleteMember = (member: MemberItem) => {
+    confirm({
+      title: '부원 삭제',
+      description: `${member.name} 부원을 정말 삭제하시겠어요?`,
+      confirmText: '삭제',
+      cancelText: '취소',
+      onConfirm: () => deleteMemberMutation.mutate(Number(member.studentNum)),
+    });
+  };
+
   const handleDeleteAccount = async () => {
     const ok = await confirm({
       title: '회원탈퇴',
@@ -204,19 +214,9 @@ const Mypage = () => {
                   추가
                 </Button>
               </div>
-
               <MemberList
                 members={members ?? []}
-                onDelete={async (member) => {
-                  const ok = await confirm({
-                    title: '부원 삭제',
-                    description: `${member.name} 부원을 정말 삭제하시겠어요?`,
-                    confirmText: '삭제',
-                    cancelText: '취소',
-                  });
-                  if (!ok) return;
-                  deleteMemberMutation.mutate(Number(member.studentNum));
-                }}
+                onDelete={handleDeleteMember}
                 buttonType="delete"
               />
             </div>

@@ -4,6 +4,7 @@ import { collegeQuery } from '@apis/college/college-queries';
 import Button from '@components/common/button';
 import TextField from '@components/common/textfield';
 import MemberList, { type MemberItem } from '@components/mypage/member-list';
+import { useModal } from '@hooks/use-modal';
 import { useSidebarStore } from '@store/sidebar-store';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
@@ -17,6 +18,8 @@ export const Management = () => {
   const [newPresidentName, setNewPresidentName] = useState('');
   const [newMemberStudentNum, setNewMemberStudentNum] = useState('');
   const [newMemberName, setNewMemberName] = useState('');
+
+  const { alert, confirm } = useModal();
 
   const parsedClubId = useMemo(() => {
     if (!clubIdParam) return null;
@@ -59,10 +62,13 @@ export const Management = () => {
       }
       setNewPresidentStudentNum('');
       setNewPresidentName('');
-      alert('학생회장이 등록되었습니다.');
+      alert({ title: '학생회장이 등록되었습니다.', description: '학생회장이 등록되었습니다.' });
     },
     onError: () => {
-      alert('학생회장 등록에 실패했습니다.');
+      alert({
+        title: '학생회장 등록에 실패했습니다.',
+        description: '학생회장 등록에 실패했습니다.',
+      });
     },
   });
 
@@ -74,10 +80,16 @@ export const Management = () => {
       }
       setNewPresidentStudentNum('');
       setNewPresidentName('');
-      alert('학생회장 정보가 변경되었습니다.');
+      alert({
+        title: '학생회장 정보가 변경되었습니다.',
+        description: '학생회장 정보가 변경되었습니다.',
+      });
     },
     onError: () => {
-      alert('학생회장 변경에 실패했습니다.');
+      alert({
+        title: '학생회장 변경에 실패했습니다.',
+        description: '학생회장 변경에 실패했습니다.',
+      });
     },
   });
 
@@ -89,10 +101,10 @@ export const Management = () => {
       }
       setNewMemberStudentNum('');
       setNewMemberName('');
-      alert('부원이 추가되었습니다.');
+      alert({ title: '부원이 추가되었습니다.', description: '부원이 추가되었습니다.' });
     },
     onError: () => {
-      alert('부원 추가에 실패했습니다.');
+      alert({ title: '부원 추가에 실패했습니다.', description: '부원 추가에 실패했습니다.' });
     },
   });
 
@@ -101,11 +113,19 @@ export const Management = () => {
     onSuccess: () => {
       if (parsedClubId !== null) {
         queryClient.invalidateQueries({ queryKey: ['admin', 'member', parsedClubId] });
+        alert({
+          title: '부원이 삭제되었습니다.',
+          description: '부원이 삭제되었습니다.',
+          confirmText: '확인',
+        });
       }
-      alert('부원이 삭제되었습니다.');
     },
     onError: () => {
-      alert('부원 삭제에 실패했습니다.');
+      alert({
+        title: '부원 삭제에 실패했습니다.',
+        description: '부원 삭제에 실패했습니다.',
+        confirmText: '확인',
+      });
     },
   });
 
@@ -126,7 +146,13 @@ export const Management = () => {
       name: newPresidentName.trim(),
     };
     if (hasPresident) {
-      patchPresidentMutation.mutate(body);
+      confirm({
+        title: '학생회장 수정',
+        description: `새 학생회장 ${newPresidentStudentNum} ${newPresidentName} 변경하시겠습니까?`,
+        cancelText: '취소',
+        confirmText: '확인',
+        onConfirm: () => patchPresidentMutation.mutate(body),
+      });
     } else {
       postPresidentMutation.mutate(body);
     }
@@ -142,8 +168,13 @@ export const Management = () => {
   };
 
   const handleDeleteMember = (member: MemberItem) => {
-    if (!window.confirm('이 부원을 삭제할까요?')) return;
-    deleteMemberMutation.mutate(member.memberId);
+    confirm({
+      title: '부원 삭제',
+      description: `${member.name} 부원을 정말 삭제하시겠어요?`,
+      confirmText: '삭제',
+      cancelText: '취소',
+      onConfirm: () => deleteMemberMutation.mutate(member.memberId),
+    });
   };
 
   if (!clubIdParam) {
