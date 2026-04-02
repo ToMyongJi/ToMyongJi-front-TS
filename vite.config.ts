@@ -20,9 +20,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['vite.svg'],
       manifest: {
-        name: 'ToMyongJi',
-        short_name: 'ToMyongJi',
-        description: 'ToMyongJi',
+        name: '투명지',
+        short_name: '투명지',
+        description: '투명한 학생회비 관리 서비스',
         theme_color: '#87AAFF',
         background_color: '#F0F4FF',
         display: 'standalone',
