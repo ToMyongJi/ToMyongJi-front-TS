@@ -49,8 +49,6 @@ const Login = () => {
   const [rememberMe, setRememberMe] = useState(false);
 
   const onSubmit = (data: LoginFormValues) => {
-    console.log('로그인 시도 데이터:', data);
-
     loginMutation.mutate(data, {
       onSuccess: async (response: authLoginResponse) => {
         const { grantType, accessToken, refreshToken } = response.data;

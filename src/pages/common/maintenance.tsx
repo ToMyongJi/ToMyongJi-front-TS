@@ -18,13 +18,13 @@ const Maintenance = ({ maintenance }: MaintenanceProps) => {
         </div>
         <div className="flex w-full flex-col gap-[1.6rem] rounded-[1rem] border-1 border-gray-20 px-[2.6rem] py-[3rem]">
           <div className="W_B15 flex flex-col">
-            <p className="text-black">점검 일시</p>
+            <p className="pb-[0.4rem] text-black">점검 일시</p>
             <p className="W_M15 text-gray-80">
               {maintenance.date ?? '0월 00일 00:00 ~ 0월 00일 00:00'}
             </p>
           </div>
           <div className="W_B15 flex flex-col">
-            <p className="text-black">점검 내용</p>
+            <p className="pb-[0.4rem] text-black">점검 내용</p>
             <p className="W_M15 text-gray-80">
               {maintenance.description ?? '서버 성능 개선 및 안정화'}
             </p>

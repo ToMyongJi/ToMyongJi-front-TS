@@ -4,8 +4,9 @@ import { myMutations } from '@apis/my/my-mutations';
 import { myQuery } from '@apis/my/my-queries';
 import Button from '@components/common/button';
 import TextField from '@components/common/textfield';
-import MemberList from '@components/mypage/member-list';
+import MemberList, { type MemberItem } from '@components/mypage/member-list';
 import Role from '@constants/role';
+import { useModal } from '@hooks/use-modal';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -23,6 +24,7 @@ const Mypage = () => {
   const { user, clearUser } = useUserStore();
   const { clearAuthData } = useAuthStore();
   const navigate = useNavigate();
+  const { alert, confirm } = useModal();
 
   const [newStudentNum, setNewStudentNum] = useState('');
   const [newName, setNewName] = useState('');
@@ -56,10 +58,18 @@ const Mypage = () => {
       queryClient.invalidateQueries({ queryKey: ['college', 'getClubMember'] });
       setNewStudentNum('');
       setNewName('');
-      alert('부원 추가에 성공했습니다.');
+      alert({
+        title: '부원 추가 성공',
+        description: '부원 추가에 성공했습니다.',
+        confirmText: '확인',
+      });
     },
     onError: () => {
-      alert('부원 추가에 실패했습니다.');
+      alert({
+        title: '부원 추가 실패',
+        description: '부원 추가에 실패했습니다.',
+        confirmText: '확인',
+      });
     },
   });
 
@@ -67,10 +77,18 @@ const Mypage = () => {
     ...myMutations.deleteMember(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['college', 'getClubMember'] });
-      alert('부원 삭제에 성공했습니다.');
+      alert({
+        title: '부원 삭제 성공',
+        description: '부원 삭제에 성공했습니다.',
+        confirmText: '확인',
+      });
     },
     onError: () => {
-      alert('부원 삭제에 실패했습니다.');
+      alert({
+        title: '부원 삭제 실패',
+        description: '부원 삭제에 실패했습니다.',
+        confirmText: '확인',
+      });
     },
   });
 
@@ -82,7 +100,11 @@ const Mypage = () => {
       navigate('/login');
     },
     onError: () => {
-      alert('회원탈퇴에 실패했습니다.');
+      alert({
+        title: '회원탈퇴 실패',
+        description: '회원탈퇴에 실패했습니다.',
+        confirmText: '확인',
+      });
     },
   });
 
@@ -95,12 +117,32 @@ const Mypage = () => {
         name: newName,
       });
     } catch {
-      alert('부원 추가에 실패했습니다.');
+      alert({
+        title: '부원 추가 실패',
+        description: '부원 추가에 실패했습니다.',
+        confirmText: '확인',
+      });
     }
   };
 
+  const handleDeleteMember = (member: MemberItem) => {
+    confirm({
+      title: '부원 삭제',
+      description: `${member.name} 부원을 정말 삭제하시겠어요?`,
+      confirmText: '삭제',
+      cancelText: '취소',
+      onConfirm: () => deleteMemberMutation.mutate(Number(member.studentNum)),
+    });
+  };
+
   const handleDeleteAccount = async () => {
-    if (!confirm('정말 탈퇴하시겠습니까?')) return;
+    const ok = await confirm({
+      title: '회원탈퇴',
+      description: '정말 탈퇴하시겠습니까?',
+      confirmText: '탈퇴',
+      cancelText: '취소',
+    });
+    if (!ok) return;
     deleteMutation.mutate();
   };
 
@@ -172,10 +214,9 @@ const Mypage = () => {
                   추가
                 </Button>
               </div>
-
               <MemberList
                 members={members ?? []}
-                onDelete={(member) => deleteMemberMutation.mutate(Number(member.studentNum))}
+                onDelete={handleDeleteMember}
                 buttonType="delete"
               />
             </div>
