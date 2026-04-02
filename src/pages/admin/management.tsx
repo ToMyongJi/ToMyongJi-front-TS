@@ -5,6 +5,7 @@ import Button from '@components/common/button';
 import TextField from '@components/common/textfield';
 import MemberList, { type MemberItem } from '@components/mypage/member-list';
 import { useModal } from '@hooks/use-modal';
+import Loading from '@pages/common/loading';
 import { useSidebarStore } from '@store/sidebar-store';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
@@ -194,11 +195,7 @@ export const Management = () => {
   }
 
   if (isLoading) {
-    return (
-      <div className="px-[3rem] pt-[4.2rem] xl:px-[9.3rem]">
-        <p className="W_B17 text-gray-60">불러오는 중…</p>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (!club) {
