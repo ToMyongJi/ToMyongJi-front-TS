@@ -13,6 +13,7 @@ import Chip from '@components/common/chip';
 import SearchBar from '@components/common/search-bar';
 import PaginationCustom from '@components/pagination-custom';
 import Dropdown from '@components/dropdown';
+import TossBankImage from '@assets/icons/toss-bank.png';
 
 const HeaderData = [
   { labels: "날짜", width: "15.8%" },
@@ -23,6 +24,7 @@ const HeaderData = [
 
 
 const ReceiptView = () => {
+  const [isHover, setIsHover] = useState(false);
   const [year, setYear] = useState("전체(년)");
   const [yearFilter, setYearFilter] = useState(false);
   const [month, setMonth] = useState("전체(월)");
@@ -70,12 +72,26 @@ const ReceiptView = () => {
   return (
     <div className="mb-[10rem] flex-col gap-[4.6rem] px-[3rem] pt-[4.2rem] xl:px-[9.3rem]">
       <section className="flex-row-between">
-        <div className="flex items-center gap-[0.8rem]">
+        <div className="relative flex items-center gap-[0.8rem]">
           <p className="W_Header text-black">{clubData?.studentClubName}</p>
-          <InfoIcon className="text-gray-20" />
+          <InfoIcon className="cursor-pointer text-gray-20" onMouseOver={() => setIsHover(true)} onMouseLeave={() => setIsHover(false)}/>
+          {isHover && <div
+            className="absolute top-14 left-1/2 z-[99] min-w-[37.5rem] flex-col gap-[0.8rem] rounded-[0.8rem] border border-gray-10 bg-white px-[1.6rem] py-[1.2rem] text-start shadow-[0_0_16px_0_rgba(163,163,163,0.25)]">
+            <div className="flex items-center gap-[0.8rem]">
+              <p className="W_B15">거래내역서 인증 마크 안내</p>
+              <div
+                className="flex w-fit items-center gap-[0.6rem] rounded-[3rem] bg-background px-[1.4rem] py-[0.4rem]">
+                <img src={TossBankImage} className="w-[8.5rem]" alt="토스뱅크 인증 마크" />
+                <p className="W_R12 text-gray-90">인증</p>
+              </div>
+            </div>
+            <p className="W_R12 text-gary-90">전체 입출금 내역의 30% 이상이 토스뱅크 거래내역서로 인증되면, <br />
+              해당 학생회의 영수증 페이지 조회 시 거래내역서 인증 마크가 추가됩니다.
+            </p>
+          </div>}
         </div>
         <button type="button" className="cursor-pointer">
-          <MenuIcon className='md:hidden' onClick={toggleSidebar} />
+          <MenuIcon className="md:hidden" onClick={toggleSidebar} />
         </button>
 
       </section>
@@ -93,7 +109,7 @@ const ReceiptView = () => {
                   setPreViewData={setYear} />}
             </div>
             <div className="relative">
-              <Chip label={month} isActive={monthFilter} onClick={() => handleChipClick('MONTH')} />
+            <Chip label={month} isActive={monthFilter} onClick={() => handleChipClick('MONTH')} />
               {monthFilter &&
                 <Dropdown
                   className="absolute top-0"
