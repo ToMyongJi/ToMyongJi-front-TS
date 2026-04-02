@@ -2,9 +2,11 @@ import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { receiptMutations } from '@apis/receipt/receipt-mutations';
+import { useModal } from '@hooks/use-modal';
 
 import BasicCard from '@components/common/basic-card';
 import Button from '@components/common/button';
+import TextField from '@components/common/textfield';
 
 import TossBankImage from "@assets/icons/toss-bank.png";
 import FileIcon from "@assets/icons/file.svg?react";
@@ -14,6 +16,7 @@ import useUserStore from '@store/user-store';
 
 const TossbankCreate = () => {
   const { user } = useUserStore();
+  const {alert} = useModal();
 
   const [file, setFile] = useState<File | null>(null);
   const [keyword, setKeyword] = useState<string>(" ");
@@ -35,23 +38,31 @@ const TossbankCreate = () => {
 
   const handleUpload = () => {
     if (user?.userId == null) {
-      alert('로그인 정보를 확인할 수 없습니다.');
       return;
     }
 
     if(file) {
-      uploadTossBank.mutate({file, userId: user.userId, keyword}, {
+      uploadTossBank.mutate({file, userId: user?.userId, keyword}, {
         onSuccess: () => {
-          alert("성공적으로 업로드가 되었습니다.");
+          void alert({
+            title: '성공',
+            description: '성공적으로 업로드 완료했습니다.',
+          });
           navigate('/receipt-create')
         },
         onError: (error: unknown) => {
           const message = error instanceof Error ? error.message : '업로드에 실패했습니다.';
-          alert(message);
+          void alert({
+            title: '업로드',
+            description: message,
+          });
         }
       })
     } else{
-      alert("파일을 선택해주세요")
+      void alert({
+        title: '업로드',
+        description: '파일을 선택해주세요',
+      });
     }
   }
 
@@ -104,13 +115,21 @@ const TossbankCreate = () => {
             </Button>
           </div>
         </BasicCard>}
-        {file && <BasicCard className="flex items-center justify-between px-[2.6rem] py-[2rem]">
-          <div className="flex items-center gap-[0.5rem]">
-            <FileIcon className="text-gray-70" />
-            <p className="W_M15">{file.name}</p>
+        {file &&
+          <div className="flex-col gap-[1.8rem]">
+            <BasicCard className="flex items-center justify-between px-[2.6rem] py-[2rem]">
+              <div className="flex items-center gap-[0.5rem]">
+                <FileIcon className="text-gray-70" />
+                <p className="W_M15">{file.name}</p>
+              </div>
+              <CancelIcon className="cursor-pointer text-error" onClick={() => setFile(null)}/>
+            </BasicCard>
+            <div className="flex items-center gap-[1rem]">
+              <p className="W_B15 text-gray-90">키워드 입력</p>
+              <TextField className="w-[28.6rem]" value={keyword} onChange={(e) => setKeyword(e.target.value)}/>
+            </div>
           </div>
-          <CancelIcon className="cursor-pointer text-error" onClick={() => setFile(null)}/>
-        </BasicCard>}
+         }
         <div className="mt-[5.4rem] flex justify-end gap-[0.8rem]">
           <Button variant="gray_outline" className="px-[4rem]" size="md" onClick={() => navigate(-1)}>
             취소
