@@ -6,4 +6,5 @@ export const adminMutations = {
   patchPresident: () => buildMutation(adminApi.patchPresident),
   postMember: () => buildMutation(adminApi.postMember),
   deleteMember: () => buildMutation(adminApi.deleteMember),
+  setStatus: () => buildMutation(adminApi.setStatus)
 };

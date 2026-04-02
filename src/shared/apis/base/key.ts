@@ -32,5 +32,6 @@ export const QK = {
   admin: {
     president: (clubId: number) => ['admin', 'president', clubId] as const,
     member: (clubId: number) => ['admin', 'member', clubId] as const,
+    status: () => ['auth', 'status'] as const,
   },
 };
