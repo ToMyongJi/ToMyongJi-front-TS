@@ -219,10 +219,19 @@ const ReceiptCreate = () => {
             setSelectedReceiptIds([]);
           }
         } catch (error) {
-          await alert({
-            title: '내역삭제',
-            description: error.message,
-          })
+          // TS에서는 catch문의 error 타입이 기본적으로 `unknown`이므로,
+          // 실제로 Error 객체인지 확인 후 메시지를 사용합니다.
+          if (error instanceof Error) {
+            await alert({
+              title: '내역삭제',
+              description: error.message,
+            })
+          } else {
+            await alert({
+              title: '내역삭제',
+              description: '알 수 없는 오류가 발생했습니다.',
+            })
+          }
         }
       }
     });
