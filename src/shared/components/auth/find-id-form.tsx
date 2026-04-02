@@ -1,6 +1,7 @@
 import { authApi } from '@apis/auth/auth';
 import Button from '@components/common/button';
 import TextField from '@components/common/textfield';
+import { useModal } from '@hooks/use-modal';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -13,6 +14,7 @@ const FindIdForm = () => {
   const [foundId, setFoundId] = useState<string | null>();
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { alert } = useModal();
 
   const { mutate: findId } = useMutation({
     mutationFn: (emailValue: string) => authApi.findId({ email: emailValue }),
@@ -22,6 +24,11 @@ const FindIdForm = () => {
     },
     onError: () => {
       setError('등록되지 않은 이메일입니다.');
+      alert({
+        title: '아이디 찾기 실패',
+        description: '등록되지 않은 이메일입니다.',
+        confirmText: '확인',
+      });
     },
   });
 
