@@ -6,6 +6,7 @@ import SelectButton from '@components/common/select-button';
 import TextField from '@components/common/textfield';
 import Role from '@constants/role';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useModal } from '@hooks/use-modal';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { useState } from 'react';
@@ -65,6 +66,8 @@ const Register = () => {
   const sendEmailMutation = useMutation(authMutations.sendEmail());
   const emailCheckMutation = useMutation(authMutations.emailCheck());
   const clubVerifyMutation = useMutation(authMutations.clubVerify());
+
+  const { alert } = useModal();
 
   const navigate = useNavigate();
 
@@ -130,13 +133,21 @@ const Register = () => {
       {
         onSuccess: () => {
           setIsEmailSent(true);
-          setEmailMessage('인증코드를 발송했습니다. 이메일을 확인해주세요.');
+          alert({
+            title: '인증코드 발송',
+            description: '인증코드를 발송했습니다. 이메일을 확인해주세요.',
+            confirmText: '확인',
+          });
           setEmailMessageType('success');
         },
         onError: () => {
           setIsEmailSent(false);
           setIsEmailVerified(false);
-          setEmailMessage('이메일 발송에 실패했습니다. 다시 시도해주세요.');
+          alert({
+            title: '인증코드 발송 실패',
+            description: '인증코드 발송에 실패했습니다. 다시 시도해주세요.',
+            confirmText: '확인',
+          });
           setEmailMessageType('error');
         },
       },
@@ -182,9 +193,10 @@ const Register = () => {
           setIsClubVerified(true);
         },
         onError: () => {
-          setError('studentClubId', {
-            type: 'manual',
-            message: '소속 인증에 실패했습니다.',
+          alert({
+            title: '소속 인증 실패',
+            description: '소속 인증에 실패했습니다. 다시 시도해주세요.',
+            confirmText: '확인',
           });
           setIsClubVerified(false);
         },
@@ -196,6 +208,11 @@ const Register = () => {
     console.log('회원가입 데이터:', data);
     signupMutation.mutate(data, {
       onSuccess: () => {
+        alert({
+          title: '회원가입 완료',
+          description: '회원가입이 완료되었습니다.',
+          confirmText: '확인',
+        });
         navigate('/login');
       },
       onError: () => {
@@ -205,7 +222,7 @@ const Register = () => {
   };
 
   return (
-    <div className="mt-[4.2rem] mb-[10rem] flex flex-col items-center justify-center">
+    <div className="mt-[4.2rem] mb-[10rem] flex flex-col items-center justify-center px-[1.5rem]">
       <div className="w-full max-w-[42rem] gap-[1.6rem]">
         <div className="mb-[1.8rem]">
           <p className="W_Title text-black">회원가입</p>
@@ -213,14 +230,14 @@ const Register = () => {
         <div className="w-full max-w-[42rem]">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-[1.6rem]">
             {/* 첫 번째 그룹: 계정 정보 */}
-            <div className="flex flex-col gap-[1.6rem] rounded-[1rem] border border-gray-20 px-[2.6rem] py-[3rem]">
+            <div className="flex flex-col gap-[1.6rem] rounded-[1rem] border border-gray-20 px-[1.6rem] py-[2rem] sm:px-[2.6rem] sm:py-[3rem]">
               {/* 아이디 */}
-              <div className="flex w-[36.6rem] flex-col gap-[1rem]">
-                <div className="flex items-center gap-[1.6rem]">
-                  <p className="W_B15 w-[5.6rem] text-gray-90">아이디</p>
-                  <div className="flex gap-[1rem]">
+              <div className="flex w-full flex-col gap-[1rem]">
+                <div className="flex items-center gap-[1rem]">
+                  <p className="W_B15 w-[5.6rem] shrink-0 text-gray-90">아이디</p>
+                  <div className="flex flex-1 gap-[1rem]">
                     <TextField
-                      className="w-[20rem]"
+                      className="flex-1"
                       {...register('userId')}
                       isError={!!errors.userId}
                       disabled={isIdChecked}
@@ -229,7 +246,7 @@ const Register = () => {
                       type="button"
                       variant="primary"
                       size="regular"
-                      className="w-[8.9rem]"
+                      className="w-[8.9rem] shrink-0"
                       disabled={!userId || isIdChecked}
                       onClick={handleIdCheck}
                     >
@@ -247,9 +264,9 @@ const Register = () => {
               {/* 비밀번호 */}
               <div className="flex flex-col gap-[0.4rem]">
                 <div className="flex items-center gap-[1rem]">
-                  <p className="W_B15 text-gray-90">비밀번호</p>
+                  <p className="W_B15 w-[5.6rem] shrink-0 text-gray-90">비밀번호</p>
                   <TextField
-                    className="w-[3rem] flex-1"
+                    className="flex-1"
                     {...register('password')}
                     isError={!!errors.password}
                   />
@@ -260,12 +277,12 @@ const Register = () => {
               </div>
 
               {/* 이메일 & 인증코드 */}
-              <div className="flex w-[36.6rem] flex-col gap-[1rem]">
+              <div className="flex w-full flex-col gap-[1rem]">
                 <div className="flex items-center gap-[1rem]">
-                  <p className="W_B15 w-[5.6rem] text-gray-90">이메일</p>
-                  <div className="flex gap-[1rem]">
+                  <p className="W_B15 w-[5.6rem] shrink-0 text-gray-90">이메일</p>
+                  <div className="flex flex-1 gap-[1rem]">
                     <TextField
-                      className="w-[20rem]"
+                      className="flex-1"
                       {...register('email', {
                         onChange: () => {
                           setIsEmailSent(false);
@@ -283,7 +300,7 @@ const Register = () => {
                       type="button"
                       variant="primary"
                       size="regular"
-                      className="w-[9.2rem]"
+                      className="w-[9.2rem] shrink-0"
                       disabled={
                         !email || !!errors.email || sendEmailMutation.isPending || isEmailSent
                       }
@@ -303,10 +320,10 @@ const Register = () => {
 
                 {/* 인증코드 */}
                 <div className="flex items-center gap-[1rem]">
-                  <p className="W_B15 w-[5.6rem] text-gray-90">인증코드</p>
-                  <div className="flex gap-[1rem]">
+                  <p className="W_B15 w-[5.6rem] shrink-0 text-gray-90">인증코드</p>
+                  <div className="flex flex-1 gap-[1rem]">
                     <TextField
-                      className="w-[20rem]"
+                      className="flex-1"
                       value={emailVerificationCode}
                       onChange={(e) => setEmailVerificationCode(e.target.value)}
                       disabled={!isEmailSent || isEmailVerified}
@@ -315,7 +332,7 @@ const Register = () => {
                       type="button"
                       variant="primary"
                       size="regular"
-                      className="w-[9.2rem]"
+                      className="w-[9.2rem] shrink-0"
                       disabled={
                         !emailVerificationCode ||
                         !isEmailSent ||
@@ -336,21 +353,21 @@ const Register = () => {
             </div>
 
             {/* 두 번째 그룹: 개인 정보 */}
-            <div className="flex flex-col gap-[2rem] rounded-[1rem] border border-gray-20 px-[2.6rem] py-[3rem]">
+            <div className="flex flex-col gap-[2rem] rounded-[1rem] border border-gray-20 px-[1.6rem] py-[2rem] sm:px-[2.6rem] sm:py-[3rem]">
               {/* 이름 */}
               <div className="flex flex-col gap-[0.8rem]">
-                <div className="flex items-center gap-[1.6rem]">
-                  <p className="W_SB15 w-[5.6rem] text-gray-90">이름</p>
-                  <TextField className="w-[30rem]" {...register('name')} isError={!!errors.name} />
+                <div className="flex items-center gap-[1rem]">
+                  <p className="W_SB15 w-[5.6rem] shrink-0 text-gray-90">이름</p>
+                  <TextField className="flex-1" {...register('name')} isError={!!errors.name} />
                 </div>
               </div>
 
               {/* 학번 */}
               <div className="flex flex-col gap-[0.8rem]">
-                <div className="flex items-center gap-[1.6rem]">
-                  <p className="W_SB15 w-[5.6rem] text-gray-90">학번</p>
+                <div className="flex items-center gap-[1rem]">
+                  <p className="W_SB15 w-[5.6rem] shrink-0 text-gray-90">학번</p>
                   <TextField
-                    className="w-[30rem]"
+                    className="flex-1"
                     {...register('studentNum')}
                     isError={!!errors.studentNum}
                   />
@@ -359,10 +376,10 @@ const Register = () => {
 
               {/* 대학 */}
               <div className="flex flex-col gap-[0.8rem]">
-                <div className="flex items-start gap-[1.6rem]">
-                  <p className="W_SB15 mt-[1rem] w-[5.6rem] text-gray-90">대학</p>
+                <div className="flex items-start gap-[1rem]">
+                  <p className="W_SB15 mt-[1rem] w-[5.6rem] shrink-0 text-gray-90">대학</p>
 
-                  <div className="relative w-[30rem]">
+                  <div className="relative flex-1">
                     <SelectButton
                       className="w-full"
                       value={selectedCollege}
@@ -401,10 +418,10 @@ const Register = () => {
 
               {/* 자격 */}
               <div className="flex flex-col gap-[0.8rem]">
-                <div className="flex items-start gap-[1.6rem]">
-                  <p className="W_SB15 mt-[1rem] w-[5.6rem] text-gray-90">자격</p>
+                <div className="flex items-start gap-[1rem]">
+                  <p className="W_SB15 mt-[1rem] w-[5.6rem] shrink-0 text-gray-90">자격</p>
 
-                  <div className="relative w-[30rem]">
+                  <div className="relative flex-1">
                     <SelectButton
                       className="w-full"
                       value={selectedRole}
@@ -438,17 +455,15 @@ const Register = () => {
 
               {/* 소속 */}
               <div className="flex flex-col gap-[0.8rem]">
-                <div className="flex items-start gap-[1.6rem]">
-                  <p className="W_SB15 mt-[1rem] w-[5.6rem] text-gray-90">소속</p>
+                <div className="flex items-start gap-[1rem]">
+                  <p className="W_SB15 mt-[1rem] w-[5.6rem] shrink-0 text-gray-90">소속</p>
 
-                  <div className="flex flex-1 gap-[0.8rem]">
-                    <div className="relative">
+                  <div className="flex flex-1 gap-[1rem]">
+                    <div className="relative flex-1">
                       <SelectButton
-                        className="w-[20rem]"
+                        className="w-full"
                         value={selectedStudentClub}
-                        placeholder={
-                          selectedCollege ? '소속을 선택해주세요' : '대학을 먼저 선택해주세요'
-                        }
+                        placeholder={'소속을 선택해주세요'}
                         isOpen={openDropdown === 'studentClub'}
                         onClick={() => {
                           if (!selectedCollege) return;
@@ -490,7 +505,7 @@ const Register = () => {
                       type="button"
                       variant="primary"
                       size="regular"
-                      className="w-[8.9rem]"
+                      className="w-[8.9rem] shrink-0"
                       disabled={!watch('studentClubId') || watch('studentClubId') < 1}
                       onClick={handleClubVerify}
                     >

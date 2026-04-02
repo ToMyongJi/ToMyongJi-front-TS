@@ -1,21 +1,30 @@
+import { isMaintenanceMode, maintenanceCopy } from '@constants/maintenance';
+import Footer from '@layouts/footer';
 import HeaderGnb from '@layouts/header-gnb';
 import Sidebar from '@layouts/sidebar';
-import Footer from '@layouts/footer';
-
-import HeaderLnb from './header-lnb';
+import Maintenance from '@pages/common/maintenance';
+import { AuthTokenWatcher } from '@routes/auth-token-watcher';
+import { useLayoutStore } from '@store/layout-store';
 import { Outlet } from 'react-router-dom';
-import { useLayoutStore } from '@store/layoutStore';
+import HeaderLnb from './header-lnb';
 
 const RootLayout = () => {
-  const { isSidebarOpen, toggleSidebar, closeSidebar } = useLayoutStore();
+  const { isSidebarOpen, closeSidebar, openSidebar } = useLayoutStore();
+  const navigationDisabled = isMaintenanceMode;
+
   return (
     <div className="flex h-full min-h-screen flex-col">
-      <HeaderGnb />
-      <HeaderLnb onClickSearch={toggleSidebar} setSidebarOpen={toggleSidebar} />
+      {!isMaintenanceMode && <AuthTokenWatcher />}
+      <HeaderGnb navigationDisabled={navigationDisabled} />
+      <HeaderLnb
+        openSidebar={openSidebar}
+        closeSidebar={closeSidebar}
+        navigationDisabled={navigationDisabled}
+      />
       <div className="relative flex flex-1">
         {isSidebarOpen && (
           <div className="absolute z-50 h-full md:static">
-            <Sidebar />
+            <Sidebar navigationDisabled={navigationDisabled} />
           </div>
         )}
         <main className="relative min-h-0 flex-1 overflow-auto">
@@ -27,7 +36,7 @@ const RootLayout = () => {
               aria-label="사이드바 닫기"
             />
           )}
-          <Outlet />
+          {isMaintenanceMode ? <Maintenance maintenance={maintenanceCopy} /> : <Outlet />}
         </main>
       </div>
       <Footer />

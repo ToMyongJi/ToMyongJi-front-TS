@@ -19,11 +19,32 @@ export type collegeGetAllResponse = Rsp<
   }[]
 >;
 
+export type transferAndUserRequest = {
+  presidentInfo: {
+    clubId: number;
+    studentNum: string;
+    name: string;
+  };
+  remainingMemberIds: string[];
+};
+
+export type transferAndUserResponse = Rsp<{
+  studentClubName: string;
+  totalDeposit: number;
+  netAmount: number;
+}>;
 export type getClubResponse = Rsp<
   {
     studentClubId: number;
     studentClubName: string;
     verification: boolean;
+  }[]
+>;
+
+export type getClubMemberResponse = Rsp<
+  {
+    studentNum: string;
+    name: string;
   }[]
 >;
 
@@ -33,4 +54,7 @@ export const collegeApi = {
   getCollegeByClub: (collegeId: number) =>
     http.get<getClubResponse>(ENDPOINTS.club.college(collegeId)),
   transferCollege: () => http.post<collegeGetAllResponse>(ENDPOINTS.club.transfer),
+  transferAndUser: (body: transferAndUserRequest) =>
+    http.post<transferAndUserResponse>(ENDPOINTS.club.transferAndUser, body),
+  getClubMember: () => http.get<getClubMemberResponse>(ENDPOINTS.club.getClubMember),
 };

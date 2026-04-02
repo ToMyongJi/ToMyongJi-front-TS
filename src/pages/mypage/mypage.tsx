@@ -4,8 +4,9 @@ import { myMutations } from '@apis/my/my-mutations';
 import { myQuery } from '@apis/my/my-queries';
 import Button from '@components/common/button';
 import TextField from '@components/common/textfield';
-import MemberList from '@components/mypage/member-list';
+import MemberList, { type MemberItem } from '@components/mypage/member-list';
 import Role from '@constants/role';
+import { useModal } from '@hooks/use-modal';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -23,9 +24,16 @@ const Mypage = () => {
   const { user, clearUser } = useUserStore();
   const { clearAuthData } = useAuthStore();
   const navigate = useNavigate();
+  const { alert, confirm } = useModal();
 
   const [newStudentNum, setNewStudentNum] = useState('');
   const [newName, setNewName] = useState('');
+
+  // 소속 이름 조회
+  const { data: collegeData } = useQuery({
+    ...collegeQuery.getAllClub(),
+    enabled: !!user?.studentClubId,
+  });
 
   // 내 정보 조회
   const { data: myInfo } = useQuery({
@@ -33,42 +41,54 @@ const Mypage = () => {
     enabled: !!user?.id,
   });
 
-  // 부원 조회
-  const { data: memberData } = useQuery({
-    ...myQuery.viewMember(user?.id ?? 0),
-    enabled: user?.role === Role.PRESIDENT && !!user?.studentClubId,
-  });
-
-  // 전체 학생회 조회 -> 내 정보 조회로 얻은 studentClubId로 학생회 이름 조회하기 위함.
-  const college = useQuery({
-    ...collegeQuery.getAllClub(),
-  });
-
-  const studentClubName =
-    college.data?.data?.find((club) => club.studentClubId === user?.studentClubId)
+  // 학생회 이름 매핑
+  const collegeName =
+    collegeData?.data?.find((college) => college.studentClubId === user?.studentClubId)
       ?.studentClubName ?? '';
+
+  // 소속 부원 조회
+  const { data: memberData } = useQuery({
+    ...collegeQuery.getClubMember(),
+    enabled: !!user?.studentClubId,
+  });
 
   const addMemberMutation = useMutation({
     ...myMutations.addMember(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['my', 'viewMember'] });
+      queryClient.invalidateQueries({ queryKey: ['college', 'getClubMember'] });
       setNewStudentNum('');
       setNewName('');
-      alert('부원 추가에 성공했습니다.');
+      alert({
+        title: '부원 추가 성공',
+        description: '부원 추가에 성공했습니다.',
+        confirmText: '확인',
+      });
     },
     onError: () => {
-      alert('부원 추가에 실패했습니다.');
+      alert({
+        title: '부원 추가 실패',
+        description: '부원 추가에 실패했습니다.',
+        confirmText: '확인',
+      });
     },
   });
 
   const deleteMemberMutation = useMutation({
     ...myMutations.deleteMember(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['my', 'viewMember'] });
-      alert('부원 삭제에 성공했습니다.');
+      queryClient.invalidateQueries({ queryKey: ['college', 'getClubMember'] });
+      alert({
+        title: '부원 삭제 성공',
+        description: '부원 삭제에 성공했습니다.',
+        confirmText: '확인',
+      });
     },
     onError: () => {
-      alert('부원 삭제에 실패했습니다.');
+      alert({
+        title: '부원 삭제 실패',
+        description: '부원 삭제에 실패했습니다.',
+        confirmText: '확인',
+      });
     },
   });
 
@@ -80,7 +100,11 @@ const Mypage = () => {
       navigate('/login');
     },
     onError: () => {
-      alert('회원탈퇴에 실패했습니다.');
+      alert({
+        title: '회원탈퇴 실패',
+        description: '회원탈퇴에 실패했습니다.',
+        confirmText: '확인',
+      });
     },
   });
 
@@ -93,24 +117,49 @@ const Mypage = () => {
         name: newName,
       });
     } catch {
-      alert('부원 추가에 실패했습니다.');
+      alert({
+        title: '부원 추가 실패',
+        description: '부원 추가에 실패했습니다.',
+        confirmText: '확인',
+      });
     }
   };
 
+  const handleDeleteMember = (member: MemberItem) => {
+    confirm({
+      title: '부원 삭제',
+      description: `${member.name} 부원을 정말 삭제하시겠어요?`,
+      confirmText: '삭제',
+      cancelText: '취소',
+      onConfirm: () => deleteMemberMutation.mutate(Number(member.studentNum)),
+    });
+  };
+
   const handleDeleteAccount = async () => {
-    if (!confirm('정말 탈퇴하시겠습니까?')) return;
+    const ok = await confirm({
+      title: '회원탈퇴',
+      description: '정말 탈퇴하시겠습니까?',
+      confirmText: '탈퇴',
+      cancelText: '취소',
+    });
+    if (!ok) return;
     deleteMutation.mutate();
   };
 
   const info = myInfo?.data;
-  const members = Array.isArray(memberData?.data) ? memberData.data : [];
+
+  const members = memberData?.data?.map((member, index) => ({
+    memberId: index + 1,
+    studentNum: member.studentNum,
+    name: member.name,
+  }));
   const isPresident = user?.role === Role.PRESIDENT;
 
   return (
-    <div className="mt-[4.2rem] mb-[10rem] flex flex-col items-center justify-center">
+    <div className="mt-[4.2rem] mb-[10rem] flex flex-col items-center justify-center px-[1.5rem]">
       <div className="flex w-full max-w-[42rem] flex-col gap-[3.2rem]">
         {/* 내 정보 */}
-        <div className="flex flex-col gap-[1.6rem]">
+        <div className="flex flex-col gap-[1.8rem]">
           <p className="W_Title text-black">내 정보</p>
           <div className="flex flex-col gap-[1.6rem] rounded-[1rem] border border-gray-20 px-[2.6rem] py-[3rem]">
             {[
@@ -118,7 +167,7 @@ const Mypage = () => {
               { label: '학번', value: info?.studentNum },
               {
                 label: '소속 이름',
-                value: studentClubName,
+                value: collegeName,
               },
               { label: '자격', value: user?.role ? roleLabel[user.role] : '' },
             ].map(({ label, value }) => (
@@ -137,7 +186,7 @@ const Mypage = () => {
             <div className="flex flex-col gap-[2rem] rounded-[1rem] border border-gray-20 px-[2.6rem] py-[3rem]">
               {/* 소속 이름 */}
               <div className="flex items-center gap-[1.6rem]">
-                <p className="W_B17 text-black">{studentClubName}</p>
+                <p className="W_B17 text-black">{collegeName}</p>
               </div>
 
               {/* 부원 추가 */}
@@ -165,31 +214,9 @@ const Mypage = () => {
                   추가
                 </Button>
               </div>
-
-              {/* 부원 목록 */}
-              {/* {members.length === 0 ? (
-                <p className="W_R14 text-center text-gray-70">소속 부원이 없습니다.</p>
-              ) : (
-                <ul className="flex flex-col gap-[0.8rem]">
-                  {members.map((member) => (
-                    <li key={member.memberId} className="flex items-center justify-between">
-                      <span className="W_R14 text-gray-90">
-                        {member.studentNum} · {member.name}
-                      </span>
-                      <button
-                        type="button"
-                        className="W_R13 text-error hover:underline"
-                        onClick={() => deleteMemberMutation.mutate(Number(member.studentNum))}
-                      >
-                        삭제
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )} */}
               <MemberList
-                members={members}
-                onDelete={(member) => deleteMemberMutation.mutate(Number(member.studentNum))}
+                members={members ?? []}
+                onDelete={handleDeleteMember}
                 buttonType="delete"
               />
             </div>
@@ -199,7 +226,12 @@ const Mypage = () => {
         {/* 하단 버튼 */}
         <div className="flex items-center justify-between">
           {isPresident ? (
-            <Button variant="primary_outline" size="md" type="button">
+            <Button
+              variant="primary_outline"
+              size="md"
+              type="button"
+              onClick={() => navigate('/club-transfer')}
+            >
               학생회 이전
             </Button>
           ) : (

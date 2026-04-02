@@ -16,6 +16,8 @@ export const QK = {
   receipt: {
     list: (clubId?: number, size?: number, y?: number, m?: number, page?: number) =>
       ['receiptList', clubId, size, y, m, page] as const,
+    club: (id?: number) => ['receipt', id] as const,
+    search: (keyword: string) => ['receiptSearch', keyword] as const,
   },
 
   collegeAndClubs: {
@@ -25,5 +27,10 @@ export const QK = {
   college: {
     getAllClub: () => ['college', 'getAllClub'] as const,
     getCollegeByClub: (collegeId: number) => ['college', 'getCollegeByClub', collegeId] as const,
+    getClubMember: () => ['college', 'getClubMember'] as const,
+  },
+  admin: {
+    president: (clubId: number) => ['admin', 'president', clubId] as const,
+    member: (clubId: number) => ['admin', 'member', clubId] as const,
   },
 };
