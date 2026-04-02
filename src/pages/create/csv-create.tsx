@@ -29,14 +29,16 @@ const CsvCreate = () => {
 
   const handleUpload = () => {
     if (!user || user.userId == null) {
-      alert('로그인 정보를 확인할 수 없습니다.');
       return;
     }
 
     if(file){
       uploadCsv.mutate({userIndexId: user.id, file}, {
         onSuccess: () => {
-          alert("성공적으로 업로드가 되었습니다.");
+          void alert({
+            title: '성공',
+            description: '성공적으로 업로드 완료했습니다.',
+          });
           navigate('/receipt-create')
         },
         onError: (e: any) => {

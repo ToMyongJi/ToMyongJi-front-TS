@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import {useModalStore} from '@store/modal-store';
 import { QK } from '@apis/base/key';
 import { receiptMutations } from '@apis/receipt/receipt-mutations';
 import { receiptQueries } from '@apis/receipt/receipt-queries';
@@ -89,7 +88,6 @@ const ReceiptCreate = () => {
   const receiptData = data?.data;
   const selectedYear = year === '전체(년)' ? undefined : Number(year.replace('년', ''));
   const selectedMonth = month === '전체(월)' ? undefined : Number(month.replace('월', ''));
-  const open = useModalStore((s) => s.open);
 
   const receiptList = useInfiniteQuery({
     ...receiptQueries.listInfinite(
@@ -128,6 +126,10 @@ const ReceiptCreate = () => {
     ...receiptMutations.create(),
     onSuccess: () => {
       invalidateReceiptCaches();
+      void alert({
+        title: '성공',
+        description: '성공적으로 추가 완료했습니다.',
+      });
       setReceiptForm((prev) => ({
         ...prev,
         content: '',
@@ -136,7 +138,10 @@ const ReceiptCreate = () => {
       }));
     },
     onError: () => {
-      // alert('내역 저장에 실패했습니다.');
+      void alert({
+        title: '영수증 추가',
+        description: '내역 저장에 실패했습니다.',
+      });
     },
   });
 
@@ -150,7 +155,10 @@ const ReceiptCreate = () => {
       invalidateReceiptCaches();
     },
     onError: () => {
-      // alert('내역 수정에 실패했습니다.');
+      void alert({
+        title: '영수증 수정',
+        description: '내역 수정에 실패했습니다.',
+      });
     },
   });
 
@@ -192,46 +200,67 @@ const ReceiptCreate = () => {
 
   const handleReceiptDelete = async () => {
     const result = await confirm({
-      title: '완료',
-      description: '저장되었습니다.',
-      onConfirm: () => {
-        return;
+      title: '내역 삭제',
+      description: '정말로 이 내역을 삭제하시겠습니까?',
+      onConfirm: async () => {
+        try {
+          if (selectedReceiptIds.length === 0) {
+            await alert({
+              title: '내역삭제',
+              description: '삭제할 내역을 입력해주세요',
+            })
+          }
+          else{
+            for (const receiptId of selectedReceiptIds) {
+              await deleteReceipt.mutateAsync(receiptId);
+            }
+
+            invalidateReceiptCaches();
+            setSelectedReceiptIds([]);
+          }
+        } catch (error) {
+          await alert({
+            title: '내역삭제',
+            description: error.message,
+          })
+        }
       }
     });
 
-    console.log(result);
-    if(!result) return;
-
-    if (selectedReceiptIds.length === 0) {
-      // alert('삭제할 내역을 선택해 주세요.');
-      return;
-    }
-
-    try {
-      for (const receiptId of selectedReceiptIds) {
-        await deleteReceipt.mutateAsync(receiptId);
-      }
-
-      invalidateReceiptCaches();
-      setSelectedReceiptIds([]);
-      // alert('성공적으로 삭제했습니다.');
-    } catch {
-      // alert('삭제에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+    if(result) {
+      await alert({
+        title: '내역 삭제,',
+        description: '내역이 삭제되었습니다.'
+      })
     }
   };
 
   const handleSaveClick = () => {
     if (user?.id == null || user.userId == null) {
-      // alert('로그인 정보를 확인할 수 없습니다.');
       return;
     }
+
     if (receiptForm.date == null) {
-      // alert('날짜를 선택해 주세요.');
+      void alert({
+        title: '영수증 추가',
+        description: '날짜를 선택해주세요',
+      });
+      return;
+    }
+
+    if(receiptForm.deposit === '' && receiptForm.withdrawal === ''){
+      void alert({
+        title: '영수증 추가',
+        description: '입출금 금액을 입력해주세요.',
+      });
       return;
     }
     const trimmedContent = receiptForm.content.trim();
     if (!trimmedContent) {
-      // alert('내용을 입력해 주세요.');
+      void alert({
+        title: '영수증 추가',
+        description: '내용을 입력해 주세요',
+      });
       return;
     }
 
@@ -245,24 +274,26 @@ const ReceiptCreate = () => {
   };
 
   const handleExportCsv = () => {
-    if (user?.userId == null) {
-      // alert('로그인 정보를 확인할 수 없습니다.');
-      return;
-    }
 
     if (selectedYear === undefined){
-      // alert('년도를 선택해주세요')
+      void alert({
+        title: '영수증 추출',
+        description: '년도를 선택해주세요',
+      });
       return;
     }
 
     if(selectedMonth === undefined){
-      // alert('월을 선택해주세요')
+      void alert({
+        title: '영수증 추출',
+        description: '월을 선택해주세요',
+      });
       return;
     }
 
     exportCsv.mutate(
       {
-        userId: user.userId,
+        userId: user?.userId,
         year: selectedYear,
         month: selectedMonth,
       },
