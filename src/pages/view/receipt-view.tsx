@@ -10,7 +10,6 @@ import MenuIcon from "@assets/icons/menu.svg?react";
 import TableHeader from '@components/table/table-header';
 import TableCell from '@components/table/table-cell';
 import Chip from '@components/common/chip';
-import SearchBar from '@components/common/search-bar';
 import PaginationCustom from '@components/pagination-custom';
 import Dropdown from '@components/dropdown';
 import TossBankImage from '@assets/icons/toss-bank.png';
@@ -30,7 +29,6 @@ const ReceiptView = () => {
   const [month, setMonth] = useState("전체(월)");
   const [monthFilter, setMonthFilter] = useState(false);
   const [page, setPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState('');
 
   const {toggleSidebar} = useLayoutStore();
   const clubData = useSidebarStore((state) => state.selectedClub);
@@ -54,14 +52,6 @@ const ReceiptView = () => {
       return acc.concat(payload.receiptDtoList ?? []);
     }, []) ?? [];
 
-  const trimmedSearchTerm = searchTerm.trim().toLowerCase();
-  const filteredReceipts =
-    trimmedSearchTerm.length < 2
-      ? receipts
-      : receipts.filter((item: Receipt) => {
-          const target = `${item.date} ${item.content} ${item.deposit} ${item.withdrawal}`.toLowerCase();
-          return target.includes(trimmedSearchTerm);
-        });
   const yearOptions =['전체(년)', ...Array.from({ length: 5 }, (_, i) => `${dayjs().year() - 2 + i}년`,)];
   const monthOptions = ['전체(월)', ...Array.from({ length: 12 }, (_, i) => `${i + 1}월`)];
 
@@ -96,56 +86,46 @@ const ReceiptView = () => {
 
       </section>
       <div className="flex-col gap-[1rem]">
-        <section className="flex-row-between">
-          <div className="flex gap-[0.8rem]">
-            <div className="relative">
-              <Chip label={year} isActive={yearFilter} onClick={() => handleChipClick('YEAR')} />
-              {yearFilter &&
-                <Dropdown
-                  className="absolute top-0"
-                  onClick={() => setYearFilter(false)}
-                  datas={yearOptions}
-                  previewData={year}
-                  setPreViewData={setYear} />}
-            </div>
-            <div className="relative">
-            <Chip label={month} isActive={monthFilter} onClick={() => handleChipClick('MONTH')} />
-              {monthFilter &&
-                <Dropdown
-                  className="absolute top-0"
-                  onClick={() => setMonthFilter(false)}
-                  datas={monthOptions}
-                  previewData={month}
-                  setPreViewData={setMonth}/>
-              }
-            </div>
+        <section className="flex gap-[0.8rem]">
+          <div className="relative">
+            <Chip label={year} isActive={yearFilter} onClick={() => handleChipClick('YEAR')} />
+            {yearFilter &&
+              <Dropdown
+                className="absolute top-0"
+                onClick={() => setYearFilter(false)}
+                datas={yearOptions}
+                previewData={year}
+                setPreViewData={setYear} />}
           </div>
-          <SearchBar
-            placeholder="검색어 2글자 이상 입력"
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setPage(1);
-            }}
-          />
+          <div className="relative">
+            <Chip label={month} isActive={monthFilter} onClick={() => handleChipClick('MONTH')} />
+            {monthFilter &&
+              <Dropdown
+                className="absolute top-0"
+                onClick={() => setMonthFilter(false)}
+                datas={monthOptions}
+                previewData={month}
+                setPreViewData={setMonth}/>
+            }
+          </div>
         </section>
         <section className="rounded-[1rem] border border-gray-20 px-[2.6rem] xl:px-[10rem]">
           <div className="pt-[1.6rem]">
             <table className="w-full table-fixed">
               <TableHeader headerData={HeaderData} />
               <tbody>
-                {filteredReceipts.length === 0 ? (
+                {receipts.length === 0 ? (
                   <tr>
                     <td colSpan={4} className="W_M15 py-[4rem] text-center text-gray-70">
                       데이터가 존재하지 않습니다.
                     </td>
                   </tr>
                 ) : (
-                  filteredReceipts.map((item: Receipt, index: number) => (
+                  receipts.map((item: Receipt, index: number) => (
                     <TableCell
                       key={item.receiptId}
                       mode="VIEW"
-                      isLastRow={index === filteredReceipts.length - 1}
+                      isLastRow={index === receipts.length - 1}
                       {...item}
                     />
                   ))
