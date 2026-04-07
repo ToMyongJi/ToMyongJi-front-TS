@@ -21,7 +21,7 @@ const MainPage = () => {
           className={cn('flex gap-[4rem]', isBelowMd ? 'flex-col' : 'flex-row', bp)}
         >
           <div className={cn('mt-[8rem] flex-col gap-[3.5rem] md:mt-[9.9rem]')}>
-            <p className={cn('L_Title text-[4rem]', bp === 'md' && "text-[3.5rem]" , bp === 'lg' && "text-[4rem]", bp === 'xl' && 'text-[5rem]' )}>
+            <p className={cn('L_Title', bp === 'md' && "text-[3.5rem]" , bp === 'lg' && "text-[4rem]", bp === 'xl' && 'text-[5rem]' )}>
               우리 학과
               <br />
               학생회비는
