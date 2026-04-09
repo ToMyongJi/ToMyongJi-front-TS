@@ -16,7 +16,7 @@ const Dropdown = ({
   ...props
 }: DropdownProps) => {
   return (
-    <div className={cn('flex-col rounded-[4px] border border-gray-70 bg-white', className)}>
+    <div className={cn('flex-col overflow-hidden rounded-[4px] border border-gray-70 bg-white', className)}>
       {datas?.map((data) => (
         <button
           type="button"
