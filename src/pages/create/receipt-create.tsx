@@ -7,8 +7,6 @@ import { receiptQueries } from '@apis/receipt/receipt-queries';
 import { Receipt } from '@apis/receipt/receipt';
 
 import dayjs from 'dayjs';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 
 import useUserStore from '@store/user-store';
 import useStudentClubStore from '@store/student-club-store';
@@ -23,6 +21,9 @@ import Dropdown from '@components/dropdown';
 import TableHeader from '@components/table/table-header';
 import TableCell from '@components/table/table-cell';
 import PaginationCustom from '@components/pagination-custom';
+import ReceiptCreateSheet from '@components/bottom-sheet/receipt-create-sheet';
+import ReceiptWriteSheet from '@components/bottom-sheet/receipt-write-sheet';
+import ReceiptDatePicker from '@components/date-picker/receipt-date-picker';
 import { useModal } from '@hooks/use-modal';
 
 const parseWonInput = (raw: string) => {
@@ -82,6 +83,8 @@ const ReceiptCreate = () => {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [page, setPage] = useState(1);
   const [selectedReceiptIds, setSelectedReceiptIds] = useState<number[]>([]);
+  const [sheetOpen, setSheetOpen] = useState(true);
+  const [editSheetOpen, setEditSheetOpen] = useState(false);
 
   const yearOptions = ['전체(년)', ...Array.from({ length: 5 }, (_, i) => `${dayjs().year() - 2 + i}년`)];
   const monthOptions = ['전체(월)', ...Array.from({ length: 12 }, (_, i) => `${i + 1}월`)];
@@ -339,16 +342,14 @@ const ReceiptCreate = () => {
           </div>
           <div className="flex-row-center gap-[0.8rem] rounded-[10px] border border-gray-20 p-[2rem]">
             <div className="flex h-[4rem] w-[11.2rem] shrink-0 items-center rounded-[0.8rem] border-[1px] border-gray-20 bg-white px-[1.4rem] py-[0.8rem] transition-colors focus-within:border-primary">
-              <DatePicker
+              <ReceiptDatePicker
                 selected={receiptForm.date}
-                onChange={(date: Date | null) => {
+                onChange={(date) => {
                   setReceiptForm((prev) => ({ ...prev, date }));
                 }}
                 dateFormat="yyyy.MM.dd"
-                popperPlacement="bottom"
-                popperClassName="receipt-datepicker-popper"
-                calendarClassName="receipt-datepicker-calendar"
-                className="W_R15 w-full bg-transparent outline-none placeholder:text-gray-70"
+                placement="bottom"
+                className="W_R15 w-full bg-transparent outline-none"
               />
             </div>
             <TextField
@@ -477,7 +478,11 @@ const ReceiptCreate = () => {
           </div>
         </section>
       </div>
-
+      <ReceiptCreateSheet isOpen={sheetOpen} onClose={() => setSheetOpen(false)} onClickEdit={() => {
+        setSheetOpen(false)
+        setEditSheetOpen(true);
+      }}/>
+      <ReceiptWriteSheet isOpen={editSheetOpen} onClose={() => setEditSheetOpen(false)} buttonLabel={"내역 추가"}/>
     </div>
   );
 };

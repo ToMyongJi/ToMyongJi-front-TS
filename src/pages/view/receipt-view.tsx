@@ -36,7 +36,7 @@ const ReceiptView = () => {
   const {toggleSidebar} = useLayoutStore();
   const { ref, width } = useElementSize<HTMLDivElement>();
   const bp = minTailwindBreakpointForWidth(width);
-  const isBelowMd = bp === 'none' || bp === 'sm' || bp === "mr";
+  const isBelowMd = bp === 'none'  || bp === "mr" || bp === 'sm';
   const clubData = useSidebarStore((state) => state.selectedClub);
 
   const selectedYear = year === '전체(년)' ? undefined : Number(year.replace('년', ''));

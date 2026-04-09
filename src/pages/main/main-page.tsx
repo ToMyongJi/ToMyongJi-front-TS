@@ -8,7 +8,7 @@ const MainPage = () => {
   const gradient = 'bg-gradient-to-b from-white to-[#DFE8FF]';
   const { ref, width } = useElementSize<HTMLDivElement>();
   const bp = minTailwindBreakpointForWidth(width);
-  const isBelowMd = bp === 'none' || bp === 'sm';
+  const isBelowMd = bp === 'none'  || bp === "mr" || bp === 'sm';
   const isBelowXl = bp !== 'xl' && bp !== '2xl';
 
   return (
@@ -21,7 +21,7 @@ const MainPage = () => {
           className={cn('flex gap-[8rem]', isBelowMd ? 'flex-col' : 'flex-row', bp)}
         >
           <div className={cn('mt-[8rem] flex-col gap-[3.5rem] md:mt-[9.9rem]')}>
-            <p className={cn('L_Title text-[3rem]', bp === 'md' && "text-[3.5rem]" , bp === 'lg' && "text-[4rem]", bp === 'xl' && 'text-[5rem]' )}>
+            <p className={cn('L_Title text-[3.2rem]', bp === 'md' && "text-[3.5rem]" , bp === 'lg' && "text-[4rem]", bp === 'xl' && 'text-[5rem]' )}>
               우리 학과
               <br />
               학생회비는

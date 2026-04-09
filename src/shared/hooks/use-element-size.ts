@@ -5,11 +5,6 @@ export type ElementSize = {
   height: number;
 };
 
-/**
- * Tailwind 기본 스크린(`sm` … `2xl`)과 같은 **픽셀** 기준.
- * 문서의 `40rem`(640px) 등은 루트 `font-size`(예: 62.5%)와 무관하게, 미디어 쿼리에서 흔히 쓰는 해석에 맞춘 값이다.
- * @see https://tailwindcss.com/docs/responsive-design
- */
 const TAILWIND_DEFAULT_MIN_WIDTH_PX = {
   mr: 480,
   sm: 640,
