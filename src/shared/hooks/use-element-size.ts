@@ -11,6 +11,7 @@ export type ElementSize = {
  * @see https://tailwindcss.com/docs/responsive-design
  */
 const TAILWIND_DEFAULT_MIN_WIDTH_PX = {
+  mr: 480,
   sm: 640,
   md: 768,
   lg: 1024,
@@ -19,6 +20,7 @@ const TAILWIND_DEFAULT_MIN_WIDTH_PX = {
 } as const;
 
 export function getTailwindMinBreakpointsPx(): {
+  mr: number;
   sm: number;
   md: number;
   lg: number;
@@ -28,7 +30,7 @@ export function getTailwindMinBreakpointsPx(): {
   return { ...TAILWIND_DEFAULT_MIN_WIDTH_PX };
 }
 
-export type TailwindMinBreakpointKey = 'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+export type TailwindMinBreakpointKey = 'none' | 'mr' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 
 /** 주어진 너비가 Tailwind `min-*` 기준으로 어느 구간인지 (mobile-first). */
 export function minTailwindBreakpointForWidth(width: number): TailwindMinBreakpointKey {
@@ -47,6 +49,9 @@ export function minTailwindBreakpointForWidth(width: number): TailwindMinBreakpo
   }
   if (width >= b.sm) {
     return 'sm';
+  }
+  if (width >= b.mr) {
+    return 'mr';
   }
   return 'none';
 }
