@@ -74,7 +74,7 @@ const MainPage = () => {
             <div className="flex-col gap-[1.2rem]">
               <DescriptionItem description={'모든 학생회의 장부를 한곳에서 확인할 수 있어요'} />
               <DescriptionItem
-                description={'각 인스타그램 피드에 흩어진 웗별 장부를 모아서 볼 수 있어요'}
+                description={'각 인스타그램 피드에 흩어진 월별 장부를 모아서 볼 수 있어요'}
               />
               <DescriptionItem description={'웹, 앱 어디서든 간편하게 장부를 조회할 수 있어요'} />
             </div>
