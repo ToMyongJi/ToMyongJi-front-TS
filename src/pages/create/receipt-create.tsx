@@ -419,7 +419,7 @@ const ReceiptCreate = () => {
             size="regular"
             className="py-[2rem]"
             onClick={handleReceiptDelete}
-            disabled={deleteReceipt.isPending}
+            disabled={deleteReceipt.isPending || selectedReceiptIds.length === 0}
             fullWidth
           >
             선택 목록  삭제
@@ -525,7 +525,7 @@ const ReceiptCreate = () => {
                   variant="danger"
                   size="regular"
                   onClick={handleReceiptDelete}
-                  disabled={deleteReceipt.isPending}
+                  disabled={deleteReceipt.isPending || selectedReceiptIds.length === 0}
                 >
                   삭제
                 </Button>}
