@@ -5,18 +5,20 @@ interface DropdownProps extends HTMLAttributes<HTMLButtonElement> {
   datas: string[];
   previewData: string;
   setPreViewData: (value: string) => void;
+  buttonClass?: string;
 }
 
 const Dropdown = ({
   datas,
   previewData,
   setPreViewData,
+  buttonClass,
   className,
   onClick,
   ...props
 }: DropdownProps) => {
   return (
-    <div className={cn('flex-col rounded-[4px] border border-gray-70 bg-white', className)}>
+    <div className={cn('flex-col overflow-hidden rounded-[4px] border border-gray-70 bg-white', className)}>
       {datas?.map((data) => (
         <button
           type="button"
@@ -25,7 +27,7 @@ const Dropdown = ({
             setPreViewData(data);
             onClick?.(event);
           }}
-          className={cn('W_M14 w-[9.6rem] p-[1rem] text-start hover:bg-background', previewData === data && 'bg-background')}
+          className={cn('W_M14 w-[9.6rem] p-[1rem] text-start hover:bg-background', previewData === data && 'bg-background', buttonClass)}
           {...props}
         >{data}</button>
       ))}

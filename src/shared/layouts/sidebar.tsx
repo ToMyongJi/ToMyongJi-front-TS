@@ -6,7 +6,7 @@ import { cn } from '@libs/cn';
 import { useLayoutStore } from '@store/layout-store';
 import { useSidebarStore } from '@store/sidebar-store';
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 type SidebarProps = {
@@ -22,7 +22,7 @@ const Sidebar = ({ navigationDisabled = false }: SidebarProps) => {
   const [isActiveCollege, setIsActiveCollege] = useState<string>('');
   const [isActiveClubs, setIsActiveClubs] = useState<string>('');
 
-  const { setSelectedClub, selectedClub } = useSidebarStore();
+  const { setSelectedClub } = useSidebarStore();
 
   const { data: collegeAndClubs } = useQuery(collegeQuery.collegeAndClubs());
 
@@ -32,12 +32,27 @@ const Sidebar = ({ navigationDisabled = false }: SidebarProps) => {
 
   const activeClubIdFromPath =
     pathname.match(/^\/receipt-view\/(\d+)/)?.[1] ??
-    pathname.match(/^\/management\/(\d+)/)?.[1] ??
-    (pathname.startsWith('/receipt-create') && selectedClub?.studentClubId != null
-      ? String(selectedClub.studentClubId)
-      : undefined);
+    pathname.match(/^\/management\/(\d+)/)?.[1];
+
+  useEffect(() => {
+    const isClubMenuPage =
+      pathname.startsWith('/receipt-view/') || pathname.startsWith('/management/');
+
+    if (!isClubMenuPage) {
+      setIsActiveClubs('');
+    }
+  }, [pathname]);
 
   const handleMenuClick = (club: college) => {
+    const isSameActiveMenu = activeClubIdFromPath === String(club.studentClubId);
+
+    // 이미 활성화된 메뉴를 다시 누르면 메인으로 이동하면서 사이드바를 닫습니다.
+    if (isSameActiveMenu) {
+      navigate('/');
+      closeSidebar();
+      return;
+    }
+
     setIsActiveClubs(club?.studentClubName);
 
     setSelectedClub({

@@ -19,7 +19,7 @@ export function Chip({ className, label, isActive = false, ref, ...props }: Chip
       )}
       {...props}
     >
-      <span className="W_M14 text-gray-90">{label}</span>
+      <span className="text-gray-90">{label}</span>
       <span
         className={cn('flex items-center justify-center', isActive ? 'rotate-0' : 'rotate-180')}
       >
