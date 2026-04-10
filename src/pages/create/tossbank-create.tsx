@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { receiptMutations } from '@apis/receipt/receipt-mutations';
 import { useModal } from '@hooks/use-modal';
+import {cn} from '@libs/cn';
 
 import BasicCard from '@components/common/basic-card';
 import Button from '@components/common/button';
@@ -13,14 +14,18 @@ import FileIcon from "@assets/icons/file.svg?react";
 import CancelIcon from "@assets/icons/cancel.svg?react";
 
 import useUserStore from '@store/user-store';
+import { minTailwindBreakpointForWidth, useElementSize } from '@hooks/use-element-size';
 
 const TossbankCreate = () => {
   const { user } = useUserStore();
   const {alert} = useModal();
+  const { ref, width } = useElementSize<HTMLDivElement>();
+
 
   const [file, setFile] = useState<File | null>(null);
   const [keyword, setKeyword] = useState<string>(" ");
-
+  const bp = minTailwindBreakpointForWidth(width);
+  const isBelowMr = bp === 'none' || bp === 'mr';
   const uploadTossBank = useMutation(receiptMutations.uploadToss());
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -67,16 +72,16 @@ const TossbankCreate = () => {
   }
 
   return (
-    <div className="flex w-full flex-col px-[3rem] pt-[4.2rem] pb-[10rem]">
+    <div ref={ref} className="flex w-full flex-col px-[3rem] pt-[4.2rem] pb-[10rem]">
       <div className="mx-auto w-full max-w-[100rem] flex-col gap-[1.8rem]">
         <p className="W_Title text-black">토스뱅크 거래내역서 인증</p>
           <BasicCard className="flex-col gap-[3rem] px-[2.6rem] py-[2rem]">
             <section className="flex-col gap-[0.8rem]">
               <div className="flex items-center gap-[1rem]">
-                <p className="W_B17 text-black">거래내역서 인증 마크 안내</p>
+                <p className={cn('W_B17 text-black', isBelowMr && "W_B15")}>거래내역서 인증 마크 안내</p>
                 <div
-                  className="flex w-fit items-center gap-[0.6rem] rounded-[3rem] bg-background px-[1.4rem] py-[0.4rem]">
-                  <img src={TossBankImage} className="w-[8.5rem]" alt="토스뱅크 인증 마크" />
+                  className={cn('flex-row-center gap-[0.6rem] rounded-[3rem] bg-background px-[1.4rem] py-[0.4rem]', bp === "none" && 'gap-[0.2rem] px-[1rem]')}>
+                  <img src={TossBankImage} className={cn('w-[8.5rem]', bp === "none" && 'w-[4rem] pt-[0.2rem]')} alt="토스뱅크 인증 마크" />
                   <p className="W_R12 text-gray-90">인증</p>
                 </div>
               </div>
@@ -87,7 +92,7 @@ const TossbankCreate = () => {
 
             </section>
             <section className="flex-col gap-[0.8rem]">
-              <p className="W_B17 text-black">
+              <p className={cn('W_B17 text-black', isBelowMr && "W_B15")}>
                 토스뱅크에서 거래내역서를 발급받는 방법
               </p>
               <ol className="W_R15 flex-col gap-[0.3rem] text-gray-90">
@@ -120,12 +125,12 @@ const TossbankCreate = () => {
             <BasicCard className="flex items-center justify-between px-[2.6rem] py-[2rem]">
               <div className="flex items-center gap-[0.5rem]">
                 <FileIcon className="text-gray-70" />
-                <p className="W_M15">{file.name}</p>
+                <p className={cn('W_M15', bp === "none" && 'W_SB13')}>{file.name}</p>
               </div>
               <CancelIcon className="cursor-pointer text-error" onClick={() => setFile(null)}/>
             </BasicCard>
             <div className="flex items-center gap-[1rem]">
-              <p className="W_B15 text-gray-90">키워드 입력</p>
+              <p className="W_B15 whitespace-nowrap text-gray-90">키워드 입력</p>
               <TextField className="w-[28.6rem]" value={keyword} onChange={(e) => setKeyword(e.target.value)}/>
             </div>
           </div>
