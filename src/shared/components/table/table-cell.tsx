@@ -209,7 +209,7 @@ const TableCell = ({
           date
         )}
       </td>
-      <td className={cn(TD_BASE, 'text-start whitespace-normal break-all')}>
+      <td className={cn(TD_BASE, 'whitespace-normal break-all text-start')}>
         <EditableText
           active={showInputs}
           value={editedFields.content}

@@ -86,6 +86,7 @@ const ReceiptCreate = () => {
   const { ref, width } = useElementSize<HTMLDivElement>();
   const bp = minTailwindBreakpointForWidth(width);
   const isBelowMd = bp === 'none'  || bp === "mr" || bp === 'sm';
+  const isBelowMr = bp === 'none'  || bp === "mr";
 
   const [receiptForm, setReceiptForm] = useState<ReceiptWriteForm>({
     date: new Date() as Date | null,
@@ -411,8 +412,18 @@ const ReceiptCreate = () => {
             <p className="W_Header"><span className="W_R14 text-gray-80">잔액</span> {(receiptData?.balance ?? 0).toLocaleString()}원</p>
           </div>
         </section>
-        {isBelowMd && <section>
+        {isBelowMd && <section className="flex-col gap-[1rem]">
           <Button variant="primary" onClick={() => setSheetOpen(true)} fullWidth>내역 추가</Button>
+          <Button
+            variant="danger"
+            size="regular"
+            className="py-[2rem]"
+            onClick={handleReceiptDelete}
+            disabled={deleteReceipt.isPending}
+            fullWidth
+          >
+            선택 목록  삭제
+          </Button>
         </section>}
         {!isBelowMd && <section className="flex-col gap-[1rem]">
           <div className="flex items-center justify-between">
@@ -475,10 +486,11 @@ const ReceiptCreate = () => {
           <div className="flex-row-between flex-wrap gap-[1rem]">
             <div className="flex gap-[0.8rem]">
               <div className="relative">
-                <Chip className={cn(isBelowMd && "W_R12")} label={year} isActive={isYearFilterOpen} onClick={() => handleChipClick('YEAR')} />
+                <Chip className={cn(isBelowMd && "W_R12 gap-[0.1rem]")} label={year} isActive={isYearFilterOpen} onClick={() => handleChipClick('YEAR')} />
                 {isYearFilterOpen &&
                   <Dropdown
                     className="absolute top-0"
+                    buttonClass={cn(isBelowMd && 'w-[8.5rem]')}
                     onClick={() => setIsYearFilterOpen(false)}
                     datas={yearOptions}
                     previewData={year}
@@ -487,10 +499,11 @@ const ReceiptCreate = () => {
                 }
               </div>
               <div className="relative">
-                <Chip className={cn(isBelowMd && "W_R12")} label={month} isActive={isMonthFilterOpen} onClick={() => handleChipClick('MONTH')} />
+                <Chip className={cn(isBelowMd && "W_R12 gap-[0.1rem]")} label={month} isActive={isMonthFilterOpen} onClick={() => handleChipClick('MONTH')} />
                 {isMonthFilterOpen &&
                   <Dropdown
                     className="absolute top-0"
+                    buttonClass={cn(isBelowMd && 'w-[8.5rem]')}
                     onClick={() => setIsMonthFilterOpen(false)}
                     datas={monthOptions}
                     previewData={month}
@@ -502,19 +515,20 @@ const ReceiptCreate = () => {
                 <Button
                   variant="primary_outline"
                   size="regular"
+                  className={cn(isBelowMr && "text-xs")}
                   onClick={handleExportCsv}
                   disabled={exportCsv.isPending}
                 >
                   영수증 추출
                 </Button>
-                <Button
+                {!isBelowMd && <Button
                   variant="danger"
                   size="regular"
                   onClick={handleReceiptDelete}
                   disabled={deleteReceipt.isPending}
                 >
                   삭제
-                </Button>
+                </Button>}
               </div>
             </div>
             <SearchBar

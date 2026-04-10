@@ -45,7 +45,7 @@ const ReceiptWriteSheet = ({
   };
 
   return (
-    <BottomSheet isOpen={isOpen} onClose={handleSheetClose} className="px-[2rem]">
+    <BottomSheet isOpen={isOpen} onClose={handleSheetClose} className="px-[2rem]" resizable={true}>
       <div className="flex-col gap-[3rem] pb-[5.4rem]">
         <p className="W_B17 text-black">영수증 작성</p>
         <div className="flex-col gap-[3rem]">
