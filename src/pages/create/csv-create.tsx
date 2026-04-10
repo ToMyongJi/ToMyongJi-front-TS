@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { receiptMutations } from '@apis/receipt/receipt-mutations';
+import { useModal } from '@hooks/use-modal';
 
 import BasicCard from '@components/common/basic-card';
 import Button from '@components/common/button';
@@ -13,6 +14,7 @@ import useUserStore from '@store/user-store';
 
 const CsvCreate = () => {
   const { user } = useUserStore();
+  const { alert } = useModal();
 
   const [file, setFile] = useState<File | null>(null);
 
@@ -42,7 +44,10 @@ const CsvCreate = () => {
           navigate('/receipt-create')
         },
         onError: (e: any) => {
-          alert(e?.message);
+          void alert({
+            title: '업로드',
+            description: e?.message ?? '업로드에 실패했습니다.',
+          });
         }
       })
     }

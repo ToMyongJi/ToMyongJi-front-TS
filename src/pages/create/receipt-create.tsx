@@ -267,7 +267,7 @@ const ReceiptCreate = () => {
 
     if(result) {
       await alert({
-        title: '내역 삭제,',
+        title: '내역 삭제',
         description: '내역이 삭제되었습니다.'
       })
     }

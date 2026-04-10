@@ -252,7 +252,7 @@ const TableCell = ({
               disabled={isSavePending}
               onClick={() => void handleSave()}
             >
-              저장하기
+              저장
             </Button>
           )}
         </td>
