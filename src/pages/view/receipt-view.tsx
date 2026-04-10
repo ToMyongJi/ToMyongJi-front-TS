@@ -16,6 +16,7 @@ import Chip from '@components/common/chip';
 import PaginationCustom from '@components/pagination-custom';
 import Dropdown from '@components/dropdown';
 import TossBankImage from '@assets/icons/toss-bank.png';
+import { flattenReceiptDtoPages, groupReceiptsByDate } from '@utils/group-receipts-by-date';
 
 const HeaderData = [
   { labels: "날짜", width: "15.8%" },
@@ -52,27 +53,8 @@ const ReceiptView = () => {
     ),
   });
   const totalPages = receiptList.data?.pages[0]?.data.totalPages ?? 0;
-  const receipts =
-    receiptList.data?.pages.reduce((acc: Receipt[], page) => {
-      const payload = page.data as unknown as { receiptDtoList?: Receipt[] };
-      return acc.concat(payload.receiptDtoList ?? []);
-    }, []) ?? [];
-
-
-  const receiptsMobile = Array.from(
-    receipts.reduce<Map<string, Receipt[]>>((acc, cur) => {
-      const dateKey = dayjs(cur.date).format('YYYY-MM-DD');
-      const groupedReceipts = acc.get(dateKey);
-      if (groupedReceipts != null) {
-        groupedReceipts.push(cur);
-      } else {
-        acc.set(dateKey, [cur]);
-      }
-
-      return acc;
-    }, new Map()),
-    ([date, receiptList]) => ({ date, receiptList }),
-  );
+  const receipts: Receipt[] = flattenReceiptDtoPages<Receipt>(receiptList.data?.pages);
+  const receiptsMobile = groupReceiptsByDate(receipts);
   const yearOptions =['전체(년)', ...Array.from({ length: 5 }, (_, i) => `${dayjs().year() - 2 + i}년`,)];
   const monthOptions = ['전체(월)', ...Array.from({ length: 12 }, (_, i) => `${i + 1}월`)];
 
@@ -149,6 +131,7 @@ const ReceiptView = () => {
                       key={receipt.date}
                       receiptList={receipt.receiptList}
                       date={receipt.date}
+                      type='VIEW'
                     />
                   ))
                 )

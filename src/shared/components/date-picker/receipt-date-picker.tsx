@@ -19,6 +19,7 @@ export type ReceiptDatePickerPanelSide = 'above' | 'below';
 export type ReceiptDatePickerProps = {
   selected: Date | null;
   onChange: (date: Date | null) => void;
+  onOpenChange?: (open: boolean) => void;
   /** dayjs 토큰 (react-datepicker의 yyyy.MM.dd 는 YYYY.MM.DD 로 넣으면 됩니다) */
   dateFormat?: string;
   className?: string;
@@ -63,6 +64,7 @@ function popoverWidthPx(): number {
 const ReceiptDatePicker = ({
   selected,
   onChange,
+  onOpenChange,
   dateFormat = 'YYYY.MM.DD',
   className,
   wrapperClassName,
@@ -78,6 +80,10 @@ const ReceiptDatePicker = ({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
+  useEffect(() => {
+    onOpenChange?.(open);
+  }, [onOpenChange, open]);
+
   const [panelPos, setPanelPos] = useState({ top: 0, left: 0 });
   const [visibleMonth, setVisibleMonth] = useState(() =>
     selected ? dayjs(selected).startOf('month') : dayjs().startOf('month'),
