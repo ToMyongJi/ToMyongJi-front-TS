@@ -170,7 +170,7 @@ const TableCell = ({
     try {
       await onSave({
         receiptId,
-        date: editedDate.toISOString(),
+        date: dayjs(editedDate).format('YYYY-MM-DD'),
         content: editedFields.content.trim(),
         deposit: parsedDeposit,
         withdrawal: parsedWithdrawal,
@@ -209,7 +209,7 @@ const TableCell = ({
           date
         )}
       </td>
-      <td className={cn(TD_BASE, 'text-start')}>
+      <td className={cn(TD_BASE, 'text-start whitespace-normal break-all')}>
         <EditableText
           active={showInputs}
           value={editedFields.content}

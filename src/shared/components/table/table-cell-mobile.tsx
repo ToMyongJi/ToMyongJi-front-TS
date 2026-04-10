@@ -10,6 +10,7 @@ type TableCellMobileProps = {
   type: 'VIEW' | 'EDIT';
   selectedReceiptIds?: number[];
   onToggleChecked?: (receiptId: number, checked: boolean) => void;
+  onClickEdit?: (data: Receipt) => void;
 };
 
 const TableCellMobile = ({
@@ -18,6 +19,7 @@ const TableCellMobile = ({
   type,
   selectedReceiptIds = [],
   onToggleChecked,
+  onClickEdit
 }: TableCellMobileProps) => {
   return (
     <div>
@@ -30,14 +32,16 @@ const TableCellMobile = ({
               key={receipt.receiptId}
               className="flex items-center justify-between gap-[1rem] px-[1rem] py-[1.2rem]"
             >
-              <div className="flex-row-center gap-[1rem]">
+              <div className="flex-row-center min-w-0 gap-[1rem]">
                 {type === 'EDIT' && onToggleChecked ? (
                   <CheckBox
                     checked={isChecked}
                     onChange={(checked) => onToggleChecked(receipt.receiptId, checked)}
                   />
                 ) : null}
-                <p className="W_SB14 text-gray-90">{receipt.content}</p>
+                <p className="W_SB14 min-w-0 whitespace-normal break-all text-gray-90">
+                  {receipt.content}
+                </p>
               </div>
               <div className="flex-row-center gap-[1rem]">
                 <p
@@ -50,7 +54,7 @@ const TableCellMobile = ({
                     ? '-' + formatNumberWithCommas(receipt.withdrawal)
                     : '+' + formatNumberWithCommas(receipt.deposit)}
                 </p>
-                {type === 'EDIT' && <IconButton iconType="edit" />}
+                {type === 'EDIT' && <IconButton iconType="edit" onClick={() => onClickEdit ? onClickEdit(receipt) : null} />}
               </div>
             </div>
           );

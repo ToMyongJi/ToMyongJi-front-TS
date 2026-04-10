@@ -36,6 +36,23 @@ const parseWonInput = (raw: string) => {
   return digits === '' ? 0 : Number(digits);
 };
 
+type ReceiptWriteForm = {
+  date: Date | null;
+  content: string;
+  deposit: string;
+  withdrawal: string;
+};
+
+const toReceiptWriteForm = (receipt: Receipt): ReceiptWriteForm => {
+  const parsedDate = dayjs(receipt.date);
+  return {
+    date: parsedDate.isValid() ? parsedDate.toDate() : null,
+    content: receipt.content ?? '',
+    deposit: String(receipt.deposit ?? 0),
+    withdrawal: String(receipt.withdrawal ?? 0),
+  };
+};
+
 
 const downloadBlob = (blob: Blob, filename: string) => {
   const url = URL.createObjectURL(blob);
@@ -70,12 +87,19 @@ const ReceiptCreate = () => {
   const bp = minTailwindBreakpointForWidth(width);
   const isBelowMd = bp === 'none'  || bp === "mr" || bp === 'sm';
 
-  const [receiptForm, setReceiptForm] = useState({
+  const [receiptForm, setReceiptForm] = useState<ReceiptWriteForm>({
     date: new Date() as Date | null,
     content: '',
     deposit: '',
     withdrawal: '',
   });
+  const [selectReceipt, setSelectReceipt] = useState<ReceiptWriteForm>({
+    date: new Date() as Date | null,
+    content: '',
+    deposit: '',
+    withdrawal: '',
+  });
+  const [selectedReceiptId, setSelectedReceiptId] = useState<number | null>(null);
   const [year, setYear] = useState('전체(년)');
   const [isYearFilterOpen, setIsYearFilterOpen] = useState(false);
   const [month, setMonth] = useState('전체(월)');
@@ -86,6 +110,7 @@ const ReceiptCreate = () => {
   const [selectedReceiptIds, setSelectedReceiptIds] = useState<number[]>([]);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editSheetOpen, setEditSheetOpen] = useState(false);
+  const [changeSheetOpen, setChangeSheetOpen] = useState(false);
 
   const yearOptions = ['전체(년)', ...Array.from({ length: 5 }, (_, i) => `${dayjs().year() - 2 + i}년`)];
   const monthOptions = ['전체(월)', ...Array.from({ length: 12 }, (_, i) => `${i + 1}월`)];
@@ -278,7 +303,7 @@ const ReceiptCreate = () => {
 
     createReceipt.mutate({
       userId: user.userId,
-      date: receiptForm.date.toISOString(),
+      date: dayjs(receiptForm.date).format('YYYY-MM-DD'),
       content: trimmedContent,
       deposit: parseWonInput(receiptForm.deposit),
       withdrawal: parseWonInput(receiptForm.withdrawal),
@@ -315,6 +340,63 @@ const ReceiptCreate = () => {
             title: '실패',
             description: '영수증 추출에 실패했습니다.',
           });
+        },
+      },
+    );
+  };
+
+  const handleEditClick = (data: Receipt) => {
+    setSelectedReceiptId(data.receiptId);
+    setSelectReceipt(toReceiptWriteForm(data));
+    setChangeSheetOpen(true);
+  };
+
+  const handleUpdateClick = () => {
+    if (selectedReceiptId == null) {
+      return;
+    }
+
+    if (selectReceipt.date == null) {
+      void alert({
+        title: '영수증 수정',
+        description: '날짜를 선택해주세요',
+      });
+      return;
+    }
+
+    if (selectReceipt.deposit === '' && selectReceipt.withdrawal === '') {
+      void alert({
+        title: '영수증 수정',
+        description: '입출금 금액을 입력해주세요.',
+      });
+      return;
+    }
+
+    const trimmedContent = selectReceipt.content.trim();
+    if (!trimmedContent) {
+      void alert({
+        title: '영수증 수정',
+        description: '내용을 입력해 주세요',
+      });
+      return;
+    }
+
+    updateReceipt.mutate(
+      {
+        receiptId: selectedReceiptId,
+        date: dayjs(selectReceipt.date).format('YYYY-MM-DD'),
+        content: trimmedContent,
+        deposit: parseWonInput(selectReceipt.deposit),
+        withdrawal: parseWonInput(selectReceipt.withdrawal),
+      },
+      {
+        onSuccess: () => {
+          void alert({
+            title: '영수증 수정',
+            description: '수정이 완료되었습니다',
+          });
+          setChangeSheetOpen(false);
+          setSelectedReceiptId(null);
         },
       },
     );
@@ -461,6 +543,7 @@ const ReceiptCreate = () => {
                       type="EDIT"
                       selectedReceiptIds={selectedReceiptIds}
                       onToggleChecked={handleCheckClick}
+                      onClickEdit={handleEditClick}
                     />
                   ))}
                 </div>
@@ -521,6 +604,15 @@ const ReceiptCreate = () => {
         setData={setReceiptForm}
         onSubmit={handleSaveClick}
         isPending={createReceipt.isPending}
+      />
+      <ReceiptWriteSheet
+        isOpen={changeSheetOpen}
+        onClose={() => setChangeSheetOpen(false)}
+        buttonLabel={"내역 수정"}
+        data={selectReceipt}
+        setData={setSelectReceipt}
+        onSubmit={handleUpdateClick}
+        isPending={updateReceipt.isPending}
       />
     </div>
   );
