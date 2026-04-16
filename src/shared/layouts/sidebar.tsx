@@ -31,12 +31,12 @@ const Sidebar = ({ navigationDisabled = false }: SidebarProps) => {
   };
 
   const activeClubIdFromPath =
-    pathname.match(/^\/receipt-view\/(\d+)/)?.[1] ??
+    pathname.match(/^\/receipts-list\/(\d+)/)?.[1] ??
     pathname.match(/^\/management\/(\d+)/)?.[1];
 
   useEffect(() => {
     const isClubMenuPage =
-      pathname.startsWith('/receipt-view/') || pathname.startsWith('/management/');
+      pathname.startsWith('/receipts-list/') || pathname.startsWith('/management/');
 
     if (!isClubMenuPage) {
       setIsActiveClubs('');
@@ -65,7 +65,7 @@ const Sidebar = ({ navigationDisabled = false }: SidebarProps) => {
       if (pathname.startsWith('/management')) {
         navigate(`/management/${club.studentClubId}`);
       } else {
-        navigate(`/receipt-view/${club.studentClubId}`);
+        navigate(`/receipts-list/${club.studentClubId}`);
       }
     }
 
