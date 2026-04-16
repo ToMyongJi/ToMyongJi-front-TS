@@ -26,7 +26,7 @@ const HeaderData = [
 ];
 
 
-const ReceiptView = () => {
+const ReceiptsList = () => {
   const [isHover, setIsHover] = useState(false);
   const [year, setYear] = useState("전체(년)");
   const [yearFilter, setYearFilter] = useState(false);
@@ -184,4 +184,4 @@ const ReceiptView = () => {
   );
 };
 
-export default ReceiptView;
+export default ReceiptsList;
