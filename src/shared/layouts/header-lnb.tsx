@@ -6,12 +6,12 @@ import useUserStore from '@store/user-store';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const LNB_MENULIST = [
-  { label: '조회', to: '/receipt-view' },
+  { label: '조회', to: '/receipts-list' },
   { label: '작성', to: '/receipt-create' },
   { label: '마이페이지', to: '/mypage' },
 ];
 const LNM_ADMIN_MENULIST = [
-  { label: '조회', to: '/receipt-view' },
+  { label: '조회', to: '/receipts-list' },
   { label: '학생회 관리', to: '/management' },
 ];
 
@@ -39,11 +39,11 @@ const HeaderLnb = ({ openSidebar, closeSidebar, navigationDisabled = false }: He
   };
 
   const handleClick = (path: string) => {
-    const viewTabActive = pathname.startsWith('/receipt-view');
+    const viewTabActive = pathname.startsWith('/receipts-list');
     const mgmtTabActive = pathname.startsWith('/management');
 
     if (navigationDisabled) {
-      if (path === '/receipt-view') {
+      if (path === '/receipts-list') {
         return;
       }
       if (path === '/management' && isAdmin) {
@@ -57,7 +57,7 @@ const HeaderLnb = ({ openSidebar, closeSidebar, navigationDisabled = false }: He
       return;
     }
 
-    if (path === '/receipt-view') {
+    if (path === '/receipts-list') {
       if (isSidebarOpen && viewTabActive) {
         closeSidebar?.();
 
@@ -71,7 +71,7 @@ const HeaderLnb = ({ openSidebar, closeSidebar, navigationDisabled = false }: He
           clubIdFromPath ??
           (selectedClub?.studentClubId != null ? String(selectedClub.studentClubId) : undefined);
         if (clubId != null) {
-          navigate(`/receipt-view/${clubId}`);
+          navigate(`/receipts-list/${clubId}`);
         }
         openSidebar?.();
         return;
