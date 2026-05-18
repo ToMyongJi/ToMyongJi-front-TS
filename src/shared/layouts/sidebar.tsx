@@ -90,35 +90,45 @@ const Sidebar = ({ navigationDisabled = false }: SidebarProps) => {
               onClick={() =>
                 setIsActiveCollege((prev) => (prev === item.collegeName ? '' : item.collegeName))
               }
+              aria-expanded={!setActiveSideBar(isActiveCollege, item.collegeName)}
               className="flex w-full cursor-pointer items-center justify-between py-[1.2rem] pr-[2.4rem] pl-[4rem]"
             >
               <p className="W_SB14 text-gray-90">{item.collegeName}</p>
               {setActiveSideBar(isActiveCollege, item.collegeName) ? (
-                <ArrowDownIcon className="text-gray-20" />
+                <ArrowDownIcon className="text-gray-20 transition-transform duration-300" />
               ) : (
-                <ArrowUpIcon className="text-gray-20" />
+                <ArrowUpIcon className="text-gray-20 transition-transform duration-300" />
               )}
             </button>
-            {!setActiveSideBar(isActiveCollege, item.collegeName) && (
-              <div className="w-full">
-                {item?.clubs?.map((club: college) => (
-                  <button
-                    key={club.studentClubId}
-                    type="button"
-                    onClick={() => handleMenuClick(club)}
-                    className={cn(
-                      'W_SB13 w-full cursor-pointer py-[1.4rem] pl-[4rem] text-start text-gray-90',
-                      (activeClubIdFromPath
-                        ? activeClubIdFromPath === String(club.studentClubId)
-                        : !setActiveSideBar(isActiveClubs, club.studentClubName)) &&
-                        'bg-background',
-                    )}
-                  >
-                    {club?.studentClubName}
-                  </button>
-                ))}
+            <div
+              className={cn(
+                'grid transition-[grid-template-rows] duration-300 ease-in-out',
+                setActiveSideBar(isActiveCollege, item.collegeName)
+                  ? 'grid-rows-[0fr]'
+                  : 'grid-rows-[1fr]',
+              )}
+            >
+              <div className="overflow-hidden">
+                <div className="w-full">
+                  {item?.clubs?.map((club: college) => (
+                    <button
+                      key={club.studentClubId}
+                      type="button"
+                      onClick={() => handleMenuClick(club)}
+                      className={cn(
+                        'W_SB13 w-full cursor-pointer py-[1.4rem] pl-[4rem] text-start text-gray-90',
+                        (activeClubIdFromPath
+                          ? activeClubIdFromPath === String(club.studentClubId)
+                          : !setActiveSideBar(isActiveClubs, club.studentClubName)) &&
+                          'bg-background',
+                      )}
+                    >
+                      {club?.studentClubName}
+                    </button>
+                  ))}
+                </div>
               </div>
-            )}
+            </div>
           </div>
         ))}
       </div>
