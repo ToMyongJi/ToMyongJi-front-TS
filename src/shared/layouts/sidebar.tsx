@@ -31,8 +31,7 @@ const Sidebar = ({ navigationDisabled = false }: SidebarProps) => {
   };
 
   const activeClubIdFromPath =
-    pathname.match(/^\/receipts-list\/(\d+)/)?.[1] ??
-    pathname.match(/^\/management\/(\d+)/)?.[1];
+    pathname.match(/^\/receipts-list\/(\d+)/)?.[1] ?? pathname.match(/^\/management\/(\d+)/)?.[1];
 
   useEffect(() => {
     const isClubMenuPage =
@@ -44,14 +43,14 @@ const Sidebar = ({ navigationDisabled = false }: SidebarProps) => {
   }, [pathname]);
 
   const handleMenuClick = (club: college) => {
-    const isSameActiveMenu = activeClubIdFromPath === String(club.studentClubId);
+    // const isSameActiveMenu = activeClubIdFromPath === String(club.studentClubId);
 
-    // 이미 활성화된 메뉴를 다시 누르면 메인으로 이동하면서 사이드바를 닫습니다.
-    if (isSameActiveMenu) {
-      navigate('/');
-      closeSidebar();
-      return;
-    }
+    // // 이미 활성화된 메뉴를 다시 누르면 메인으로 이동하면서 사이드바를 닫습니다.
+    // if (isSameActiveMenu) {
+    //   navigate('/');
+    //   closeSidebar();
+    //   return;
+    // }
 
     setIsActiveClubs(club?.studentClubName);
 
@@ -88,7 +87,9 @@ const Sidebar = ({ navigationDisabled = false }: SidebarProps) => {
           >
             <button
               type="button"
-              onClick={() => setIsActiveCollege(item.collegeName)}
+              onClick={() =>
+                setIsActiveCollege((prev) => (prev === item.collegeName ? '' : item.collegeName))
+              }
               className="flex w-full cursor-pointer items-center justify-between py-[1.2rem] pr-[2.4rem] pl-[4rem]"
             >
               <p className="W_SB14 text-gray-90">{item.collegeName}</p>
