@@ -14,7 +14,7 @@ import MainPage from '@pages/main/main-page';
 import { ClubTransfer } from '@pages/mypage/club-transfer';
 import Mypage from '@pages/mypage/mypage';
 import ButtonTestPage from '@pages/test/button-test';
-import ReceiptView from '@pages/view/receipt-view';
+import ReceiptsList from '@pages/view/receipts-list';
 import ProtectedRouter from '@routes/protected-router';
 import { createBrowserRouter } from 'react-router-dom';
 import AdminRouter from './admin-router';
@@ -26,7 +26,7 @@ export const router = createBrowserRouter([
     element: <RootLayout />,
     children: [
       { index: true, element: <MainPage /> },
-      { path: 'receipt-view/:clubid', element: <ReceiptView /> },
+      { path: 'receipts-list/:clubid', element: <ReceiptsList /> },
       { path: 'test/buttons', element: <ButtonTestPage /> },
       {
         path: 'maintenance',

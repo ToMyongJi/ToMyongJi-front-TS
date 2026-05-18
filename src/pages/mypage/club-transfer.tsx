@@ -5,6 +5,7 @@ import { TransferStep1 } from '@components/mypage/transfer-step1';
 import { TransferStep2 } from '@components/mypage/transfer-step2';
 import { TransferStep3 } from '@components/mypage/transfer-step3';
 import { TransferStep4 } from '@components/mypage/transfer-step4';
+import { useModal } from '@hooks/use-modal';
 import useAuthStore from '@store/auth-store';
 import useUserStore from '@store/user-store';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -15,6 +16,7 @@ export const ClubTransfer = () => {
   const navigate = useNavigate();
   const { clearAuthData } = useAuthStore();
   const { user, clearUser } = useUserStore();
+  const { alert, confirm } = useModal();
 
   const [checkedMembers, setCheckedMembers] = useState<MemberItem[]>([]);
   const [checkedStudentNumbers, setCheckedStudentNumbers] = useState<string[]>([]);
@@ -38,7 +40,11 @@ export const ClubTransfer = () => {
     },
     onError: (error) => {
       console.log(error);
-      alert('학생회 이전에 실패했어요.');
+      alert({
+        title: '학생회 이전 실패',
+        description: '학생회 이전에 실패했습니다.',
+        confirmText: '확인',
+      });
     },
   });
 
@@ -77,22 +83,30 @@ export const ClubTransfer = () => {
       console.log('체크된 멤버 학번:', checkedStudentNumbers);
     }
     if (step === 3) {
-      console.log('회장 이름:', presidentName);
-      console.log('회장 학번:', presidentStudentNumber);
-      if (user?.studentClubId) {
-        mutateTransfer.mutate({
-          presidentInfo: {
-            clubId: user?.studentClubId,
-            studentNum: presidentStudentNumber,
-            name: presidentName,
-          },
-          remainingMemberIds: checkedStudentNumbers,
-        });
-      }
       if (!user?.studentClubId) {
-        alert('소속 학생회를 찾을 수 없어요.');
+        alert({
+          title: '소속 학생회 찾기 실패',
+          description: '소속 학생회를 찾을 수 없습니다.',
+          confirmText: '확인',
+        });
         return;
       }
+
+      void confirm({
+        title: '학생회 이전',
+        description: `이전 후 되돌릴 수 없으며, 완료 시 로그아웃됩니다.`,
+        confirmText: '이전',
+        cancelText: '취소',
+        onConfirm: () =>
+          mutateTransfer.mutate({
+            presidentInfo: {
+              clubId: user?.studentClubId ?? 0,
+              studentNum: presidentStudentNumber,
+              name: presidentName,
+            },
+            remainingMemberIds: checkedStudentNumbers,
+          }),
+      });
     }
   };
 

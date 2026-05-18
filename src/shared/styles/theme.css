@@ -1,5 +1,6 @@
 @theme{
     --font-sans: 'Suit', sans-serif;
+    --font-gmarket: 'GMarketSans', sans-serif;
     --color-primary: #87AAFF;
     --color-primary-deep: #759DFF;
     --color-success: #3979F1;
@@ -13,6 +14,7 @@
     --color-gray-10: #E2EBFF;
     --color-background: #F0F4FF;
     --color-white: #FFFFFF;
+    --shadow-bottom: 0 -12px 40px 0 rgba(80, 92, 162, 0.25);
 
 }
 
@@ -103,4 +105,9 @@
         line-height: normal;
     }
 
+    .L_Title {
+        font-family: var(--font-gmarket);
+        font-weight: 700;
+        line-height: normal;
+    }
 }

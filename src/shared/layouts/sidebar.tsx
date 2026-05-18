@@ -6,7 +6,7 @@ import { cn } from '@libs/cn';
 import { useLayoutStore } from '@store/layout-store';
 import { useSidebarStore } from '@store/sidebar-store';
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 type SidebarProps = {
@@ -22,7 +22,7 @@ const Sidebar = ({ navigationDisabled = false }: SidebarProps) => {
   const [isActiveCollege, setIsActiveCollege] = useState<string>('');
   const [isActiveClubs, setIsActiveClubs] = useState<string>('');
 
-  const { setSelectedClub, selectedClub } = useSidebarStore();
+  const { setSelectedClub } = useSidebarStore();
 
   const { data: collegeAndClubs } = useQuery(collegeQuery.collegeAndClubs());
 
@@ -31,13 +31,27 @@ const Sidebar = ({ navigationDisabled = false }: SidebarProps) => {
   };
 
   const activeClubIdFromPath =
-    pathname.match(/^\/receipt-view\/(\d+)/)?.[1] ??
-    pathname.match(/^\/management\/(\d+)/)?.[1] ??
-    (pathname.startsWith('/receipt-create') && selectedClub?.studentClubId != null
-      ? String(selectedClub.studentClubId)
-      : undefined);
+    pathname.match(/^\/receipts-list\/(\d+)/)?.[1] ?? pathname.match(/^\/management\/(\d+)/)?.[1];
+
+  useEffect(() => {
+    const isClubMenuPage =
+      pathname.startsWith('/receipts-list/') || pathname.startsWith('/management/');
+
+    if (!isClubMenuPage) {
+      setIsActiveClubs('');
+    }
+  }, [pathname]);
 
   const handleMenuClick = (club: college) => {
+    // const isSameActiveMenu = activeClubIdFromPath === String(club.studentClubId);
+
+    // // 이미 활성화된 메뉴를 다시 누르면 메인으로 이동하면서 사이드바를 닫습니다.
+    // if (isSameActiveMenu) {
+    //   navigate('/');
+    //   closeSidebar();
+    //   return;
+    // }
+
     setIsActiveClubs(club?.studentClubName);
 
     setSelectedClub({
@@ -50,7 +64,7 @@ const Sidebar = ({ navigationDisabled = false }: SidebarProps) => {
       if (pathname.startsWith('/management')) {
         navigate(`/management/${club.studentClubId}`);
       } else {
-        navigate(`/receipt-view/${club.studentClubId}`);
+        navigate(`/receipts-list/${club.studentClubId}`);
       }
     }
 
@@ -73,36 +87,48 @@ const Sidebar = ({ navigationDisabled = false }: SidebarProps) => {
           >
             <button
               type="button"
-              onClick={() => setIsActiveCollege(item.collegeName)}
+              onClick={() =>
+                setIsActiveCollege((prev) => (prev === item.collegeName ? '' : item.collegeName))
+              }
+              aria-expanded={!setActiveSideBar(isActiveCollege, item.collegeName)}
               className="flex w-full cursor-pointer items-center justify-between py-[1.2rem] pr-[2.4rem] pl-[4rem]"
             >
               <p className="W_SB14 text-gray-90">{item.collegeName}</p>
               {setActiveSideBar(isActiveCollege, item.collegeName) ? (
-                <ArrowDownIcon className="text-gray-20" />
+                <ArrowDownIcon className="text-gray-20 transition-transform duration-300" />
               ) : (
-                <ArrowUpIcon className="text-gray-20" />
+                <ArrowUpIcon className="text-gray-20 transition-transform duration-300" />
               )}
             </button>
-            {!setActiveSideBar(isActiveCollege, item.collegeName) && (
-              <div className="w-full">
-                {item?.clubs?.map((club: college) => (
-                  <button
-                    key={club.studentClubId}
-                    type="button"
-                    onClick={() => handleMenuClick(club)}
-                    className={cn(
-                      'W_SB13 w-full cursor-pointer py-[1.4rem] pl-[4rem] text-start text-gray-90',
-                      (activeClubIdFromPath
-                        ? activeClubIdFromPath === String(club.studentClubId)
-                        : !setActiveSideBar(isActiveClubs, club.studentClubName)) &&
-                        'bg-background',
-                    )}
-                  >
-                    {club?.studentClubName}
-                  </button>
-                ))}
+            <div
+              className={cn(
+                'grid transition-[grid-template-rows] duration-300 ease-in-out',
+                setActiveSideBar(isActiveCollege, item.collegeName)
+                  ? 'grid-rows-[0fr]'
+                  : 'grid-rows-[1fr]',
+              )}
+            >
+              <div className="overflow-hidden">
+                <div className="w-full">
+                  {item?.clubs?.map((club: college) => (
+                    <button
+                      key={club.studentClubId}
+                      type="button"
+                      onClick={() => handleMenuClick(club)}
+                      className={cn(
+                        'W_SB13 w-full cursor-pointer py-[1.4rem] pl-[4rem] text-start text-gray-90',
+                        (activeClubIdFromPath
+                          ? activeClubIdFromPath === String(club.studentClubId)
+                          : !setActiveSideBar(isActiveClubs, club.studentClubName)) &&
+                          'bg-background',
+                      )}
+                    >
+                      {club?.studentClubName}
+                    </button>
+                  ))}
+                </div>
               </div>
-            )}
+            </div>
           </div>
         ))}
       </div>

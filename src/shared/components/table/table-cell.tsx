@@ -1,17 +1,13 @@
-import { cn } from '@libs/cn';
-import { useEffect, useState } from 'react';
-import type { ChangeEvent, ReactNode } from 'react';
-
-import dayjs from 'dayjs';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-
 import type { UpdateReceiptRequest } from '@apis/receipt/receipt';
-
-import CheckBox from '@components/common/check-box';
 import Button from '@components/common/button';
+import CheckBox from '@components/common/check-box';
 import IconButton from '@components/common/icon-button';
 import TextField from '@components/common/textfield';
+import ReceiptDatePicker from '@components/date-picker/receipt-date-picker';
+import { cn } from '@libs/cn';
+import dayjs from 'dayjs';
+import type { ChangeEvent, ReactNode } from 'react';
+import { useEffect, useState } from 'react';
 
 type TableRowMode = 'VIEW' | 'EDIT';
 
@@ -41,7 +37,11 @@ const DATE_PICKER_WRAP =
 
 const formatAmount = (value: number) => (value ?? 0).toLocaleString('ko-KR');
 
-const toEditableFields = (content: string, deposit: number, withdrawal: number): EditableFields => ({
+const toEditableFields = (
+  content: string,
+  deposit: number,
+  withdrawal: number,
+): EditableFields => ({
   content,
   deposit: String(deposit ?? 0),
   withdrawal: String(withdrawal ?? 0),
@@ -157,9 +157,7 @@ const TableCell = ({
       return;
     }
 
-    if (
-      isDraftUnchanged(editedDate, date, content, deposit, withdrawal, editedFields)
-    ) {
+    if (isDraftUnchanged(editedDate, date, content, deposit, withdrawal, editedFields)) {
       setIsEditing(false);
       return;
     }
@@ -172,7 +170,7 @@ const TableCell = ({
     try {
       await onSave({
         receiptId,
-        date: editedDate.toISOString(),
+        date: dayjs(editedDate).format('YYYY-MM-DD'),
         content: editedFields.content.trim(),
         deposit: parsedDeposit,
         withdrawal: parsedWithdrawal,
@@ -199,21 +197,19 @@ const TableCell = ({
       <td className={TD_BASE}>
         {showInputs ? (
           <div className={DATE_PICKER_WRAP}>
-            <DatePicker
+            <ReceiptDatePicker
               selected={editedDate}
-              onChange={(next: Date | null) => setEditedDate(next)}
+              onChange={(next) => setEditedDate(next)}
               dateFormat="yyyy.MM.dd"
-              popperPlacement="bottom-start"
-              popperClassName="receipt-datepicker-popper"
-              calendarClassName="receipt-datepicker-calendar"
-              className="W_R15 w-full min-w-0 bg-transparent text-center outline-none placeholder:text-gray-70"
+              placement="bottom-start"
+              className="W_R15 w-full min-w-0 bg-transparent text-center outline-none"
             />
           </div>
         ) : (
           date
         )}
       </td>
-      <td className={cn(TD_BASE, 'text-start')}>
+      <td className={cn(TD_BASE, 'whitespace-normal break-all text-start')}>
         <EditableText
           active={showInputs}
           value={editedFields.content}
@@ -256,7 +252,7 @@ const TableCell = ({
               disabled={isSavePending}
               onClick={() => void handleSave()}
             >
-              저장하기
+              저장
             </Button>
           )}
         </td>

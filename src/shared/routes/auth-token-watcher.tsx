@@ -1,3 +1,4 @@
+import { useModal } from '@hooks/use-modal';
 import useAuthStore from '@store/auth-store';
 import useUserStore from '@store/user-store';
 import { useCallback, useEffect } from 'react';
@@ -14,6 +15,7 @@ const decodeJwtPayload = (token: string) => {
 };
 
 export const AuthTokenWatcher = () => {
+  const { alert } = useModal();
   const navigate = useNavigate();
   const { authData, clearAuthData } = useAuthStore();
   const { clearUser } = useUserStore();
@@ -21,9 +23,13 @@ export const AuthTokenWatcher = () => {
   const logoutByExpiration = useCallback(() => {
     clearUser();
     clearAuthData();
-    alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+    alert({
+      title: '로그인 만료',
+      description: '로그인이 만료되었습니다. 다시 로그인해주세요.',
+      confirmText: '확인',
+    });
     navigate('/login', { replace: true });
-  }, [clearUser, clearAuthData, navigate]);
+  }, [clearUser, clearAuthData, navigate, alert]);
 
   useEffect(() => {
     if (!authData?.accessToken) return;
