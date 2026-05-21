@@ -6,11 +6,7 @@ import useAuthStore from '../store/auth-store';
 import useStudentClubStore from '../store/student-club-store';
 import useUserStore from '../store/user-store';
 
-type HeaderGnbProps = {
-  navigationDisabled?: boolean;
-};
-
-const HeaderGnb = ({ navigationDisabled = false }: HeaderGnbProps) => {
+const HeaderGnb = () => {
   const navigate = useNavigate();
   const { authData, clearAuthData } = useAuthStore();
   const { user, clearUser } = useUserStore();
@@ -36,7 +32,6 @@ const HeaderGnb = ({ navigationDisabled = false }: HeaderGnbProps) => {
   };
 
   const goLogin = () => {
-    if (navigationDisabled) return;
     navigate('/login');
   };
 

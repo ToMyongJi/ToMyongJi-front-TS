@@ -1,4 +1,3 @@
-import { isMaintenanceMode, maintenanceCopy } from '@constants/maintenance';
 import Footer from '@layouts/footer';
 import HeaderGnb from '@layouts/header-gnb';
 import Sidebar from '@layouts/sidebar';
@@ -6,17 +5,42 @@ import { cn } from '@libs/cn';
 import Maintenance from '@pages/common/maintenance';
 import { AuthTokenWatcher } from '@routes/auth-token-watcher';
 import { useLayoutStore } from '@store/layout-store';
-import { Outlet } from 'react-router-dom';
+import useMaintenanceStore from '@store/maintenance-store';
+import useUserStore from '@store/user-store';
+import { adminQueries } from '@apis/admin/admin-queries';
+import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 import HeaderLnb from './header-lnb';
 
 const RootLayout = () => {
+  const { isMaintenance, isNetworkError, info, setNetworkError, setMaintenance } = useMaintenanceStore();
   const { isSidebarOpen, closeSidebar, openSidebar } = useLayoutStore();
-  const navigationDisabled = isMaintenanceMode;
+  const { user } = useUserStore();
+  const { pathname } = useLocation();
+  const { data, isError } = useQuery({ ...adminQueries.checkStatus(), refetchInterval: 10_000, retry: false });
+
+  const isMaintenanceActive = isMaintenance || isNetworkError;
+  const isLoginPage = pathname === '/login';
+  const isAdmin = user?.role === 'ADMIN';
+  const navigationDisabled = isMaintenanceActive && !isAdmin;
+
+  const maintenanceProps = info
+    ? { date: `${info.startTime} ~ ${info.expectedEndTime}`, description: info.message }
+    : { date: '', description: '' };
+
+  useEffect(() => {
+    if (isError) {
+      setNetworkError(true);
+    } else if (data) {
+      setMaintenance(data.data);
+    }
+  }, [data, isError, setMaintenance, setNetworkError]);
 
   return (
     <div className="flex h-full min-h-screen flex-col">
-      {!isMaintenanceMode && <AuthTokenWatcher />}
-      <HeaderGnb navigationDisabled={navigationDisabled} />
+      {!isMaintenanceActive && <AuthTokenWatcher />}
+      <HeaderGnb />
       <HeaderLnb
         openSidebar={openSidebar}
         closeSidebar={closeSidebar}
@@ -43,7 +67,7 @@ const RootLayout = () => {
             aria-label="사이드바 닫기"
             aria-hidden={!isSidebarOpen}
           />
-          {isMaintenanceMode ? <Maintenance maintenance={maintenanceCopy} /> : <Outlet />}
+          {isMaintenanceActive && !isLoginPage && !isAdmin ? <Maintenance maintenance={maintenanceProps} /> : <Outlet />}
         </main>
       </div>
       <Footer />

@@ -7,4 +7,6 @@ export const adminQueries = {
     buildQuery(QK.admin.president(clubId), () => adminApi.getPresident(clubId)),
   getMember: (clubId: number) =>
     buildQuery(QK.admin.member(clubId), () => adminApi.getMember(clubId)),
+  checkStatus: () =>
+    buildQuery(QK.admin.status(), () => adminApi.checkStatus())
 };
