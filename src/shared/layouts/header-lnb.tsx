@@ -13,6 +13,7 @@ const LNB_MENULIST = [
 const LNM_ADMIN_MENULIST = [
   { label: '조회', to: '/receipts-list' },
   { label: '학생회 관리', to: '/management' },
+  { label: '점검 설정', to: '/system-check' },
 ];
 
 type HeaderLnbProps = {

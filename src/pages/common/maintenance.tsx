@@ -23,12 +23,12 @@ const Maintenance = ({ maintenance }: MaintenanceProps) => {
               {maintenance.date ?? '0월 00일 00:00 ~ 0월 00일 00:00'}
             </p>
           </div>
-          <div className="W_B15 flex flex-col">
+          {maintenance.description && <div className="W_B15 flex flex-col">
             <p className="pb-[0.4rem] text-black">점검 내용</p>
             <p className="W_M15 text-gray-80">
-              {maintenance.description ?? '서버 성능 개선 및 안정화'}
+              {maintenance.description}
             </p>
-          </div>
+          </div>}
           <p className="W_B15 text-error">* 점검 중에는 서비스 이용이 일시 중단됩니다.</p>
         </div>
       </div>

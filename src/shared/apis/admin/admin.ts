@@ -31,7 +31,14 @@ export type getMemberResponse = Rsp<
   }[]
 >;
 
-export type status = Rsp<{
+export type setStatusRequest = {
+  status: string;
+  message: string;
+  startTime: string;
+  expectedEndTime: string;
+};
+
+export type statusResponse = Rsp<{
   status: string;
   message: string;
   startTime: string;
@@ -49,8 +56,8 @@ export const adminApi = {
     http.get<presidentResponse>(ENDPOINTS.admin.clubPresident(clubId)),
   getMember: (clubId: number) => http.get<getMemberResponse>(ENDPOINTS.admin.clubMember(clubId)),
   deleteMember: (memberId: number) => http.delete<memberResponse>(ENDPOINTS.admin.delete(memberId)),
-  setStatus: (body: status) =>
+  setStatus: (body: setStatusRequest) =>
     http.post<null, typeof body>(ENDPOINTS.status.change, body),
   checkStatus: () =>
-    http.get<status>(ENDPOINTS.status.check)
+    http.get<statusResponse>(ENDPOINTS.status.check),
 };
