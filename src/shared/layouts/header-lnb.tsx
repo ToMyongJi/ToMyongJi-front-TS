@@ -13,6 +13,7 @@ const LNB_MENULIST = [
 const LNM_ADMIN_MENULIST = [
   { label: '조회', to: '/receipts-list' },
   { label: '학생회 관리', to: '/management' },
+  { label: '점검 설정', to: '/system-check' },
 ];
 
 type HeaderLnbProps = {
@@ -39,11 +40,11 @@ const HeaderLnb = ({ openSidebar, closeSidebar, navigationDisabled = false }: He
   };
 
   const handleClick = (path: string) => {
-    const viewTabActive = pathname.startsWith('/receipts-list');
     const mgmtTabActive = pathname.startsWith('/management');
 
     if (navigationDisabled) {
       if (path === '/receipts-list') {
+        if (isSidebarOpen) closeSidebar?.();
         return;
       }
       if (path === '/management' && isAdmin) {
@@ -58,9 +59,8 @@ const HeaderLnb = ({ openSidebar, closeSidebar, navigationDisabled = false }: He
     }
 
     if (path === '/receipts-list') {
-      if (isSidebarOpen && viewTabActive) {
+      if (isSidebarOpen) {
         closeSidebar?.();
-
         return;
       }
       // 관리자는 학생회 관리 화면(/management)에 있을 때 조회만 누르면 URL이 그대로라

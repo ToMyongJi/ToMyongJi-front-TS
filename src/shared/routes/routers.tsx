@@ -2,6 +2,7 @@ import { maintenanceCopy } from '@constants/maintenance';
 import RootLayout from '@layouts/root-layout';
 import AdminPage from '@pages/admin/admin-page';
 import { Management } from '@pages/admin/management';
+import SystemCheck from "@pages/admin/system-check";
 import FindAccount from '@pages/auth/find-account';
 import Login from '@pages/auth/login';
 import Register from '@pages/auth/register';
@@ -65,6 +66,7 @@ export const router = createBrowserRouter([
           { path: 'home-admin', element: <AdminPage /> },
           { path: 'management', element: <Management /> },
           { path: 'management/:clubId', element: <Management /> },
+          { path: 'system-check', element: <SystemCheck /> },
         ],
       },
     ],
