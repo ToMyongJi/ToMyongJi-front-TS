@@ -4,9 +4,9 @@ import ErrorCircleIcon from '@assets/icons/error-circle.svg?react';
 import FileIcon from '@assets/icons/file.svg?react';
 import BasicCard from '@components/common/basic-card';
 import Button from '@components/common/button';
+import Spinner from '@components/common/spinner';
 import TableHeader from '@components/table/table-header';
 import { useModal } from '@hooks/use-modal';
-import Loading from '@pages/common/loading';
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -65,7 +65,6 @@ const AiCsvCreate = () => {
   };
 
   const resetToUpload = () => {
-    setFile(null);
     setParsedRows([]);
     setStep('upload');
   };
@@ -102,7 +101,7 @@ const AiCsvCreate = () => {
     return (
       <div className="flex w-full flex-col-center gap-[7.2rem] pt-[4.2rem]">
         <div className="flex-col-center gap-[3rem] pt-[6rem]">
-          <Loading />
+          <Spinner />
           <div className="flex-col-center gap-[0.4rem]">
             <p className="W_Title text-black">파일 정리 중</p>
             <p className="W_M15 text-center text-gray-70">
@@ -149,7 +148,6 @@ const AiCsvCreate = () => {
             다시 정리
           </Button>
         </div>
-        v
       </div>
     );
   }
@@ -195,7 +193,7 @@ const AiCsvCreate = () => {
           </div>
 
           <div className="mt-[5.4rem] flex justify-end gap-[0.8rem]">
-            <Button variant="gray_outline" className="w-[11rem]" size="md" onClick={resetToUpload}>
+            <Button variant="gray_outline" className="w-[11rem]" size="md" onClick={handleUpload}>
               다시 정리
             </Button>
             <Button
@@ -214,24 +212,15 @@ const AiCsvCreate = () => {
   }
 
   return (
-    <div className="flex w-full flex-col px-[3rem] pt-[4.2rem] pb-[10rem]">
+    <div className="flex w-full flex-col px-[1.5rem] pt-[4.2rem] pb-[10rem]">
       <div className="mx-auto w-full max-w-[100rem] flex-col gap-[1.8rem]">
         <p className="W_Title text-black">Excel 데이터 추가</p>
-        <BasicCard className="flex-col gap-[3rem] px-[2.6rem] py-[2rem]">
+        <BasicCard className="flex-col px-[2.6rem] py-[2rem]">
           <section className="flex-col gap-[0.8rem]">
             <p className="W_B17 gray-80">Excel 데이터 파일 형식 안내</p>
-            <li className="W_R15 ml-1 list-inside list-disc text-gray-90">
-              날짜, 내용, 금액 항목이 포함된 엑셀 파일을 업로드하세요.
-            </li>
-          </section>
-
-          <section className="flex-col gap-[0.8rem]">
-            <p className="W_B17 text-black">주의사항</p>
-            <ol className="W_R15 list-inside list-disc flex-col gap-[0.3rem] text-gray-90">
-              <li>.xlsx, .xls 형식의 파일만 업로드 가능합니다.</li>
-              <li>날짜와 내용이 같은 줄은 영수증으로 인식되지 않습니다.</li>
-              <li>AI가 날짜, 내용, 입금, 출금 항목을 자동으로 인식합니다.</li>
-              <li>인식이 잘못된 항목은 미리보기 화면에서 확인 후 저장할 수 있습니다.</li>
+            <ol className="W_R14 ml-1 list-inside list-disc text-gray-90">
+              <li>날짜, 내용, 금액 항목이 포함된 엑셀 파일을 업로드하세요.</li>
+              <li>형식에 상관없이 AI가 자동으로 정리합니다.</li>
             </ol>
           </section>
         </BasicCard>
