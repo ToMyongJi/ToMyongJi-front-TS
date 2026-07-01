@@ -1,7 +1,7 @@
 import { HttpClient } from '@apis/base/http';
 import { axiosInstance } from '@apis/base/instance';
 import { ENDPOINTS } from '@apis/constants/endpoints';
-import type {Rsp} from '@apis/constants/statuscode';
+import type { Rsp } from '@apis/constants/statuscode';
 
 const http = new HttpClient(axiosInstance);
 
@@ -11,7 +11,7 @@ export type PaginationList<T> = {
   pageSize: number;
   totalElements: number;
   totalPages: number;
-  last: boolean
+  last: boolean;
 };
 
 export type Receipt = {
@@ -20,12 +20,12 @@ export type Receipt = {
   content: string;
   deposit: number;
   withdrawal: number;
-}
+};
 
 export type ClubReceipt = {
   receiptList: Receipt[];
   balance: number;
-}
+};
 
 export type CreateReceiptRequest = {
   userId: string;
@@ -47,37 +47,35 @@ export type ExportCsvRequest = {
   userId?: string;
   year?: number;
   month?: number;
-}
+};
 
 export type UploadCsvRequest = {
   userIndexId: number;
   file: File;
-}
+};
 
 export type UploadTossBankRequest = {
   file: File;
   userId: string;
   keyword?: string;
-}
-
-
+};
 export const receiptApi = {
-  list: (clubId?: number, params?: {page?: number; size? : number; year?:number; month?: number}) =>
-    http.get<Rsp<PaginationList<Receipt>>>(ENDPOINTS.receipt.paging(clubId), {params}),
-  club: (id?: number) =>
-    http.get<Rsp<ClubReceipt>>(ENDPOINTS.receipt.club(id)),
+  list: (
+    clubId?: number,
+    params?: { page?: number; size?: number; year?: number; month?: number },
+  ) => http.get<Rsp<PaginationList<Receipt>>>(ENDPOINTS.receipt.paging(clubId), { params }),
+  club: (id?: number) => http.get<Rsp<ClubReceipt>>(ENDPOINTS.receipt.club(id)),
   create: (body: CreateReceiptRequest) =>
     http.post<Rsp<Receipt>, CreateReceiptRequest>(ENDPOINTS.receipt.root, body),
   update: (body: UpdateReceiptRequest) =>
     http.put<Rsp<Receipt>, UpdateReceiptRequest>(ENDPOINTS.receipt.root, body),
-  delete: (receiptId: number) =>
-    http.delete<Rsp<null>>(ENDPOINTS.receipt.specific(receiptId)),
+  delete: (receiptId: number) => http.delete<Rsp<null>>(ENDPOINTS.receipt.specific(receiptId)),
   search: (keyword: string) =>
-    http.get<Rsp<Receipt[]>>(ENDPOINTS.receipt.keyword, {params: {keyword}}),
+    http.get<Rsp<Receipt[]>>(ENDPOINTS.receipt.keyword, { params: { keyword } }),
   uploadCsv: (body: UploadCsvRequest) => {
     const formData = new FormData();
     formData.append('file', body.file);
-    return http.post<Rsp<null>>(ENDPOINTS.csv.upload(body.userIndexId), formData)
+    return http.post<Rsp<null>>(ENDPOINTS.csv.upload(body.userIndexId), formData);
   },
   exportCsv: (body: ExportCsvRequest) =>
     http.post<Blob, ExportCsvRequest>(ENDPOINTS.csv.export, body, { responseType: 'blob' }),
@@ -88,4 +86,4 @@ export const receiptApi = {
     formData.append('keyword', body.keyword ?? '');
     return http.postForm<Rsp<null>>(ENDPOINTS.parse.breakdown, formData);
   },
-}
+};
