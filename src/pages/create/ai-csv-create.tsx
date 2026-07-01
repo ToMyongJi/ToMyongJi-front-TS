@@ -1,12 +1,12 @@
 import CancelIcon from '@assets/icons/cancel.svg?react';
-import CheckIcon from '@assets/icons/check.svg';
+import CheckIcon from '@assets/icons/check.svg?react';
 import ErrorCircleIcon from '@assets/icons/error-circle.svg?react';
 import FileIcon from '@assets/icons/file.svg?react';
-import loading from '@assets/icons/loading.svg';
 import BasicCard from '@components/common/basic-card';
 import Button from '@components/common/button';
 import TableHeader from '@components/table/table-header';
 import { useModal } from '@hooks/use-modal';
+import Loading from '@pages/common/loading';
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -100,19 +100,21 @@ const AiCsvCreate = () => {
 
   if (step === 'loading') {
     return (
-      <div className="h-full w-full flex-col-center gap-[3rem] pt-[10rem]">
-        <img src={loading} alt="loading" className="h-[16.3rem] w-[12.8rem]" />
-        <div className="flex-col-center gap-[0.4rem]">
-          <p className="W_Title text-black">파일 정리 중</p>
-          <p className="W_M15 text-center text-gray-70">
-            날짜, 내용, 금액을 자동으로 인식하고 있습니다.
-            <br />
-            화면을 닫아도 업로드가 진행되며, 결과는 완료 후 10분간 보관됩니다.
-          </p>
-        </div>
-        <div className="flex items-center gap-[0.5rem]">
-          <FileIcon className="h-[1.7rem] w-[1.7rem] text-gray-70" />
-          <p className="W_M15 text-black">{file?.name}</p>
+      <div className="flex w-full flex-col-center gap-[7.2rem] pt-[4.2rem]">
+        <div className="flex-col-center gap-[3rem] pt-[6rem]">
+          <Loading />
+          <div className="flex-col-center gap-[0.4rem]">
+            <p className="W_Title text-black">파일 정리 중</p>
+            <p className="W_M15 text-center text-gray-70">
+              날짜, 내용, 금액을 자동으로 인식하고 있습니다.
+              <br />
+              화면을 닫아도 업로드가 진행되며, 결과는 완료 후 10분간 보관됩니다.
+            </p>
+          </div>
+          <div className="flex items-center gap-[0.5rem]">
+            <FileIcon className="h-[1.7rem] w-[1.7rem] text-gray-70" />
+            <p className="W_M15 text-black">{file?.name}</p>
+          </div>
         </div>
       </div>
     );
@@ -156,8 +158,11 @@ const AiCsvCreate = () => {
     return (
       <div className="flex w-full flex-col px-[3rem] pt-[4.2rem] pb-[10rem]">
         <div className="mx-auto w-full max-w-[100rem] flex-col gap-[1.8rem]">
-          <CheckIcon />
-          <p className="W_Title text-black">Excel 데이터 정리 미리보기</p>
+          <div className="flex gap-[0.8rem]">
+            <CheckIcon className="h-[2.4rem] w-[2.4rem]" />
+            <p className="W_Title text-black">Excel 데이터 정리 미리보기</p>
+          </div>
+          <p className="W_B17 text-gray-80">미리보기-상위 5건</p>
           <BasicCard className="flex-col gap-[1rem] px-[2.7rem] py-[1.6rem]">
             <table className="w-full table-fixed">
               <TableHeader headerData={HEADER_DATA} />
