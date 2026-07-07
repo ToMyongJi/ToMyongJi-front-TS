@@ -2,12 +2,13 @@ import { maintenanceCopy } from '@constants/maintenance';
 import RootLayout from '@layouts/root-layout';
 import AdminPage from '@pages/admin/admin-page';
 import { Management } from '@pages/admin/management';
-import SystemCheck from "@pages/admin/system-check";
+import SystemCheck from '@pages/admin/system-check';
 import FindAccount from '@pages/auth/find-account';
 import Login from '@pages/auth/login';
 import Register from '@pages/auth/register';
 import ResetPassword from '@pages/auth/reset-password';
 import Maintenance from '@pages/common/maintenance';
+import AiCsvCreate from '@pages/create/ai-csv-create';
 import CsvCreate from '@pages/create/csv-create';
 import ReceiptCreate from '@pages/create/receipt-create';
 import TossbankCreate from '@pages/create/tossbank-create';
@@ -49,6 +50,7 @@ export const router = createBrowserRouter([
         element: <ProtectedRouter />,
         children: [
           { path: 'csv-create', element: <CsvCreate /> },
+          { path: 'ai-csv-create', element: <AiCsvCreate /> },
           { path: 'receipt-create', element: <ReceiptCreate /> },
           { path: 'tossbank-create', element: <TossbankCreate /> },
           { path: 'mypage', element: <Mypage /> },
