@@ -39,13 +39,14 @@ export const excelApi = {
   upload: (body: UploadExcelRequest) => {
     const formData = new FormData();
     formData.append('file', body.file);
-    return http.postForm<Rsp<ExcelStatusResponseDto>>(ENDPOINTS.excel.upload, formData);
+    // Content-Type을 직접 지정하지 않고 axios가 boundary 포함 multipart 헤더를 자동 생성하도록 둔다.
+    return http.post<Rsp<ExcelStatusResponseDto>, FormData>(ENDPOINTS.excel.upload, formData);
   },
 
   analyze: (body: AnalyzeExcelRequest) => {
     const formData = new FormData();
     formData.append('file', body.file);
-    return http.postForm<Rsp<ExcelStatusResponseDto>>(ENDPOINTS.excel.analyze, formData);
+    return http.post<Rsp<ExcelStatusResponseDto>, FormData>(ENDPOINTS.excel.analyze, formData);
   },
 
   confirm: (body: ConfirmExcelRequest) =>
