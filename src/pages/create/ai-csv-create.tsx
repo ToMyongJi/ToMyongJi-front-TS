@@ -1,3 +1,4 @@
+import { excelMutations } from '@apis/excel/excel-mutations';
 import CancelIcon from '@assets/icons/cancel.svg?react';
 import CheckIcon from '@assets/icons/check.svg?react';
 import ErrorCircleIcon from '@assets/icons/error-circle.svg?react';
@@ -7,18 +8,11 @@ import Button from '@components/common/button';
 import Spinner from '@components/common/spinner';
 import TableHeader from '@components/table/table-header';
 import { useModal } from '@hooks/use-modal';
+import useUserStore from '@store/user-store';
+import { useMutation } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-type Step = 'upload' | 'loading' | 'preview' | 'error';
-
-type ParsedReceipt = {
-  date: string;
-  content: string;
-  deposit: number;
-  withdrawal: number;
-  isValid: boolean;
-};
+import { useExcelPreview } from './use-excel-preview';
 
 const HEADER_DATA = [
   { labels: '날짜', width: '20%' },
@@ -27,77 +21,67 @@ const HEADER_DATA = [
   { labels: '출금', width: '20%' },
 ];
 
-// TODO: API 연동 시 목데이터/타이머 제거하고 실제 파싱 결과로 대체
-const MOCK_PARSED_ROWS: ParsedReceipt[] = [
-  { date: '2026-03-02', content: '학생회비 입금', deposit: 50000, withdrawal: 0, isValid: true },
-  { date: '2026-03-05', content: '간식 구매', deposit: 0, withdrawal: 12000, isValid: true },
-  {
-    date: '03-08',
-    content: '엠티 물품 구매가 너무 많음',
-    deposit: 0,
-    withdrawal: 35000,
-    isValid: false,
-  },
-  { date: '2026-03-10', content: '회식비', deposit: 0, withdrawal: 80000, isValid: true },
-];
-
-// 파일명에 "fail"이 포함되면 실패 화면을, 그 외에는 성공 화면을 보여준다 (데모용)
-const mockParseExcel = (file: File): Promise<{ success: boolean; rows: ParsedReceipt[] }> =>
-  new Promise((resolve) => {
-    setTimeout(() => {
-      const isFailure = file.name.toLowerCase().includes('fail');
-      resolve({ success: !isFailure, rows: MOCK_PARSED_ROWS });
-    }, 1200);
-  });
-
 const AiCsvCreate = () => {
   const navigate = useNavigate();
   const { alert } = useModal();
+  const { user } = useUserStore();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
-  const [step, setStep] = useState<Step>('upload');
-  const [parsedRows, setParsedRows] = useState<ParsedReceipt[]>([]);
-  const [isSaving, setIsSaving] = useState(false);
+
+  const { status, preview, fileName, previewedFile, startPreview, startAnalyze, resetPreview } =
+    useExcelPreview();
+  const confirmMutation = useMutation(excelMutations.confirm());
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFile(e.target.files?.[0] ?? null);
   };
 
-  const resetToUpload = () => {
-    setParsedRows([]);
-    setStep('upload');
-  };
-
-  const handleUpload = async () => {
+  const handleUpload = () => {
     if (!file) {
       return;
     }
+    startPreview(file);
+  };
 
-    setStep('loading');
-    const result = await mockParseExcel(file);
-
-    if (result.success) {
-      setParsedRows(result.rows);
-      setStep('preview');
-    } else {
-      setStep('error');
+  // 미리보기/실패 화면에서 같은 파일로 다시 시도한다.
+  // upload 폴백을 거치지 않고 무조건 analyze(AI 분석)로 새로 정리한다.
+  const handleReanalyze = () => {
+    const target = previewedFile ?? file;
+    resetPreview();
+    if (target) {
+      startAnalyze(target);
     }
   };
 
   const handleSave = () => {
-    setIsSaving(true);
-    setTimeout(() => {
-      setIsSaving(false);
-      void alert({
-        title: '성공',
-        description: '성공적으로 업로드 완료했습니다.',
-      });
-      navigate('/receipt-create');
-    }, 600);
+    if (!preview?.requestId || user?.studentClubId == null) {
+      return;
+    }
+
+    // 저장하기: 미리보기 응답의 requestId 로 확정(S3·DB 저장)한다.
+    confirmMutation.mutate(
+      { requestId: preview.requestId, studentClubId: user.studentClubId },
+      {
+        onSuccess: () => {
+          resetPreview();
+          void alert({
+            title: '성공',
+            description: '성공적으로 업로드 완료했습니다.',
+          });
+          navigate('/receipt-create');
+        },
+        onError: (e: unknown) => {
+          void alert({
+            title: '저장',
+            description: e instanceof Error ? e.message : '저장에 실패했습니다.',
+          });
+        },
+      },
+    );
   };
 
-  if (step === 'loading') {
+  if (status === 'pending') {
     return (
       <div className="flex w-full flex-col-center gap-[7.2rem] pt-[4.2rem]">
         <div className="flex-col-center gap-[3rem] pt-[6rem]">
@@ -112,14 +96,14 @@ const AiCsvCreate = () => {
           </div>
           <div className="flex items-center gap-[0.5rem]">
             <FileIcon className="h-[1.7rem] w-[1.7rem] text-gray-70" />
-            <p className="W_M15 text-black">{file?.name}</p>
+            <p className="W_M15 text-black">{fileName}</p>
           </div>
         </div>
       </div>
     );
   }
 
-  if (step === 'error') {
+  if (status === 'error') {
     return (
       <div className="flex w-full flex-col-center gap-[7.2rem] pt-[4.2rem]">
         <div className="flex-col-center gap-[3rem] pt-[6rem]">
@@ -132,7 +116,7 @@ const AiCsvCreate = () => {
           </div>
           <div className="flex items-center gap-[0.5rem]">
             <FileIcon className="h-[1.7rem] w-[1.7rem] text-gray-70" />
-            <p className="W_M15 text-black">{file?.name}</p>
+            <p className="W_M15 text-black">{fileName}</p>
           </div>
         </div>
         <div className="flex justify-end gap-[0.8rem]">
@@ -140,11 +124,16 @@ const AiCsvCreate = () => {
             variant="gray_outline"
             className="W_M15 px-[4rem] text-gray-90"
             size="md"
-            onClick={resetToUpload}
+            onClick={resetPreview}
           >
             이전으로
           </Button>
-          <Button variant="primary" className="W_M15 px-[3.4rem]" size="md" onClick={resetToUpload}>
+          <Button
+            variant="primary"
+            className="W_M15 px-[3.4rem]"
+            size="md"
+            onClick={handleReanalyze}
+          >
             다시 정리
           </Button>
         </div>
@@ -152,7 +141,7 @@ const AiCsvCreate = () => {
     );
   }
 
-  if (step === 'preview') {
+  if (status === 'success' && preview) {
     return (
       <div className="flex w-full flex-col px-[3rem] pt-[4.2rem] pb-[10rem]">
         <div className="mx-auto w-full max-w-[100rem] flex-col gap-[1.8rem]">
@@ -160,15 +149,17 @@ const AiCsvCreate = () => {
             <CheckIcon className="h-[2.4rem] w-[2.4rem]" />
             <p className="W_Title text-black">Excel 데이터 정리 미리보기</p>
           </div>
-          <p className="W_B17 text-gray-80">미리보기-상위 5건</p>
+          <p className="W_B17 text-gray-80">미리보기 - 상위 {preview.previewData.length}건</p>
           <BasicCard className="flex-col gap-[1rem] px-[2.7rem] py-[1.6rem]">
             <table className="w-full table-fixed">
               <TableHeader headerData={HEADER_DATA} />
               <tbody>
-                {parsedRows.map((row, index) => (
+                {preview.previewData.map((row, index) => (
                   <tr
                     key={`${row.date}-${index}`}
-                    className={index !== parsedRows.length - 1 ? 'border-gray-20 border-b' : ''}
+                    className={
+                      index !== preview.previewData.length - 1 ? 'border-gray-20 border-b' : ''
+                    }
                   >
                     <td className="W_M15 px-[0.3rem] py-[1rem] text-center text-gray-90">
                       {row.date}
@@ -189,21 +180,26 @@ const AiCsvCreate = () => {
           </BasicCard>
           <div className="flex items-center gap-[0.5rem]">
             <FileIcon className="h-[1.7rem] w-[1.7rem] text-gray-70" />
-            <p className="W_M15 text-black">{file?.name}</p>
+            <p className="W_M15 text-black">{fileName}</p>
           </div>
 
           <div className="mt-[5.4rem] flex justify-end gap-[0.8rem]">
-            <Button variant="gray_outline" className="w-[11rem]" size="md" onClick={handleUpload}>
+            <Button
+              variant="gray_outline"
+              className="w-[11rem]"
+              size="md"
+              onClick={handleReanalyze}
+            >
               다시 정리
             </Button>
             <Button
               variant="primary"
               size="md"
               className="w-[11rem]"
-              disabled={isSaving}
+              disabled={confirmMutation.isPending}
               onClick={handleSave}
             >
-              {isSaving ? '저장 중' : '저장하기'}
+              {confirmMutation.isPending ? '저장 중' : '저장하기'}
             </Button>
           </div>
         </div>
@@ -229,9 +225,6 @@ const AiCsvCreate = () => {
           <BasicCard className="flex-col gap-[1rem] py-[2rem]">
             <p className="W_M15 text-center text-gray-70">
               엑셀 파일(.xlsx, .xls)만 첨부 가능합니다.
-            </p>
-            <p className="W_R12 text-center text-gray-40">
-              (데모) 파일명에 "fail"을 포함하면 실패 화면을 확인할 수 있습니다.
             </p>
             <div>
               <input

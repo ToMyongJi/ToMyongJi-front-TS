@@ -48,6 +48,12 @@ export const ENDPOINTS = {
     upload: (userId: number) => `/api/ocr/upload/${userId}`,
   },
 
+  excel: {
+    upload: '/api/excel/upload',
+    analyze: '/api/excel/analyze',
+    confirm: '/api/excel/confirm',
+  },
+
   my: {
     add: '/api/my/members',
     view: (id: number) => `/api/my/${id}`,

@@ -64,21 +64,29 @@ export const receiptApi = {
     clubId?: number,
     params?: { page?: number; size?: number; year?: number; month?: number },
   ) => http.get<Rsp<PaginationList<Receipt>>>(ENDPOINTS.receipt.paging(clubId), { params }),
+
   club: (id?: number) => http.get<Rsp<ClubReceipt>>(ENDPOINTS.receipt.club(id)),
+
   create: (body: CreateReceiptRequest) =>
     http.post<Rsp<Receipt>, CreateReceiptRequest>(ENDPOINTS.receipt.root, body),
+
   update: (body: UpdateReceiptRequest) =>
     http.put<Rsp<Receipt>, UpdateReceiptRequest>(ENDPOINTS.receipt.root, body),
+
   delete: (receiptId: number) => http.delete<Rsp<null>>(ENDPOINTS.receipt.specific(receiptId)),
+
   search: (keyword: string) =>
     http.get<Rsp<Receipt[]>>(ENDPOINTS.receipt.keyword, { params: { keyword } }),
+
   uploadCsv: (body: UploadCsvRequest) => {
     const formData = new FormData();
     formData.append('file', body.file);
     return http.post<Rsp<null>>(ENDPOINTS.csv.upload(body.userIndexId), formData);
   },
+
   exportCsv: (body: ExportCsvRequest) =>
     http.post<Blob, ExportCsvRequest>(ENDPOINTS.csv.export, body, { responseType: 'blob' }),
+
   upLoadToss: (body: UploadTossBankRequest) => {
     const formData = new FormData();
     formData.append('file', body.file);
