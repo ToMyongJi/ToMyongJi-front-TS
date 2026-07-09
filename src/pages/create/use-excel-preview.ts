@@ -22,6 +22,7 @@ type PreviewSnapshot = {
 export const useExcelPreview = () => {
   const queryClient = useQueryClient();
   const { mutate } = useMutation(excelMutations.preview());
+  const { mutate: mutateAnalyze } = useMutation(excelMutations.reanalyze());
 
   const snapshots = useMutationState<PreviewSnapshot>({
     filters: { mutationKey: EXCEL_PREVIEW_KEY },
@@ -38,6 +39,11 @@ export const useExcelPreview = () => {
     mutate(file);
   };
 
+  // 다시 정리: upload 폴백 없이 곧바로 analyze(AI 분석)로 요청한다.
+  const startAnalyze = (file: File) => {
+    mutateAnalyze(file);
+  };
+
   const resetPreview = () => {
     const cache = queryClient.getMutationCache();
     cache.findAll({ mutationKey: EXCEL_PREVIEW_KEY }).forEach((mutation) => {
@@ -51,6 +57,7 @@ export const useExcelPreview = () => {
     fileName: latest?.variables?.name,
     previewedFile: latest?.variables,
     startPreview,
+    startAnalyze,
     resetPreview,
   };
 };

@@ -29,7 +29,7 @@ const AiCsvCreate = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
 
-  const { status, preview, fileName, previewedFile, startPreview, resetPreview } =
+  const { status, preview, fileName, previewedFile, startPreview, startAnalyze, resetPreview } =
     useExcelPreview();
   const confirmMutation = useMutation(excelMutations.confirm());
 
@@ -45,11 +45,12 @@ const AiCsvCreate = () => {
   };
 
   // 미리보기/실패 화면에서 같은 파일로 다시 시도한다.
+  // upload 폴백을 거치지 않고 무조건 analyze(AI 분석)로 새로 정리한다.
   const handleReanalyze = () => {
     const target = previewedFile ?? file;
     resetPreview();
     if (target) {
-      startPreview(target);
+      startAnalyze(target);
     }
   };
 

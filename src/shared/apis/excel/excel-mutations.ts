@@ -39,4 +39,12 @@ export const excelMutations = {
         gcTime: 10 * 60 * 1000, // 완료 후 결과를 10분간 캐시에 보관
       },
     ),
+
+  // 다시 정리 버튼: 저장된 매핑(upload)을 건너뛰고 무조건 AI 분석(analyze)으로 새로 정리한다.
+  // preview 와 같은 mutationKey/gcTime 을 써서 진행/결과 상태 복원이 그대로 동작한다.
+  reanalyze: () =>
+    buildMutation((file: File) => excelApi.analyze({ file }), {
+      mutationKey: EXCEL_PREVIEW_KEY,
+      gcTime: 10 * 60 * 1000,
+    }),
 };
