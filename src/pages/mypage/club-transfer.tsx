@@ -34,12 +34,10 @@ export const ClubTransfer = () => {
 
   const mutateTransfer = useMutation({
     mutationFn: collegeApi.transferAndUser,
-    onSuccess: (data) => {
-      console.log(data);
+    onSuccess: () => {
       setStep((prev) => prev + 1);
     },
-    onError: (error) => {
-      console.log(error);
+    onError: () => {
       alert({
         title: '학생회 이전 실패',
         description: '학생회 이전에 실패했습니다.',
@@ -75,12 +73,10 @@ export const ClubTransfer = () => {
   const handleNext = () => {
     if (step === 1) {
       setStep((prev) => prev + 1);
-      console.log('members', clubMember);
     }
     if (step === 2) {
       setCheckedStudentNumbers(checkedMembers.map((member) => member.studentNum));
       setStep((prev) => prev + 1);
-      console.log('체크된 멤버 학번:', checkedStudentNumbers);
     }
     if (step === 3) {
       if (!user?.studentClubId) {
