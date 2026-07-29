@@ -15,7 +15,7 @@ import TossbankCreate from '@pages/create/tossbank-create';
 import MainPage from '@pages/main/main-page';
 import { ClubTransfer } from '@pages/mypage/club-transfer';
 import Mypage from '@pages/mypage/mypage';
-import ButtonTestPage from '@pages/test/button-test';
+// import ButtonTestPage from '@pages/test/button-test';
 import ReceiptsList from '@pages/view/receipts-list';
 import ProtectedRouter from '@routes/protected-router';
 import { createBrowserRouter } from 'react-router-dom';
@@ -29,7 +29,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <MainPage /> },
       { path: 'receipts-list/:clubid', element: <ReceiptsList /> },
-      { path: 'test/buttons', element: <ButtonTestPage /> },
+      // { path: 'test/buttons', element: <ButtonTestPage /> },
       {
         path: 'maintenance',
         element: <Maintenance maintenance={maintenanceCopy} />,
