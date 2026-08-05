@@ -29,9 +29,9 @@ storybook-static
 .env
 
 # AI agent context files (local only)
+.omc/
 AGENTS.md
 **/AGENTS.md
 .claude/
 .cursor/
 docs/worklog/
-docs/issue/
