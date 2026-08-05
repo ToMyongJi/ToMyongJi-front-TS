@@ -1,27 +1,36 @@
 import { maintenanceCopy } from '@constants/maintenance';
 import RootLayout from '@layouts/root-layout';
-import AdminPage from '@pages/admin/admin-page';
-import { Management } from '@pages/admin/management';
-import SystemCheck from '@pages/admin/system-check';
-import FindAccount from '@pages/auth/find-account';
-import Login from '@pages/auth/login';
-import Register from '@pages/auth/register';
-import ResetPassword from '@pages/auth/reset-password';
 import Maintenance from '@pages/common/maintenance';
-import AiCsvCreate from '@pages/create/ai-csv-create';
-import CsvCreate from '@pages/create/csv-create';
-import ReceiptCreate from '@pages/create/receipt-create';
-import TossbankCreate from '@pages/create/tossbank-create';
 import MainPage from '@pages/main/main-page';
-import { ClubTransfer } from '@pages/mypage/club-transfer';
-import Mypage from '@pages/mypage/mypage';
-// import ButtonTestPage from '@pages/test/button-test';
-import ReceiptsList from '@pages/view/receipts-list';
 import ProtectedRouter from '@routes/protected-router';
+// import ButtonTestPage from '@pages/test/button-test';
+import { lazy } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import AdminRouter from './admin-router';
 import PresidentRouter from './president-router';
 import PublicRouter from './public-router';
+
+// 라우트 기반 코드 스플리팅
+// MainPage는 첫 진입 페이지라 정적 유지(청크 워터폴로 LCP 악화 방지),
+// Maintenance는 root-layout이 이미 정적으로 물고 있어 lazy로 바꿔도 번들에서 빠지지 않는다.
+const ReceiptsList = lazy(() => import('@pages/view/receipts-list'));
+const Login = lazy(() => import('@pages/auth/login'));
+const Register = lazy(() => import('@pages/auth/register'));
+const FindAccount = lazy(() => import('@pages/auth/find-account'));
+const ResetPassword = lazy(() => import('@pages/auth/reset-password'));
+const CsvCreate = lazy(() => import('@pages/create/csv-create'));
+const AiCsvCreate = lazy(() => import('@pages/create/ai-csv-create'));
+const ReceiptCreate = lazy(() => import('@pages/create/receipt-create'));
+const TossbankCreate = lazy(() => import('@pages/create/tossbank-create'));
+const Mypage = lazy(() => import('@pages/mypage/mypage'));
+const AdminPage = lazy(() => import('@pages/admin/admin-page'));
+const SystemCheck = lazy(() => import('@pages/admin/system-check'));
+const Management = lazy(() =>
+  import('@pages/admin/management').then((m) => ({ default: m.Management })),
+);
+const ClubTransfer = lazy(() =>
+  import('@pages/mypage/club-transfer').then((m) => ({ default: m.ClubTransfer })),
+);
 
 export const router = createBrowserRouter([
   {
