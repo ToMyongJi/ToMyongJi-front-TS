@@ -1,6 +1,7 @@
 import { maintenanceCopy } from '@constants/maintenance';
 import RootLayout from '@layouts/root-layout';
 import Maintenance from '@pages/common/maintenance';
+import RouteError from '@pages/common/route-error';
 import MainPage from '@pages/main/main-page';
 import ProtectedRouter from '@routes/protected-router';
 // import ButtonTestPage from '@pages/test/button-test';
@@ -35,49 +36,59 @@ const ClubTransfer = lazy(() =>
 export const router = createBrowserRouter([
   {
     element: <RootLayout />,
+    // 매칭되는 라우트가 없거나(404) RootLayout 자체가 실패한 경우.
+    // 레이아웃을 그릴 수 없는 상황이라 안내 화면만 단독으로 표시된다.
+    errorElement: <RouteError />,
     children: [
-      { index: true, element: <MainPage /> },
-      { path: 'receipts-list/:clubid', element: <ReceiptsList /> },
-      // { path: 'test/buttons', element: <ButtonTestPage /> },
       {
-        path: 'maintenance',
-        element: <Maintenance maintenance={maintenanceCopy} />,
-      },
-      // 이미 로그인된 사용자의 접근을 막는 라우터 (로그인, 회원가입)
-      {
-        element: <PublicRouter />,
+        // 페이지에서 발생한 에러(lazy 청크 로드 실패 포함)를 여기서 잡는다.
+        // RootLayout 하위에 있으므로 헤더/사이드바/푸터는 유지된 채 <main> 안에만 표시된다.
+        errorElement: <RouteError />,
         children: [
-          { path: 'login', element: <Login /> },
-          { path: 'register', element: <Register /> },
-          { path: 'find-account', element: <FindAccount /> },
-          { path: 'password/reset', element: <ResetPassword /> },
-          { path: 'password/reset/:token', element: <ResetPassword /> },
-        ],
-      },
-      // 로그인된 사용자만 접근할 수 있는 라우터 (영수증 생성, 마이페이지)
-      {
-        element: <ProtectedRouter />,
-        children: [
-          { path: 'csv-create', element: <CsvCreate /> },
-          { path: 'ai-csv-create', element: <AiCsvCreate /> },
-          { path: 'receipt-create', element: <ReceiptCreate /> },
-          { path: 'tossbank-create', element: <TossbankCreate /> },
-          { path: 'mypage', element: <Mypage /> },
-        ],
-      },
-      // 학생회장만 접근할 수 있는 라우터
-      {
-        element: <PresidentRouter />,
-        children: [{ path: 'club-transfer', element: <ClubTransfer /> }],
-      },
-      // 관리자만 접근할 수 있는 라우터
-      {
-        element: <AdminRouter />,
-        children: [
-          { path: 'home-admin', element: <AdminPage /> },
-          { path: 'management', element: <Management /> },
-          { path: 'management/:clubId', element: <Management /> },
-          { path: 'system-check', element: <SystemCheck /> },
+          { index: true, element: <MainPage /> },
+          { path: 'receipts-list/:clubid', element: <ReceiptsList /> },
+          // { path: 'test/buttons', element: <ButtonTestPage /> },
+          {
+            path: 'maintenance',
+            element: <Maintenance maintenance={maintenanceCopy} />,
+          },
+          // 이미 로그인된 사용자의 접근을 막는 라우터 (로그인, 회원가입)
+          {
+            element: <PublicRouter />,
+            children: [
+              { path: 'login', element: <Login /> },
+              { path: 'register', element: <Register /> },
+              { path: 'find-account', element: <FindAccount /> },
+              { path: 'password/reset', element: <ResetPassword /> },
+              { path: 'password/reset/:token', element: <ResetPassword /> },
+            ],
+          },
+          // 로그인된 사용자만 접근할 수 있는 라우터 (영수증 생성, 마이페이지)
+          {
+            element: <ProtectedRouter />,
+            children: [
+              { path: 'csv-create', element: <CsvCreate /> },
+              { path: 'ai-csv-create', element: <AiCsvCreate /> },
+              { path: 'receipt-create', element: <ReceiptCreate /> },
+              { path: 'tossbank-create', element: <TossbankCreate /> },
+              { path: 'mypage', element: <Mypage /> },
+            ],
+          },
+          // 학생회장만 접근할 수 있는 라우터
+          {
+            element: <PresidentRouter />,
+            children: [{ path: 'club-transfer', element: <ClubTransfer /> }],
+          },
+          // 관리자만 접근할 수 있는 라우터
+          {
+            element: <AdminRouter />,
+            children: [
+              { path: 'home-admin', element: <AdminPage /> },
+              { path: 'management', element: <Management /> },
+              { path: 'management/:clubId', element: <Management /> },
+              { path: 'system-check', element: <SystemCheck /> },
+            ],
+          },
         ],
       },
     ],
