@@ -1,8 +1,9 @@
 # 투명지 프론트엔드 — 기술 부채 / 성능 최적화 조사
 
-> 최초 조사 2026-07-22 · 재검증 2026-07-29 · 재작성 2026-08-05 (기준 커밋 `21dc118`)
-> **상태: 조사 완료 / 구현 보류.** 남은 항목 **13건** (+ P3 별도 작업 6건).
+> 최초 조사 2026-07-22 · 재검증 2026-07-29 · 재작성 2026-08-05 · P0 해결 반영 2026-08-05 (기준 커밋 `ae467f3`)
+> **상태: 조사 완료 / P0 해결 완료, P1 이후 구현 보류.** 남은 항목 **12건** (+ P3 별도 작업 6건).
 > 해결된 항목은 본문에서 빼고 문서 끝 [해결 이력](#해결-이력)에 모았다.
+> **항목 번호는 해결분 제거 시 재부여된다** — 외부에서 참조할 때는 번호가 아니라 제목을 기준으로 할 것.
 
 ---
 
@@ -16,14 +17,12 @@
 1. **횡단 관심사의 부재** — 에러 처리, CI, 테스트가 통째로 비어 있다
 2. **누적된 설정 잔해** — 쓰지 않는 의존성, 락파일 2개 공존, 동작하지 않는 스크립트
 
-### 즉시 조치가 필요한 1건 (성능과 무관)
+### 즉시 조치 항목(P0)은 남아 있지 않다
 
-| # | 문제 | 위치 |
-|---|---|---|
-| 1 | 모듈 import 시점에 무조건 API 호출 | `student-club-store.ts:198` |
+**모듈 import 시점의 무조건 API 호출**, **평문 비밀번호·학번 콘솔 출력**,
+**테스트 전용 라우트 노출** 3건이 모두 처리됐다 → [해결 이력](#해결-이력)
 
-> 함께 조사됐던 **평문 비밀번호·학번 콘솔 출력**과 **테스트 전용 라우트 노출**은 해결됐다
-> → [해결 이력](#해결-이력)
+남은 것은 성능(P1)과 유지보수 기반(P2)이며, 서비스가 당장 깨지는 건은 없다.
 
 ### 조사로만 드러난 사실 (코드를 읽어서는 바로 알기 어려움)
 
@@ -51,30 +50,9 @@ Vite가 `Some chunks are larger than 500 kB` 경고를 낸다.
 
 ---
 
-## P0 — 즉시 조치
-
-### 1. 모듈 로드 시점의 무조건 API 호출 제거
-
-`src/shared/store/student-club-store.ts:198` — 파일 최하단, 스토어 정의 직후:
-```ts
-useStudentClubStore.getState().fetchClubs();
-```
-
-**import 되는 순간 네트워크 요청이 나간다.** 소비처인 `header-gnb.tsx`가 RootLayout에 항상
-마운트되므로 사실상 앱 시작 시 항상 실행된다 — 로그인 여부, 점검 모드, 페이지와 무관하다.
-React 생명주기 밖이라 취소·재시도·에러 바운더리가 전부 적용되지 않는다.
-
-**조치**: 최상위 호출 1줄 삭제. **소비처 수정은 불필요하다** —
-`header-gnb.tsx:16-20`과 `receipt-create.tsx:200-202`가 이미
-`if (authData && allClubsFlat.length === 0)`으로 가드하고 있다.
-최상위 호출과 effect가 겹쳐 발생하던 중복 요청도 함께 해소된다.
-근본 해결은 P2 항목 9 참조.
-
----
-
 ## P1 — 성능 (Lighthouse 직결)
 
-### 2. 라우트 기반 코드 스플리팅 — 효과가 가장 큰 항목
+### 1. 라우트 기반 코드 스플리팅 — 효과가 가장 큰 항목
 
 `routers.tsx`가 17개 페이지를 전부 정적 import하고, 프로젝트 전체에 `React.lazy` / 동적 `import()`가
 **0건**이다. 일반 사용자가 관리자 전용 페이지 코드까지 전부 내려받는다.
@@ -113,7 +91,7 @@ React 생명주기 밖이라 취소·재시도·에러 바운더리가 전부 �
 부수적으로 확인된 사실: `receipt-create`가 단독 **164.94 kB** 청크로 분리된다.
 이 페이지 하나가 전체의 상당 부분을 차지하고 있었다 — P3의 거대 컴포넌트 분해 대상과 일치한다.
 
-### 3. LCP 이미지 최적화
+### 2. LCP 이미지 최적화
 
 `src/pages/main/main-page.tsx:36` — `landing-1.png`(858×739, 148KB)가 메인 히어로에 렌더된다.
 `width` / `height` / `fetchPriority`가 모두 없다.
@@ -136,7 +114,7 @@ React 생명주기 밖이라 취소·재시도·에러 바운더리가 전부 �
   `receipts-list.tsx:81`, `tossbank-create.tsx:84`.
   `loading.tsx:6`은 Suspense fallback이므로 **제외**
 
-### 4. 폰트 self-host
+### 3. 폰트 self-host
 
 `src/shared/styles/font.css`가 SUIT 9종 + GMarketSans를 전부 jsdelivr CDN에서 로드하고,
 `index.html`에 preconnect/preload가 없다.
@@ -158,7 +136,7 @@ React 생명주기 밖이라 취소·재시도·에러 바운더리가 전부 �
 `public/` 배치 시 Vite가 `dist/`로 복사한다. `vite.config.ts:45`의 workbox `globPatterns`에
 `woff2`는 이미 포함돼 있으나 **`woff`는 없다** — GMarketSans SW 캐싱을 위해 `woff` 추가 필요.
 
-### 5. `staleTime` 설정으로 불필요한 refetch 제거
+### 4. `staleTime` 설정으로 불필요한 refetch 제거
 
 `src/shared/libs/query-client.ts`에 `refetchOnWindowFocus: false`와 `retry: 1`만 있다.
 **`staleTime` 미설정 = 기본값 0**이므로 모든 쿼리가 마운트 즉시 stale이 되어
@@ -178,7 +156,7 @@ collegeAndClubs: () =>
   }),
 ```
 
-### 6. 전 사용자 대상 10초 폴링 완화
+### 5. 전 사용자 대상 10초 폴링 완화
 
 `src/shared/layouts/root-layout.tsx:20`
 ```ts
@@ -207,7 +185,10 @@ refetchInterval: isMaintenance ? 10_000 : 60_000,
 
 ## P2 — 유지보수 기반 (재발 방지)
 
-### 7. 서버 상태 이중 관리 해소
+### 6. 서버 상태 이중 관리 해소
+
+> P0 해결 이후 **우선순위가 올라간 항목**이다. 최상위 호출이 사라지면서 이 스토어의 fetch는
+> 소비처 effect 2곳에만 의존하게 됐고, 아래의 중복 요청·중복 캐시 문제가 그대로 남아 있다.
 
 `src/shared/store/student-club-store.ts`(200줄)가 zustand 안에서 직접 API를 호출하며
 `isLoading`/`error`/캐시를 수동 구현한다(`fetchClubs:40`, `fetchClubMembers:86`,
@@ -217,6 +198,16 @@ refetchInterval: isMaintenance ? 10_000 : 60_000,
 서로 동기화되지 않는다. `store/AGENTS.md:26`("서버 fetch 결과를 store에 복제 저장하지 마세요")를
 정면으로 위반한다.
 
+**남은 구체적 증상**(P0 해결 후 재확인):
+- `/create` 진입 시 `header-gnb.tsx:16-20`과 `receipt-create.tsx:198-202`의 effect가 동시에
+  `allClubsFlat.length === 0`을 보고 **각각 요청**한다 (기존 3회 → 2회로 줄었을 뿐 중복은 남음)
+- `sidebar.tsx:27`이 RootLayout에서 조건 없이 `collegeQuery.collegeAndClubs()`를 호출하므로
+  **비로그인 상태에서도 같은 엔드포인트는 계속 호출**된다. 요청 총량을 실제로 줄이려면 이 항목이 필요하다
+- `fetchClubs` 실패 시 `allClubsFlat.length`가 그대로라 effect deps가 변하지 않아 **재시도가 없다**.
+  react-query로 옮기면 retry/에러 상태가 함께 해결된다
+- `getClubNameById`(`:63-66`)는 목록이 비면 `'Admin'`을 반환한다. 로딩 중 상태와 구분되지 않아
+  세션 중 로그인 직후 헤더에 `Admin`이 잠깐 노출될 수 있다 — 일원화 시 로딩 상태로 대체할 것
+
 유사 사례:
 - `user-store` vs `myQuery.getMyInfo` — `login.tsx:65-77`이 결과를 store에 복사·persist하는데
   마이페이지에서 정보를 수정해도 사본이 갱신되지 않아 재접속 시 stale 데이터가 보인다
@@ -224,7 +215,7 @@ refetchInterval: isMaintenance ? 10_000 : 60_000,
 
 **조치**: `student-club-store`의 서버 fetch를 `collegeQuery`로 일원화. 나머지 두 건도 순차 정리.
 
-### 8. 전역 에러 처리 3계층 도입
+### 7. 전역 에러 처리 3계층 도입
 
 세 계층이 모두 비어 있고, 그 공백을 20곳 이상의 복붙 `onError`와 `alert()`가 메우고 있다.
 
@@ -244,7 +235,7 @@ refetchInterval: isMaintenance ? 10_000 : 60_000,
 **조치 순서**: response 인터셉터(401) → `errorElement` + 404 라우트 →
 `MutationCache.onError` 도입 후 중복 정리.
 
-### 9. 인증 가드 정합성
+### 8. 인증 가드 정합성
 
 - **토큰 만료 미검사** — 가드 4종 모두 `!!authData?.accessToken`, 즉 **문자열 존재 여부만** 본다.
   `exp` 검증은 `auth-token-watcher`의 `setTimeout`에만 의존하는데, watcher는
@@ -261,7 +252,7 @@ refetchInterval: isMaintenance ? 10_000 : 60_000,
   `auth-token-watcher.tsx:7-15`(base64 padding 보정)가 별개 구현이고 **서로의 보정이 상대에 없다**
 - **토큰이 localStorage에 평문 저장** — `auth-store.ts:17,31` persist. XSS 노출면이므로 최소한 인지할 것
 
-### 10. lint 스크립트 수정 + CI 도입
+### 9. lint 스크립트 수정 + CI 도입
 
 `package.json`의 `"lint:fix": "biome check . --apply"` — `--apply`는 Biome 2.x에서 **제거된 플래그**라
 실행 시 즉시 에러가 난다(현재 2.2.4).
@@ -276,7 +267,7 @@ refetchInterval: isMaintenance ? 10_000 : 60_000,
 
 > 포맷팅 62건 일괄 수정은 diff가 매우 크므로 **로직 변경과 같은 커밋에 섞지 말 것.**
 
-### 11. 의존성 정리
+### 10. 의존성 정리
 
 - **`react-js-pagination`** — 유령 의존성(위 Executive Summary 참조).
   HIGH 취약점(+전이 CRITICAL `tar`)을 유발한다. 제거 시 AGENTS.md 2곳도 함께 수정
@@ -290,17 +281,19 @@ refetchInterval: isMaintenance ? 10_000 : 60_000,
 - `npm audit` 기준 **15건 취약점(critical 1, high 11)**. 대부분 `npm audit fix`로 해결되나
   프로덕션 영향이 있는 `axios` / `react-router-dom` / `vite`를 우선 처리
 
-### 12. 죽은 코드 제거
+### 11. 죽은 코드 제거
 
 - import 0건 파일 3개: `store/college-store.ts`(39줄, `useCollegeStore` 참조 0),
   `apis/auth/auth-queries.ts`, `apis/college/college-mutations.ts`
+- `store/student-club-store.ts:198` — P0 조치가 **삭제가 아니라 주석 처리**로 들어갔다(`796246b`).
+  주석으로 남은 `// useStudentClubStore.getState().fetchClubs();` 한 줄을 여기서 함께 제거할 것
 - `apis/base/instance.ts:23-31` — 죽은 인터셉터 주석.
   25행이 `const token = ;`로 **문법조차 깨진 초안**이고 바로 위 12행에 살아있는 구현이 있다
 - `layouts/sidebar.tsx:46-53` — 주석 처리된 메뉴 재클릭 로직
 - `pages/test/button-test.tsx` — 라우트에서 빠져 번들에는 안 들어가지만 파일은 남아 있다.
   삭제할지 유지할지 여기서 함께 판단할 것 ([해결 이력](#해결-이력) 참조)
 
-### 13. 문서-코드 불일치 수정
+### 12. 문서-코드 불일치 수정
 
 AGENTS.md가 현재 코드와 어긋난 곳이 다수다. **문서를 믿고 작업하면 틀린다.**
 
@@ -345,15 +338,14 @@ AGENTS.md가 현재 코드와 어긋난 곳이 다수다. **문서를 믿고 작
 
 ## 구현 시 권장 순서와 커밋 구성
 
-P0 + P1을 1차 작업으로, 나머지는 후속 PR로 분리하기를 권장한다.
-항목별로 나눠서 커밋한다 (보안 / 스플리팅 / 이미지 / 폰트 …).
+P0는 완료됐다(`796246b`). P1을 1차 작업으로, 나머지는 후속 PR로 분리하기를 권장한다.
+항목별로 나눠서 커밋한다 (스플리팅 / 이미지 / 폰트 …).
 
-1. `fix: 모듈 로드 시점 무조건 API 호출 제거`
-2. `perf: 라우트 기반 코드 스플리팅 적용`
-3. `perf: LCP 이미지 최적화 및 lazy loading 적용`
-4. `perf: 폰트 self-host 전환 및 미사용 weight 제거`
-5. `perf: react-query staleTime 설정`
-6. `perf: 점검 상태 폴링 주기 완화`
+1. `perf: 라우트 기반 코드 스플리팅 적용`
+2. `perf: LCP 이미지 최적화 및 lazy loading 적용`
+3. `perf: 폰트 self-host 전환 및 미사용 weight 제거`
+4. `perf: react-query staleTime 설정`
+5. `perf: 점검 상태 폴링 주기 완화`
 
 ---
 
@@ -375,7 +367,6 @@ npx lighthouse http://localhost:4173 --only-categories=performance --view
 
 | 항목 | 확인 방법 |
 |---|---|
-| 최상위 호출 제거 | 로그인하지 않고 메인 진입 시 Network에 `/api/collegesAndClubs`가 **뜨지 않는지**. 로그인 후에는 1회 요청되는지 |
 | 스플리팅 | `ls -la dist/assets/*.js` — 단일 883KB에서 다수 청크로 분할됐는지. DevTools Network에서 일반 사용자가 admin 청크를 받지 않는지 |
 | 이미지 | `ls -la dist/assets/landing-1*` 크기 비교 |
 | 폰트 | `grep -c jsdelivr dist/assets/*.css`가 **0**인지, Network 요청이 same-origin `/fonts/...`인지. SUIT weight가 5개만 요청되는지. `.L_Title` 렌더가 깨지지 않는지 |
@@ -389,6 +380,34 @@ DevTools Performance 패널에서 재측정할 것.
 
 ## 해결 이력
 
+### 모듈 로드 시점의 무조건 API 호출 — `796246b` (PR #72, 2026-08-05)
+
+`src/shared/store/student-club-store.ts:198`, 스토어 정의 직후의 최상위 호출:
+```ts
+useStudentClubStore.getState().fetchClubs();
+```
+import 되는 순간 네트워크 요청이 나갔고, 소비처 `header-gnb.tsx`가 RootLayout에 항상 마운트되므로
+로그인 여부·점검 모드·페이지와 무관하게 앱 시작 시 항상 실행됐다.
+React 생명주기 밖이라 취소·재시도·에러 바운더리가 전부 적용되지 않았다.
+
+**조치**: 해당 1줄 비활성화. 예고대로 **소비처 수정은 불필요했다** —
+`header-gnb.tsx:16-20`과 `receipt-create.tsx:198-202`가 이미
+`if (authData && allClubsFlat.length === 0)`으로 가드하고 있다.
+
+**삭제 전 영향 검증**(2026-08-05):
+- 스토어 소비처는 위 2곳뿐이고, `clubs` / `currentClub` / `setCurrentClub` / `fetchClubMembers` /
+  `verifyClubMembership` / `addMember` / `deleteMember`는 **스토어 밖 호출이 0건**이라
+  "앱 시작 시 미리 채워져 있어야" 동작하는 코드가 없다. `persist`도 없어 새로고침 시 어차피 초기화된다
+- 두 소비처 모두 셀렉터 없이 `useStudentClubStore()`를 쓰므로 fetch 완료 시 리렌더되고,
+  zustand 액션 참조는 고정이라 effect 무한 루프도 없다. `tsc -b` 통과
+- 중복 요청은 `/create` 기준 3회 → 2회로 줄었다. 나머지 중복과
+  비로그인 요청(`sidebar.tsx:27`의 무조건 `collegeQuery` 호출)은 **P2 항목 6**에서 해소한다
+
+> **잔여 작업 2건**
+> 1. 삭제가 아니라 **주석 처리**로 들어갔다 — 죽은 코드 한 줄이 남아 있다 (P2 항목 11)
+> 2. 세션 중 로그인 시 목록이 아직 없어 헤더에 `getClubNameById`의 폴백 `'Admin'`이
+>    잠깐 노출될 수 있다 (P2 항목 6에서 로딩 상태로 대체)
+
 ### 평문 비밀번호·학번 콘솔 출력 — `d357324` (2026-07-29)
 
 `register.tsx`의 `console.log('회원가입 데이터:', data)`가 `RegisterFormValues` 전체를 찍어
@@ -399,11 +418,11 @@ DevTools Performance 패널에서 재측정할 것.
 라우팅에서 빠진 `button-test.tsx`라 **민감정보 노출은 없다.**
 
 > **재발 방지는 미조치** — `biome.json`에 `suspicious.noConsole`(`allow: ["error"]`) 룰이 없어
-> 린트가 같은 실수를 잡지 못한다. `button-test.tsx`가 걸리므로 P2 항목 12 이후 도입이 깔끔하고,
-> P2 항목 8의 전역 에러 처리가 들어오면 개별 `console.error`도 대체된다.
+> 린트가 같은 실수를 잡지 못한다. `button-test.tsx`가 걸리므로 P2 항목 11(죽은 코드 제거) 이후
+> 도입이 깔끔하고, P2 항목 7의 전역 에러 처리가 들어오면 개별 `console.error`도 대체된다.
 
 ### 테스트 전용 라우트 노출 — `b765caf` (2026-07-29)
 
 `routers.tsx`의 `ButtonTestPage` import와 `test/buttons` 라우트를 주석 처리해
 인증 가드 밖에 노출되던 테스트 페이지를 없앴다. `/test/buttons` 접근 시 더 이상 렌더되지 않는다.
-페이지 파일 자체는 남아 있으므로 삭제 여부는 P2 항목 12에서 함께 판단할 것.
+페이지 파일 자체는 남아 있으므로 삭제 여부는 P2 항목 11(죽은 코드 제거)에서 함께 판단할 것.
