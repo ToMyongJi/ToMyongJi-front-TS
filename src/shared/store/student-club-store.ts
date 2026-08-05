@@ -195,6 +195,6 @@ const useStudentClubStore = create<StudentClubState>((set, get) => ({
   },
 }));
 
-useStudentClubStore.getState().fetchClubs();
+// useStudentClubStore.getState().fetchClubs();
 
 export default useStudentClubStore;
