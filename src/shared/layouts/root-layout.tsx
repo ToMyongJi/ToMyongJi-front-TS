@@ -2,6 +2,7 @@ import Footer from '@layouts/footer';
 import HeaderGnb from '@layouts/header-gnb';
 import Sidebar from '@layouts/sidebar';
 import { cn } from '@libs/cn';
+import Loading from '@pages/common/loading';
 import Maintenance from '@pages/common/maintenance';
 import { AuthTokenWatcher } from '@routes/auth-token-watcher';
 import { useLayoutStore } from '@store/layout-store';
@@ -9,7 +10,7 @@ import useMaintenanceStore from '@store/maintenance-store';
 import useUserStore from '@store/user-store';
 import { adminQueries } from '@apis/admin/admin-queries';
 import { useQuery } from '@tanstack/react-query';
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import HeaderLnb from './header-lnb';
 
@@ -67,7 +68,13 @@ const RootLayout = () => {
             aria-label="사이드바 닫기"
             aria-hidden={!isSidebarOpen}
           />
-          {isMaintenanceActive && !isLoginPage && !isAdmin ? <Maintenance maintenance={maintenanceProps} /> : <Outlet />}
+          {isMaintenanceActive && !isLoginPage && !isAdmin ? (
+            <Maintenance maintenance={maintenanceProps} />
+          ) : (
+            <Suspense fallback={<Loading />}>
+              <Outlet />
+            </Suspense>
+          )}
         </main>
       </div>
       <Footer />

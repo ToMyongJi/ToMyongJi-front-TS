@@ -205,7 +205,6 @@ const Register = () => {
   };
 
   const onSubmit = (data: RegisterFormValues) => {
-    console.log('회원가입 데이터:', data);
     signupMutation.mutate(data, {
       onSuccess: () => {
         alert({
