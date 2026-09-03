@@ -4,7 +4,7 @@ import { Button } from '@components/common/button';
 import { cn } from '@libs/cn';
 import type { ButtonHTMLAttributes, Ref } from 'react';
 
-type ReceiptType = 'toss' | 'excel';
+type ReceiptType = 'toss' | 'excel' | 'aiExcel';
 
 interface ReceiptButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   receiptType: ReceiptType;
@@ -19,6 +19,7 @@ export function ReceiptButton({
   ref,
   ...props
 }: ReceiptButtonProps) {
+
   const config = {
     toss: {
       text: '거래내역서 추가',
@@ -28,6 +29,10 @@ export function ReceiptButton({
       text: 'Excel 데이터 추가',
       icon: <ExcelIcon width={17} height={16} />,
     },
+    aiExcel: {
+      text: 'AI Excel 데이터 추가',
+       icon: <ExcelIcon width={17} height={16} />,
+    }
   };
 
   const currentConfig = config[receiptType];
